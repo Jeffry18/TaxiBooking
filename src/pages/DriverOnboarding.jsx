@@ -135,10 +135,10 @@ export default function DriverOnboardingAndList() {
   };
 
   return (
-    <Container className="mt-4">
+    <Container className="mt-4 ">
       {/* Onboarding Form */}
-      <Card className="p-4 shadow mb-5">
-        <h3>Onboard Driver</h3>
+      <Card className="p-4 shadow mb-5 ">
+        <h3 className="text-center fw-bold" style={{fontSize:"40px"}}>Onboard Driver</h3>
 
         {message.text && (
           <Alert
@@ -227,21 +227,22 @@ export default function DriverOnboardingAndList() {
             )}
           </Form.Group>
 
-          <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? "Adding Driver..." : "Add Driver"}
-          </Button>
+          <div className="text-center">
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? "Adding Driver..." : "Add Driver"}
+            </Button>
+          </div>
         </Form>
       </Card>
 
       {/* Approved Drivers List */}
-      <h3 className="mb-4">Approved Drivers ({drivers.length})</h3>
-      <p className="text-muted mb-4">Only drivers approved by admin are displayed here</p>
+      <h3 className="mb-4 text-center" style={{fontSize:"38px"}}>Approved Drivers ({drivers.length})</h3>
       {listLoading ? (
         <div className="text-center">
           <Spinner animation="border" />
         </div>
       ) : (
-        <Row>
+        <Row className="justify-content-center">
           {drivers.map((driver) => (
                          <Col md={4} key={driver._id} className="mb-4">
                <Card className="shadow h-100">
@@ -286,7 +287,10 @@ export default function DriverOnboardingAndList() {
             </Col>
           ))}
         </Row>
+        
       )}
+            <p className="text-muted mb-4">Only drivers approved by admin are displayed here</p>
+
     </Container>
   );
 }

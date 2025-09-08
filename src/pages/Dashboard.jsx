@@ -608,13 +608,13 @@ export default function AdminPage() {
     <Container fluid className="p-0">
       <Row>
         {/* Sidebar */}
-        <Col md={2} className="bg-dark text-white vh-100 sticky-top p-3">
-          <h4 className="mb-4">Admin Dashboard</h4>
+        <Col md={2} className="bg-primary text-dark vh-100 sticky-top p-3">
+          <h4 className="mb-4 ms-3 fw-bold">Admin Dashboard</h4>
           <Nav className="flex-column">
             <Nav.Link
               onClick={() => setActiveTab("vehicles")}
               className={
-                activeTab === "vehicles" ? "active text-primary" : "text-white"
+                activeTab === "vehicles" ? "active text-primary" : "text-dark"
               }
             >
               Onboarded Vehicles
@@ -622,7 +622,7 @@ export default function AdminPage() {
             <Nav.Link
               onClick={() => setActiveTab("drivers")}
               className={
-                activeTab === "drivers" ? "active text-primary" : "text-white"
+                activeTab === "drivers" ? "active text-primary" : "text-dark"
               }
             >
               Onboarded Drivers
@@ -630,7 +630,7 @@ export default function AdminPage() {
             <Nav.Link
               onClick={() => setActiveTab("bookings")}
               className={
-                activeTab === "bookings" ? "active text-primary" : "text-white"
+                activeTab === "bookings" ? "active text-primary" : "text-dark"
               }
             >
               Booking Management
@@ -638,7 +638,7 @@ export default function AdminPage() {
             <Nav.Link
               onClick={() => setActiveTab("packages")}
               className={
-                activeTab === "packages" ? "active text-primary" : "text-white"
+                activeTab === "packages" ? "active text-primary" : "text-dark"
               }
             >
               Package Entry
@@ -646,7 +646,7 @@ export default function AdminPage() {
             <Nav.Link
               onClick={() => setActiveTab("trips")}
               className={
-                activeTab === "trips" ? "active text-primary" : "text-white"
+                activeTab === "trips" ? "active text-primary" : "text-dark"
               }
             >
               Package Bookings

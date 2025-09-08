@@ -124,7 +124,7 @@ export const Home = () => {
   const customStyles = {
   control: (provided, state) => ({
     ...provided,
-    backgroundColor: "#f1f1fbff", // input background
+    backgroundColor: "", // input background
     borderRadius: "7px",        // rounded corners
     borderColor: state.isFocused ? "#ffffffff" : "#ccc", // border color on focus
     boxShadow: state.isFocused  ? "inset 0 2px 4px rgba(0,0,0,0.1), 0 0 0 1px #007bff"
@@ -156,7 +156,7 @@ export const Home = () => {
   }),
   placeholder: (provided) => ({
     ...provided,
-    color: "#8b8b8bff",
+    color: "#ffffffff",
     marginLeft: "15px",
   }),
 };

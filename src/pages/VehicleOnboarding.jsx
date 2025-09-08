@@ -64,7 +64,7 @@ export default function VehicleOnboarding() {
   return (
     <Container className="mt-4">
       <Card className="p-4 shadow">
-        <h3>Onboard Vehicle</h3>
+        <h3 className="text-center" style={{fontSize:"40px"}}>Onboard Vehicle</h3>
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col>
@@ -118,9 +118,11 @@ export default function VehicleOnboarding() {
             </Col>
           </Row>
 
-          <Button type="submit" className="mt-3" variant="success">
-            Onboard Vehicle
-          </Button>
+          <div className="text-center">
+            <Button type="submit" className="mt-3" variant="success">
+              Onboard Vehicle
+            </Button>
+          </div>
         </Form>
       </Card>
     </Container>
