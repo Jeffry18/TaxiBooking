@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Form, Button, Container, Row, Col, Card, Alert } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
+import '../App.css'
+import Select from 'react-select';
 import defaultVehicleImage from '../assets/default-vehicle.jpg';
 
 export const Home = () => {
@@ -18,6 +20,7 @@ export const Home = () => {
     passengerCount: "",
   });
   const [message, setMessage] = useState("");
+  const [places, setPlaces] = useState([]);
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -38,6 +41,16 @@ export const Home = () => {
       }
     };
     fetchVehicles();
+
+    const fetchPlaces = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/places/kerala-places");
+        setPlaces(res.data); // store in state
+      } catch (err) {
+        console.error("Error loading places:", err);
+      }
+    };
+    fetchPlaces();
   }, []);
 
   const handleChange = (e) => {
@@ -62,10 +75,10 @@ export const Home = () => {
     try {
 
       const token = sessionStorage.getItem("token");
-    if (!token) {
-      setMessage("❌ You must be logged in to book a taxi");
-      return;
-    }
+      if (!token) {
+        setMessage("❌ You must be logged in to book a taxi");
+        return;
+      }
 
       if (!form.vehicle) {
         setMessage("❌ Please select a vehicle first");
@@ -108,32 +121,86 @@ export const Home = () => {
     }
   };
 
+  const customStyles = {
+  control: (provided, state) => ({
+    ...provided,
+    backgroundColor: "#f1f1fbff", // input background
+    borderRadius: "7px",        // rounded corners
+    borderColor: state.isFocused ? "#ffffffff" : "#ccc", // border color on focus
+    boxShadow: state.isFocused  ? "inset 0 2px 4px rgba(0,0,0,0.1), 0 0 0 1px #007bff"
+      : "inset 0 2px 4px rgba(147, 147, 147, 0.34)",
+    // "&:hover": {
+    //   borderColor: "#007bff",
+    // },
+    minHeight: "55px",
+  }),
+  menu: (provided) => ({
+    ...provided,
+    borderRadius: "12px",
+    backgroundColor: "#deebffff",
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected
+      ? "#c0deffff"
+      : state.isFocused
+      ? "#e6f0ff"
+      : "#fff",
+    color: state.isSelected ? "#fff" : "#000",
+    "&:hover": {
+      backgroundColor: "#cce0ff",
+      color: "#000",
+    },
+    borderRadius: "8px",
+    margin: "2px 5px",
+  }),
+  placeholder: (provided) => ({
+    ...provided,
+    color: "#8b8b8bff",
+    marginLeft: "15px",
+  }),
+};
+
   return (
     <div>
       <Container className="mt-4">
         {/* Booking Form */}
         <Row>
           <Col md={12} className="mb-4">
-            <Card className="p-4 shadow">
-              <h4>Book a Taxi</h4>
+            <Card className="p-3 shadow" style={{ height: "400px" }}>
+              <h4 className="text-center fw-bold" style={{ fontSize: "35px" }}>Book a Taxi</h4>
               <Form onSubmit={handleSubmit}>
-                <Row>
-                  <Col>
-                    <Form.Control
-                      placeholder="Pickup Location"
-                      name="pickup"
-                      value={form.pickup}
-                      onChange={handleChange}
-                      required
+                <Row className="justify-content-center">
+                  <Col md={6}>
+                    <Select
+                      options={places.map((p) => ({ value: p.name, label: p.name }))}
+                      value={
+                        form.pickup
+                          ? { value: form.pickup, label: form.pickup }
+                          : null
+                      }
+                      onChange={(selected) =>
+                        setForm({ ...form, pickup: selected.value })
+                      }
+                      placeholder="Select Pickup Location"
+                      isSearchable
+                      styles={customStyles}
                     />
                   </Col>
-                  <Col>
-                    <Form.Control
-                      placeholder="Drop Location"
-                      name="drop"
-                      value={form.drop}
-                      onChange={handleChange}
-                      required
+                  <Col md={6}>
+                    <Select
+                      options={places.map((p) => ({ value: p.name, label: p.name }))}
+                      value={
+                        form.drop
+                          ? { value: form.drop, label: form.drop }
+                          : null
+                      }
+                      onChange={(selected) =>
+                        setForm({ ...form, drop: selected.value })
+                      }
+                      placeholder="Select Drop Location"
+                      isSearchable
+                      styles={customStyles}
                     />
                   </Col>
                 </Row>
@@ -200,9 +267,11 @@ export const Home = () => {
                   </Col>
                 </Row>
 
-                <Button className="mt-3" variant="primary" type="submit">
-                  Book Now
-                </Button>
+                <div className="d-flex justify-content-center">
+                  <Button className="mt-3 fw-bold" variant="primary" type="submit" style={{ fontSize: "25px", padding: "10px 40px" }}>
+                    Book Now
+                  </Button>
+                </div>
               </Form>
             </Card>
           </Col>
@@ -236,15 +305,15 @@ export const Home = () => {
         )}
 
         {/* Vehicle Preview List */}
-        <h5 className="mb-3">Available Vehicles</h5>
-        <Row>
+        <h5 className="mb-4 mt-3 fw-bold text-center" style={{ fontSize: "50px" }}>Available Vehicles</h5>
+        <Row className="justify-content-center">
           {vehicles
             .filter((vehicle) => vehicle.status === "approved")
             .map((vehicle) => (
-              <Col md={4} key={vehicle._id} className="mb-3">
+              <Col md={4} key={vehicle._id} className="mb-3 d-flex justify-content-center">
                 <Card className="shadow">
-                  <Card.Img 
-                    variant="top" 
+                  <Card.Img
+                    variant="top"
                     src={vehicle.imageUrl ? `${SERVER_URL}/uploads/${vehicle.imageUrl}` : defaultVehicleImage}
                     alt={vehicle.model}
                     onError={(e) => {

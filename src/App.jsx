@@ -9,6 +9,7 @@ import Footer from './components/Footer.jsx'
 import Header from './components/Header.jsx'
 import Driver from './pages/DriverOnboarding.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import  AboutUs from './pages/AboutUs.jsx'
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
         <Route path='/driver-onboarding' element={<Driver/>}/>
         <Route path='/login' element={<Auth/>}/>
         <Route path='/register' element={<Auth insideRegister={true}/>}/>
+        <Route path='/aboutus' element={<AboutUs/>}/>
       </Routes>
       <Footer/>
     </>
