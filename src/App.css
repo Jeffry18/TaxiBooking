@@ -1,0 +1,80 @@
+/* ---------- FORM CONTAINER ---------- */
+.booking-form-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 40px 30px;
+  box-shadow: 0px 6px 20px rgba(0,0,0,0.08);
+  max-width: 1500px;
+  max-height: auto;
+  margin:  auto;
+}
+
+/* ---------- LABELS ---------- */
+.booking-label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #2b2f33;
+  margin-bottom: 6px;
+  text-align: left;
+}
+
+@media (max-width: 576px) {
+  .booking-label { text-align: center; }
+}
+
+/* ---------- INPUTS & SELECTS ---------- */
+.booking-input,
+.booking-select .rs__control {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid #d1d5db !important; /* light gray */
+  border-radius: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 30px !important;
+  height: 48px;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.booking-input:focus,
+.booking-select .rs__control--is-focused {
+  border-bottom-color: #2bb3ff !important;
+  box-shadow: 0px 4px 10px rgba(43, 179, 255, 0.2) !important;
+}
+
+/* react-select tweaks */
+.booking-select .rs__value-container { padding-left: 0 !important; }
+.booking-select .rs__single-value,
+.booking-select .rs__placeholder { margin-left: 0 !important; }
+.booking-select .rs__indicator-separator { display: none !important; }
+
+/* ---------- FIELD GROUPING ---------- */
+.booking-field {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+@media (max-width: 576px) {
+  .booking-field { max-width: 100%; }
+}
+
+/* ---------- BUTTON ---------- */
+.book-btn {
+  font-size: 22px;
+  padding: 12px 45px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #2bb3ff, #007bff);
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0px 6px 15px rgba(0, 123, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.book-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 10px 20px rgba(0, 123, 255, 0.4);
+}

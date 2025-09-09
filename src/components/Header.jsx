@@ -1,6 +1,7 @@
 import React from "react";
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 
 
@@ -14,7 +15,13 @@ export const Header = () => {
     <div>
       <Navbar bg="" variant="primary" expand="lg" className="mt-3 ms-1 me-1 flex-column shadow" style={{ minHeight: "120px" }}>
         <Container className="d-flex flex-column align-items-center ">
-          <Navbar.Brand as={Link} to="/" className="fw-bold  mb-2 mt-3 text-center" style={{fontFamily:"fantasy" , fontSize:"50px"}}><i className="fa-solid fa-taxi me-2"></i>TAXI BOOKING</Navbar.Brand>
+          <Navbar.Brand as={Link} to="/" className="fw-bold  mb-2 mt-3 text-center" style={{ fontFamily: "fantasy", fontSize: "50px" }}>
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ height: "100px", width: "300px" }}
+            />
+          </Navbar.Brand>
           <Nav className="d-flex justify-content-center flex-wrap fw-semibold gap-3 mt-3 mb-3">
             <Nav.Link as={Link} to="/">Home</Nav.Link>
             <Nav.Link as={Link} to="/packages">Trip Packages</Nav.Link>

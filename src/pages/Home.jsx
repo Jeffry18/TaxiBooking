@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Form, Button, Container, Row, Col, Card, Alert } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Card, Alert, Nav, } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
 import '../App.css'
 import Select from 'react-select';
 import defaultVehicleImage from '../assets/default-vehicle.jpg';
+
 
 export const Home = () => {
   const [vehicles, setVehicles] = useState([]);
@@ -15,12 +16,24 @@ export const Home = () => {
     pickup: "",
     drop: "",
     date: "",
+    returnDate: "",
     time: "",
     vehicleType: "",
     passengerCount: "",
+    tripType: "",
   });
   const [message, setMessage] = useState("");
   const [places, setPlaces] = useState([]);
+  const [tripType, setTripType] = useState("round");
+  const [selectedAirport, setSelectedAirport] = useState(null);
+  const [airportTripType, setAirportTripType] = useState("pickup");
+
+  const keralaAirports = [
+    { value: "COK", label: "Cochin International Airport (COK)" },
+    { value: "TRV", label: "Trivandrum International Airport (TRV)" },
+    { value: "CCJ", label: "Calicut International Airport (CCJ)" },
+    { value: "CNN", label: "Kannur International Airport (CNN)" },
+  ];
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -86,14 +99,18 @@ export const Home = () => {
       }
 
       const bookingData = {
-        vehicle: form.vehicle, // ✅ fixed field name
+        vehicle: form.vehicle,
         pickup: form.pickup,
         drop: form.drop,
         date: form.date,
+        returnDate: tripType === "round" ? form.returnDate : null,
         time: form.time,
         passengerCount: parseInt(form.passengerCount) || 1,
+        tripType,
+        airportTripType: tripType === "airport" ? airportTripType : null, // ✅
         status: "pending",
       };
+
 
       const selectedVehicle = vehicles.find((v) => v._id === form.vehicle);
       if (selectedVehicle && bookingData.passengerCount > selectedVehicle.capacity) {
@@ -110,9 +127,11 @@ export const Home = () => {
           pickup: "",
           drop: "",
           date: "",
+          returnDate: "",
           time: "",
           vehicleType: "",
           passengerCount: "",
+          tripType: "",
         });
       }
     } catch (err) {
@@ -121,92 +140,98 @@ export const Home = () => {
     }
   };
 
-  const customStyles = {
-  control: (provided, state) => ({
-    ...provided,
-    backgroundColor: "", // input background
-    borderRadius: "7px",        // rounded corners
-    borderColor: state.isFocused ? "#ffffffff" : "#ccc", // border color on focus
-    boxShadow: state.isFocused  ? "inset 0 2px 4px rgba(0,0,0,0.1), 0 0 0 1px #007bff"
-      : "inset 0 2px 4px rgba(147, 147, 147, 0.34)",
-    // "&:hover": {
-    //   borderColor: "#007bff",
-    // },
-    minHeight: "55px",
-  }),
-  menu: (provided) => ({
-    ...provided,
-    borderRadius: "12px",
-    backgroundColor: "#deebffff",
-  }),
-  option: (provided, state) => ({
-    ...provided,
-    backgroundColor: state.isSelected
-      ? "#c0deffff"
-      : state.isFocused
-      ? "#e6f0ff"
-      : "#fff",
-    color: state.isSelected ? "#fff" : "#000",
-    "&:hover": {
-      backgroundColor: "#cce0ff",
-      color: "#000",
-    },
-    borderRadius: "8px",
-    margin: "2px 5px",
-  }),
-  placeholder: (provided) => ({
-    ...provided,
-    color: "#ffffffff",
-    marginLeft: "15px",
-  }),
-};
+
 
   return (
     <div>
       <Container className="mt-4">
+        <h4 className="text-center fw-bold" style={{ fontSize: "35px" }}>Book Your Taxi</h4>
+
         {/* Booking Form */}
         <Row>
-          <Col md={12} className="mb-4">
-            <Card className="p-3 shadow" style={{ height: "400px" }}>
-              <h4 className="text-center fw-bold" style={{ fontSize: "35px" }}>Book a Taxi</h4>
+          <Col md={12} className="mb-4 ">
+            <Card className="booking-form-card p-3 shadow d-flex justify-content-center" style={{ height: "500px", width: "100%" }}>
+              <div
+                className="  rounded  justify-content-center align-items-center text-center "
+                style={{ maxWidth: "1350px", margin: "auto" }}
+              >
+                <Nav variant="" activeKey={tripType} className="justify-content-center align-items-center text-center mb-2 " style={{ width: "500px" }}>
+                  <Nav.Item>
+                    <Nav.Link eventKey="oneway" onClick={() => setTripType("oneway")}>
+                      ONE WAY
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link eventKey="round" onClick={() => setTripType("round")}>
+                      ROUND TRIP
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link eventKey="local" onClick={() => setTripType("local")}>
+                      LOCAL
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link eventKey="airport" onClick={() => setTripType("airport")}>
+                      AIRPORT
+                    </Nav.Link>
+                  </Nav.Item>
+                </Nav>
+              </div>
+
+
               <Form onSubmit={handleSubmit}>
-                <Row className="justify-content-center">
-                  <Col md={6}>
+                {/* Trip Type (only for airport) */}
+                {tripType === "airport" && (
+                  <Row className="mb-4 justify-content-center">
+                    <Col md={6} className="booking-field">
+                      <Form.Label className="booking-label">Trip Type</Form.Label>
+                      <Form.Select
+                        className="booking-input"
+                        value={airportTripType}
+                        onChange={(e) => setAirportTripType(e.target.value)}
+                      >
+                        <option value="pickup">Pickup from Airport</option>
+                        <option value="drop">Drop to Airport</option>
+                      </Form.Select>
+                    </Col>
+                  </Row>
+                )}
+
+                {/* Pickup & Drop */}
+                <Row className="mb-4 justify-content-center">
+                  <Col md={5} className="booking-field">
+                    <Form.Label className="booking-label">From</Form.Label>
                     <Select
+                      classNamePrefix="rs"
+                      className="booking-select booking-field"
                       options={places.map((p) => ({ value: p.name, label: p.name }))}
-                      value={
-                        form.pickup
-                          ? { value: form.pickup, label: form.pickup }
-                          : null
-                      }
-                      onChange={(selected) =>
-                        setForm({ ...form, pickup: selected.value })
-                      }
+                      value={form.pickup ? { value: form.pickup, label: form.pickup } : null}
+                      onChange={(selected) => setForm({ ...form, pickup: selected.value })}
                       placeholder="Select Pickup Location"
                       isSearchable
-                      styles={customStyles}
                     />
                   </Col>
-                  <Col md={6}>
+                  <Col md={5} className="booking-field">
+                    <Form.Label className="booking-label">To</Form.Label>
                     <Select
+                      classNamePrefix="rs"
+                      className="booking-select booking-field"
                       options={places.map((p) => ({ value: p.name, label: p.name }))}
-                      value={
-                        form.drop
-                          ? { value: form.drop, label: form.drop }
-                          : null
-                      }
-                      onChange={(selected) =>
-                        setForm({ ...form, drop: selected.value })
-                      }
+                      value={form.drop ? { value: form.drop, label: form.drop } : null}
+                      onChange={(selected) => setForm({ ...form, drop: selected.value })}
                       placeholder="Select Drop Location"
                       isSearchable
-                      styles={customStyles}
                     />
                   </Col>
                 </Row>
-                <Row className="mt-2">
-                  <Col>
+
+                {/* Dates & Time */}
+                <Row className="mb-4 justify-content-center">
+                  <Col md={4} className="booking-field">
+                    <Form.Label className="booking-label">Pick Up Date</Form.Label>
                     <Form.Control
+                      className="booking-input"
                       type="date"
                       name="date"
                       value={form.date}
@@ -214,8 +239,24 @@ export const Home = () => {
                       required
                     />
                   </Col>
-                  <Col>
+
+                  {tripType === "round" && (
+                    <Col md={4} className="booking-field">
+                      <Form.Label className="booking-label">Return Date</Form.Label>
+                      <Form.Control
+                        className="booking-input"
+                        type="date"
+                        value={form.returnDate || ""}
+                        min={form.date || new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setForm({ ...form, returnDate: e.target.value })}
+                      />
+                    </Col>
+                  )}
+
+                  <Col md={4} className="booking-field">
+                    <Form.Label className="booking-label">Pick Up Time</Form.Label>
                     <Form.Control
+                      className="booking-input"
                       type="time"
                       name="time"
                       value={form.time}
@@ -225,10 +266,12 @@ export const Home = () => {
                   </Col>
                 </Row>
 
-                {/* Vehicle Dropdown */}
-                <Row className="mt-2">
-                  <Col>
+                {/* Vehicle & Passengers */}
+                <Row className="mb-4 justify-content-center">
+                  <Col md={6} className="booking-field">
+                    <Form.Label className="booking-label">Vehicle</Form.Label>
                     <Form.Select
+                      className="booking-input"
                       name="vehicle"
                       value={form.vehicle}
                       onChange={(e) => {
@@ -239,6 +282,7 @@ export const Home = () => {
                           ...prev,
                           vehicle: e.target.value,
                           vehicleType: selectedVehicle?.type || "",
+                          selectedVehicle,
                         }));
                       }}
                       required
@@ -253,8 +297,11 @@ export const Home = () => {
                         ))}
                     </Form.Select>
                   </Col>
-                  <Col>
+
+                  <Col md={6} className="booking-field">
+                    <Form.Label className="booking-label">Passengers</Form.Label>
                     <Form.Control
+                      className="booking-input"
                       placeholder="Passenger Count"
                       name="passengerCount"
                       value={form.passengerCount}
@@ -267,8 +314,9 @@ export const Home = () => {
                   </Col>
                 </Row>
 
+                {/* Submit Button */}
                 <div className="d-flex justify-content-center">
-                  <Button className="mt-3 fw-bold" variant="primary" type="submit" style={{ fontSize: "25px", padding: "10px 40px" }}>
+                  <Button type="submit" className="book-btn">
                     Book Now
                   </Button>
                 </div>
