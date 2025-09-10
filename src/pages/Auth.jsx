@@ -85,12 +85,12 @@ const Auth = ({ insideRegister }) => {
       <div className='p-5 mt-5' style={{ width: '100%', height: '100%' }}>
         <div className='card shadow ' style={{ border: 'none', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
           <div className='row align-items-center'>
-            <div className='col-lg-4 text-light fw-bolder'>
+            <div className='col-lg-4 text-dark fw-bolder'>
               <h2 className='ps-5 pb-3'>Let's Make It Better</h2>
               <h4 className='ps-5' style={{ fontSize: '1500' }}>Push harder than yesterday if you want a different tomorrow.</h4>
               <p className='ps-5'>Take care of your body. It's the only place you have to live.</p>
             </div>
-            <div className='col-lg-4 text-light fw-bolder'>
+            <div className='col-lg-4 text-dark fw-bolder'>
               <h1 className='mt-5'>Start Today</h1>
               <h4 className='mt-2'>Sign {insideRegister ? 'up' : 'in'} to your Account</h4>
               <Form>

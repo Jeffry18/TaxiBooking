@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Card, Button, Row, Col, Alert, Modal, Form } from "react-bootstrap";
+import { Container, Card, Button, Row, Col, Alert, Modal, Form, Table, Spinner } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
 
 export default function Packages() {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsError, setBookingsError] = useState(null);
+  const [myTrips, setMyTrips] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -46,6 +49,42 @@ export default function Packages() {
     };
 
     fetchPackages();
+  }, []);
+
+  useEffect(() => {
+    const fetchMyTrips = async () => {
+      try {
+        setBookingsLoading(true);
+        setBookingsError(null);
+        const res = await axios.get(`${SERVER_URL}/trips`);
+        const list = Array.isArray(res.data?.data)
+          ? res.data.data
+          : Array.isArray(res.data)
+          ? res.data
+          : [];
+
+        const email = sessionStorage.getItem('email');
+        const phone = sessionStorage.getItem('phone');
+
+        const filtered = email
+          ? list.filter(t => (t.email || '').toLowerCase() === email.toLowerCase())
+          : phone
+          ? list.filter(t => (t.phone || '') === phone)
+          : list;
+
+        // newest first
+        filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        setMyTrips(filtered);
+      } catch (err) {
+        console.error('Error fetching user trips:', err);
+        setBookingsError('Failed to load your package bookings.');
+        setMyTrips([]);
+      } finally {
+        setBookingsLoading(false);
+      }
+    };
+
+    fetchMyTrips();
   }, []);
 
   const handleBookNow = (pkg) => {
@@ -150,7 +189,7 @@ export default function Packages() {
                 <Card.Title>{pkg.name}</Card.Title>
                 <Card.Text>{pkg.description}</Card.Text>
                 <p><strong>Duration:</strong> {pkg.duration}</p>
-                <p><strong>Price:</strong> ₹{pkg.price}</p>
+                <p><strong>Price Per Person:</strong> ₹{pkg.price}</p>
                                  <Button 
                    variant="primary" 
                    onClick={() => handleBookNow(pkg)}
@@ -162,6 +201,50 @@ export default function Packages() {
           </Col>
                  ))}
        </Row>
+
+      {/* My Booked Packages */}
+      <div className="mt-4">
+        <h4 className="mb-3">My Package Bookings</h4>
+        {bookingsLoading && <Spinner animation="border" variant="primary" />}
+        {bookingsError && <Alert variant="danger">{bookingsError}</Alert>}
+        {!bookingsLoading && !bookingsError && myTrips.length === 0 && (
+          <Alert variant="info">You have not booked any packages yet.</Alert>
+        )}
+        {!bookingsLoading && !bookingsError && myTrips.length > 0 && (
+          <Table striped bordered hover responsive>
+            <thead className="table-dark">
+              <tr>
+                <th>Package</th>
+                <th>Travel Date</th>
+                <th>Time</th>
+                <th>Passengers</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+                <th>Price Per Person</th>
+              </tr>
+            </thead>
+            <tbody>
+              {myTrips.map(t => (
+                <tr key={t._id}>
+                  <td>{t.packageName || t.packageId?.name}</td>
+                  <td>{t.date ? new Date(t.date).toLocaleDateString() : '-'}</td>
+                  <td>{t.time}</td>
+                  <td>{t.passengers}</td>
+                  <td>{t.pickupLocation}</td>
+                  <td>{t.dropLocation}</td>
+                  <td>
+                    <span className={`badge ${t.status === 'confirmed' ? 'bg-success' : t.status === 'pending' ? 'bg-warning text-dark' : t.status === 'cancelled' ? 'bg-danger' : 'bg-secondary'}`}>
+                      {t.status}
+                    </span>
+                  </td>
+                  <td>₹{t.packagePrice || t.packageId?.price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
+      </div>
 
        {/* Booking Modal */}
        <Modal show={showModal} onHide={handleCloseModal} size="lg">

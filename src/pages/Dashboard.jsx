@@ -605,16 +605,16 @@ export default function AdminPage() {
   );
 
   return (
-    <Container fluid className="p-0">
+    <Container fluid className="p-0" style={{marginTop:"100px"}}>
       <Row>
         {/* Sidebar */}
-        <Col md={2} className="bg-primary text-dark vh-100 sticky-top p-3">
+        <Col md={2} className="bg-light text-dark vh-100 sticky-top p-3">
           <h4 className="mb-4 ms-3 fw-bold">Admin Dashboard</h4>
           <Nav className="flex-column">
             <Nav.Link
               onClick={() => setActiveTab("vehicles")}
               className={
-                activeTab === "vehicles" ? "active text-primary" : "text-dark"
+                activeTab === "vehicles" ? "active text-light" : "text-dark"
               }
             >
               Onboarded Vehicles
@@ -748,7 +748,7 @@ export default function AdminPage() {
                             <strong>Duration:</strong> {pkg.duration}
                           </p>
                           <p>
-                            <strong>Price:</strong> ₹{pkg.price}
+                            <strong>Price Per Person:</strong> ₹{pkg.price}
                           </p>
                           <div className="d-flex justify-content-end">
                             <Button
