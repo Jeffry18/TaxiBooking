@@ -1,8 +1,15 @@
 /* ---------- FORM CONTAINER ---------- */
+
+*{
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
 .booking-form-card {
   background: #ffffff;
   border-radius: 16px;
-  padding: 40px 30px;
+  padding: 0px 20px;
   box-shadow: 0px 6px 20px rgba(0,0,0,0.08);
   max-width: 1500px;
   max-height: auto;
@@ -28,21 +35,21 @@
 /* ---------- INPUTS & SELECTS ---------- */
 .booking-input,
 .booking-select .rs__control {
-  background: transparent !important;
-  border: none !important;
-  border-bottom: 2px solid #d1d5db !important; /* light gray */
-  border-radius: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 30px !important;
-  height: 48px;
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 6px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  height: 44px;
   width: 100%;
-  transition: all 0.3s ease;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .booking-input:focus,
 .booking-select .rs__control--is-focused {
-  border-bottom-color: #2bb3ff !important;
-  box-shadow: 0px 4px 10px rgba(43, 179, 255, 0.2) !important;
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1) !important;
 }
 
 /* react-select tweaks */
@@ -77,4 +84,118 @@
 .book-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0px 10px 20px rgba(0, 123, 255, 0.4);
+}
+
+
+/* Carousel container full width */
+.carousel-item img {
+  height: 700px;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* Hero slider enhancements */
+.hero-slide .hero-image { filter: brightness(0.7); }
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.65) 100%);
+}
+.hero-caption { text-align: left; left: 8%; right: auto; bottom: 18%; }
+.hero-heading {
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroFadeUp 800ms ease-out forwards;
+}
+.hero-subtitle {
+  font-size: 20px;
+  color: #e9ecef;
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeUp 900ms ease-out 200ms forwards;
+}
+
+/* Unique animated accent bar under heading */
+.hero-heading::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 4px;
+  margin-top: 12px;
+  background: linear-gradient(90deg, #2bb3ff, #007bff);
+  border-radius: 4px;
+  animation: heroAccent 1s ease 300ms forwards;
+}
+
+@keyframes heroAccent {
+  from { width: 0; }
+  to { width: 120px; }
+}
+
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .carousel-item img { height: 520px; }
+  .hero-caption { left: 6%; bottom: 16%; }
+  .hero-heading { font-size: 44px; }
+  .hero-subtitle { font-size: 18px; }
+}
+
+@media (max-width: 768px) {
+  .carousel-item img { height: 440px; }
+  .hero-caption { left: 6%; bottom: 14%; }
+  .hero-heading { font-size: 36px; }
+  .hero-subtitle { font-size: 16px; }
+  .hero-heading::after { height: 3px; }
+}
+
+@media (max-width: 576px) {
+  .carousel-item img { height: 360px; }
+  .hero-caption { left: 5%; right: 5%; bottom: 12%; text-align: center; }
+  .hero-heading { font-size: 28px; }
+  .hero-subtitle { font-size: 15px; }
+  .hero-heading::after { margin-left: auto; margin-right: auto; width: 96px; }
+}
+
+/* Caption styling */
+.carousel-caption {
+  text-align: right;          /* right-align text */
+  justify-content: flex-end;  /* align dots to right */
+
+  right: 20px;                /* spacing from right edge */
+  left: 100px;
+  bottom: 40px;               /* spacing from bottom */
+  color: #ffffff00;                /* white text */
+  text-shadow: 2px 2px 5px rgb(255, 0, 0);
+}
+
+/* Indicators (pagination bullets) */
+.carousel-indicators {
+  right: 20px !important;
+  left: auto !important;
+  justify-content: flex-end;  /* align dots to right */
+  bottom: 20px;               /* spacing from bottom */
+}
+
+.carousel-indicators li {
+  background-color: #fff;     /* bullet color */
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  margin: 0 4px;
+  opacity: 0.8;
+}
+
+.carousel-indicators .active {
+  background-color: #ff0000;  /* active bullet color */
+  opacity: 1;
 }

@@ -13,16 +13,16 @@ export const Header = () => {
   }
   return (
     <div>
-      <Navbar bg="" variant="primary" expand="lg" className="mt-3 ms-1 me-1 flex-column shadow" style={{ minHeight: "120px" }}>
-        <Container className="d-flex flex-column align-items-center ">
-          <Navbar.Brand as={Link} to="/" className="fw-bold  mb-2 mt-3 text-center" style={{ fontFamily: "fantasy", fontSize: "50px" }}>
+      <Navbar bg="white" variant="primary" expand="lg" fixed="top" className=" shadow " style={{ minHeight: "20px" , maxHeight:"70px" }}>
+        <Container className=" ">
+          <Navbar.Brand as={Link} to="/" className="fw-bold    " style={{ fontFamily: "fantasy", fontSize: "50px" }}>
             <img
               src={logo}
               alt="Logo"
-              style={{ height: "100px", width: "300px" }}
+              style={{ height: "60px", width: "250px" }}
             />
           </Navbar.Brand>
-          <Nav className="d-flex justify-content-center flex-wrap fw-semibold gap-3 mt-3 mb-3">
+          <Nav className=" fw-semibold gap-3  ">
             <Nav.Link as={Link} to="/">Home</Nav.Link>
             <Nav.Link as={Link} to="/packages">Trip Packages</Nav.Link>
             <NavDropdown title="Onboarding" id="onboarding-dropdown" className="px-3">
