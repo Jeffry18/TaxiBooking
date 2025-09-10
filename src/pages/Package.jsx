@@ -111,8 +111,8 @@ export default function Packages() {
   };
 
   return (
-    <Container className="mt-4">
-      <h3>Trip Packages</h3>
+    <Container className="" style={{marginTop:"90px"}}>
+      <h3 className="mb-3">Trip Packages</h3>
 
       {loading && (
         <Alert variant="info">Loading packages...</Alert>

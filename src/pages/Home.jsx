@@ -6,6 +6,10 @@ import '../App.css'
 import Select from 'react-select';
 import defaultVehicleImage from '../assets/default-vehicle.jpg';
 import HomeCarousel from "../components/Carousel";
+import local from '../assets/local.jpg';
+import round from '../assets/round.jpg';
+import airport from '../assets/airport.jpg';
+import oneway from '../assets/oneway.jpg';
 
 
 export const Home = () => {
@@ -204,11 +208,12 @@ export const Home = () => {
                 style={{
                   position: "absolute",   // position it over the carousel
                   bottom: "-180px",        // adjust how much it overlaps
-                  left: "100px",           // distance from left
-                  width: "100%",         // fixed width
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: "85%",         // width within viewport
                   zIndex: 10,             // ensure it’s on top
                   borderRadius: "10px",
-                  height: "290px", width: "85%"
+                  height: "290px"
                 }}>
 
 
@@ -413,7 +418,7 @@ export const Home = () => {
 
         {/* Recent Bookings */}
 
-        <div className="" style={{ marginTop:"250px" }}>
+        <div className="" style={{ marginTop:"250px" , marginLeft:"100px" , marginRight:"100px" }}>
           <h4 className="fw-bold  text-center">Recent Bookings</h4>
 
           {loading && (
@@ -462,7 +467,7 @@ export const Home = () => {
                         : b.tripType}
                     </td>
                     <td>
-                      {b.vehicleName} ({b.vehicleType})
+                      {b.vehicle.name} ({b.vehicle.type})
                     </td>
                     <td>
                       <span
@@ -482,43 +487,45 @@ export const Home = () => {
             </Table>
           )}
         </div>
+ 
 
+        {/* Trip Types */}
         <div className="text-center" style={{ marginTop:"50px" }}>
           <h1 className="fw-bold mb-3">TRIP TYPES</h1>
           <Row className="g-3 m-2">
             <Col md={3} sm={6} xs={12}>
-              <Card>
-                <Card.Img variant="top" src="/trip1.png" />
+              <Card className="trip-card shadow ">
+                <Card.Img className="trip-card-img" variant="top" src={local} alt="Local trips" />
                 <Card.Body>
-                  <Card.Title>Trip Type 1</Card.Title>
-                  <Card.Text>Description of Trip Type 1</Card.Text>
+                  <Card.Title>LOCAL TRIPS</Card.Title>
+                  <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
                 </Card.Body>
               </Card>
             </Col>
             <Col md={3} sm={6} xs={12}>
-              <Card>
-                <Card.Img variant="top" src="/trip1.png" />
+              <Card className="trip-card shadow ">
+                <Card.Img className="trip-card-img" variant="top" src={round} alt="Round trips" />
                 <Card.Body>
-                  <Card.Title>Trip Type 1</Card.Title>
-                  <Card.Text>Description of Trip Type 1</Card.Text>
+                  <Card.Title>ROUND TRIPS</Card.Title>
+                  <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
                 </Card.Body>
               </Card>
             </Col>
             <Col md={3} sm={6} xs={12}>
-              <Card>
-                <Card.Img variant="top" src="/trip1.png" />
+              <Card className="trip-card shadow ">
+                <Card.Img className="trip-card-img" variant="top" src={oneway} alt="One-way trips" />
                 <Card.Body>
-                  <Card.Title>Trip Type 1</Card.Title>
-                  <Card.Text>Description of Trip Type 1</Card.Text>
+                  <Card.Title>ONE WAY TRIPS</Card.Title>
+                  <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
                 </Card.Body>
               </Card>
             </Col>
             <Col md={3} sm={6} xs={12}>
-              <Card>
-                <Card.Img variant="top" src="/trip1.png" />
+              <Card className="trip-card shadow">
+                <Card.Img className="trip-card-img" variant="top" src={airport} alt="Airport trips" />
                 <Card.Body>
-                  <Card.Title>Trip Type 1</Card.Title>
-                  <Card.Text>Description of Trip Type 1</Card.Text>
+                  <Card.Title>AIRPORT TRIPS</Card.Title>
+                  <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
                 </Card.Body>
               </Card>
             </Col>
@@ -533,8 +540,9 @@ export const Home = () => {
             .filter((vehicle) => vehicle.status === "approved")
             .map((vehicle) => (
               <Col md={4} key={vehicle._id} className="mb-3 d-flex justify-content-center">
-                <Card className="shadow">
+                <Card className="shadow vehicle-card">
                   <Card.Img
+                    className="vehicle-card-img"
                     variant="top"
                     src={vehicle.imageUrl ? `${SERVER_URL}/uploads/${vehicle.imageUrl}` : defaultVehicleImage}
                     alt={vehicle.model}

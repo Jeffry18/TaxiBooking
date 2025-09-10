@@ -62,7 +62,7 @@ export default function VehicleOnboarding() {
   };
 
   return (
-    <Container className="mt-4">
+    <Container className="" style={{marginTop:"130px"}}>
       <Card className="p-4 shadow">
         <h3 className="text-center" style={{fontSize:"40px"}}>Onboard Vehicle</h3>
         <Form onSubmit={handleSubmit}>

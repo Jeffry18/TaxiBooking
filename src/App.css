@@ -6,6 +6,7 @@
   box-sizing: border-box;
   font-family: Georgia, 'Times New Roman', Times, serif;
 }
+html, body { overflow-x: hidden; }
 .booking-form-card {
   background: #ffffff;
   border-radius: 16px;
@@ -148,6 +149,35 @@
   .hero-caption { left: 6%; bottom: 16%; }
   .hero-heading { font-size: 44px; }
   .hero-subtitle { font-size: 18px; }
+}
+
+/* ----- Trip type cards ----- */
+.trip-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 40px;
+}
+
+.trip-card-img {
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.trip-card .card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+/* ----- Vehicle listing card image hover ----- */
+.vehicle-card { overflow: hidden; }
+.vehicle-card-img {
+  transition: transform 0.35s ease;
+  will-change: transform;
+}
+.vehicle-card:hover .vehicle-card-img {
+  transform: scale(1.06);
 }
 
 @media (max-width: 768px) {
