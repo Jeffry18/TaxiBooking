@@ -11,8 +11,10 @@ import {
   Nav,
   Alert,
   Badge,
+  Modal,
 } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
+
 
 export default function AdminPage() {
   const [vehicles, setVehicles] = useState([]);
@@ -20,6 +22,8 @@ export default function AdminPage() {
   const [drivers, setDrivers] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [trips, setTrips] = useState([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [newPackage, setNewPackage] = useState({
     name: "",
     description: "",
@@ -303,7 +307,8 @@ export default function AdminPage() {
               <th>Type</th>
               <th>Capacity</th>
               <th>Fare/km</th>
-              <th>Driver</th>
+              {/* <th>Driver</th> */}
+              <th>Image</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -317,7 +322,21 @@ export default function AdminPage() {
                   <td>{v.type}</td>
                   <td>{v.capacity}</td>
                   <td>₹{v.fare}</td>
-                  <td>{v.driver?.name || "N/A"}</td>
+                  {/* <td>{v.driver?.name || "N/A"}</td> */}
+                  <td>
+                    {v.imageUrl ? (
+                      <Button
+                        variant="link"
+                        size="sm"
+                        onClick={() => handleViewImage(v.imageUrl)}
+                        style={{ padding: 0, textDecoration: 'underline' }}
+                      >
+                        View Image
+                      </Button>
+                    ) : (
+                      "No Image"
+                    )}
+                  </td>
                   <td>{v.status}</td>
                   <td>
                     {v.status === "approved" ? (
@@ -342,7 +361,7 @@ export default function AdminPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="text-center">
+                <td colSpan={9} className="text-center">
                   No vehicles available
                 </td>
               </tr>
@@ -350,6 +369,24 @@ export default function AdminPage() {
           </tbody>
         </Table>
       )}
+
+      {/* Image Modal */}
+      <Modal show={showImageModal} onHide={handleCloseModal} centered size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Vehicle Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          {selectedImage ? (
+            <img
+              src={selectedImage}
+              alt="Vehicle"
+              style={{ maxWidth: "100%", height: "auto" }}
+            />
+          ) : (
+            <p>No image available</p>
+          )}
+        </Modal.Body>
+      </Modal>
     </>
   );
 
@@ -604,6 +641,16 @@ export default function AdminPage() {
     </>
   );
 
+  const handleViewImage = (imageUrl) => {
+    setSelectedImage(`${SERVER_URL}/uploads/${imageUrl}`);
+    setShowImageModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowImageModal(false);
+    setSelectedImage(null);
+  };
+
   return (
     <Container fluid className="p-0" style={{marginTop:"100px"}}>
       <Row>
@@ -622,7 +669,7 @@ export default function AdminPage() {
             <Nav.Link
               onClick={() => setActiveTab("drivers")}
               className={
-                activeTab === "drivers" ? "active text-primary" : "text-dark"
+                activeTab === "drivers" ? "active text-light" : "text-dark"
               }
             >
               Onboarded Drivers
@@ -630,7 +677,7 @@ export default function AdminPage() {
             <Nav.Link
               onClick={() => setActiveTab("bookings")}
               className={
-                activeTab === "bookings" ? "active text-primary" : "text-dark"
+                activeTab === "bookings" ? "active text-light" : "text-dark"
               }
             >
               Booking Management
@@ -638,7 +685,7 @@ export default function AdminPage() {
             <Nav.Link
               onClick={() => setActiveTab("packages")}
               className={
-                activeTab === "packages" ? "active text-primary" : "text-dark"
+                activeTab === "packages" ? "active text-light" : "text-dark"
               }
             >
               Package Entry
@@ -646,7 +693,7 @@ export default function AdminPage() {
             <Nav.Link
               onClick={() => setActiveTab("trips")}
               className={
-                activeTab === "trips" ? "active text-primary" : "text-dark"
+                activeTab === "trips" ? "active text-light" : "text-dark"
               }
             >
               Package Bookings

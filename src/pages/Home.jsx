@@ -12,6 +12,7 @@ import airport from '../assets/airport.jpg';
 import oneway from '../assets/oneway.jpg';
 
 
+
 export const Home = () => {
   const [vehicles, setVehicles] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -195,9 +196,9 @@ export const Home = () => {
   return (
     <div>
 
-      <Container fluid className=" " style={{ width: "100%", minHeight: "100vh", paddingTop: "70px" ,paddingLeft: "100px" ,paddingRight: "0px", paddingLeft:"0px" }}>
+      <Container fluid className=" " style={{ width: "100%", minHeight: "100vh", paddingTop: "70px", paddingRight: "0px", paddingLeft: "0px" }}>
 
-        <div style={{ position: "relative" , width:"100%" }}>
+        <div style={{ position: "relative", width: "100%" }}>
           {/* Banner Carousel */}
           <HomeCarousel />
 
@@ -220,7 +221,7 @@ export const Home = () => {
                 <Card style={{ border: "none" }}>
                   <div
                     className="mt-3 mb-2  rounded  justify-content-center align-items-center text-center "
-                    style={{ maxWidth: "1350px", width:"100px" }}
+                    style={{ maxWidth: "1350px", width: "100px" }}
                   >
                     <Nav variant="" activeKey={tripType} className=" justify-content-center align-items-center text-center  " style={{ width: "500px" }}>
                       <Nav.Item>
@@ -258,7 +259,7 @@ export const Home = () => {
                           className="booking-input"
                           value={airportTripType}
                           onChange={(e) => setAirportTripType(e.target.value)}
-                          
+
                         >
                           <option value="pickup">Pickup from Airport</option>
                           <option value="drop">Drop to Airport</option>
@@ -387,9 +388,9 @@ export const Home = () => {
         </div>
 
 
-                {/* Error and Loading States */}
-                {loading && (
-          <Row className="mb-4" style={{ marginTop:"250px" }}>
+        {/* Error and Loading States */}
+        {loading && (
+          <Row className="mb-4" style={{ marginTop: "250px" }}>
             <Col>
               <Alert variant="info">Loading vehicles...</Alert>
             </Col>
@@ -418,7 +419,7 @@ export const Home = () => {
 
         {/* Recent Bookings */}
 
-        <div className="" style={{ marginTop:"250px" , marginLeft:"100px" , marginRight:"100px" }}>
+        <div className="" style={{ marginTop: "250px", marginLeft: "100px", marginRight: "100px" }}>
           <h4 className="fw-bold  text-center">Recent Bookings</h4>
 
           {loading && (
@@ -445,7 +446,7 @@ export const Home = () => {
                   <th>Passengers</th>
                   <th>Trip Type</th>
                   <th>Vehicle</th>
-                  <th>Status</th>
+                  {/* <th>Status</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -469,7 +470,7 @@ export const Home = () => {
                     <td>
                       {b.vehicle.name} ({b.vehicle.type})
                     </td>
-                    <td>
+                    {/* <td>
                       <span
                         className={`badge ${b.status === "confirmed"
                             ? "bg-success"
@@ -480,17 +481,17 @@ export const Home = () => {
                       >
                         {b.status}
                       </span>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
             </Table>
           )}
         </div>
- 
+
 
         {/* Trip Types */}
-        <div className="text-center" style={{ marginTop:"50px" }}>
+        <div className="text-center" style={{ marginTop: "50px" }}>
           <h1 className="fw-bold mb-3">TRIP TYPES</h1>
           <Row className="g-3 m-2">
             <Col md={3} sm={6} xs={12}>
@@ -498,7 +499,9 @@ export const Home = () => {
                 <Card.Img className="trip-card-img" variant="top" src={local} alt="Local trips" />
                 <Card.Body>
                   <Card.Title>LOCAL TRIPS</Card.Title>
-                  <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
+                  <Card.Text>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+                  </Card.Text>
                 </Card.Body>
               </Card>
             </Col>
@@ -534,12 +537,12 @@ export const Home = () => {
 
 
         {/* Vehicle Preview List */}
-        <h5 className=" fw-bold text-center" style={{ fontSize: "50px" , marginTop:"150px"}}>Available Vehicles</h5>
-        <Row className="justify-content-center">
+        <h5 className=" fw-bold text-center" style={{ fontSize: "50px", marginTop: "150px" }}>Available Vehicles</h5>
+        <Row className="justify-content-center mt-3" style={{marginLeft:"100px", marginRight:"100px"}}>
           {vehicles
             .filter((vehicle) => vehicle.status === "approved")
             .map((vehicle) => (
-              <Col md={4} key={vehicle._id} className="mb-3 d-flex justify-content-center">
+              <Col md={3} key={vehicle._id} className="mb-3 d-flex justify-content-center">
                 <Card className="shadow vehicle-card">
                   <Card.Img
                     className="vehicle-card-img"

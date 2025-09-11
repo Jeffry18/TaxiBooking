@@ -34,6 +34,16 @@ export const Header = () => {
               </NavDropdown.Item>
             </NavDropdown>
             <Nav.Link as={Link} to="/aboutus">About us</Nav.Link>
+
+            {
+              sessionStorage.getItem("role")=== "admin" ?(
+              <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
+              ):null
+              
+            }
+          
+          
+        
             <NavDropdown title="Contact Us" id="contact" className="px-3">
               <NavDropdown.Item as={Link} to="mailto:email.gmail.com">
                 email@gmail.com

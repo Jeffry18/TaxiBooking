@@ -18,16 +18,16 @@ export const Footer = () => {
             {/* links */}
             <div className='d-flex flex-column'>
               <h5>Links</h5>
-              <Link to={'/'} style={{textDecoration:'none', color:'white'}}> Home Page</Link>
-              <Link to={'/login'} style={{textDecoration:'none', color:'white'}}> Login Page</Link>
-              <Link to={'/register'} style={{textDecoration:'none', color:'white'}}> Register Page</Link>
+              <Link to={'/'} style={{textDecoration:'none', color:'black'}}> Home Page</Link>
+              <Link to={'/login'} style={{textDecoration:'none', color:'black'}}> Login Page</Link>
+              <Link to={'/register'} style={{textDecoration:'none', color:'black'}}> Register Page</Link>
             </div>
             {/* guides */}
             <div className='d-flex flex-column'>
               <h5>Guides</h5>
-              <a href="https://react.dev/" target='blank' style={{textDecoration:'none', color:'white'}}>React</a>
-              <a href="https://react-bootstrap.netlify.app/" target='blank' style={{textDecoration:'none', color:'white'}}>React Bootstrap</a>
-              <a href="https://www.npmjs.com/package/react-router-dom" target='blank' style={{textDecoration:'none', color:'white'}}>React Router</a>
+              <a href="https://react.dev/" target='blank' style={{textDecoration:'none', color:'black'}}>React</a>
+              <a href="https://react-bootstrap.netlify.app/" target='blank' style={{textDecoration:'none', color:'black'}}>React Bootstrap</a>
+              <a href="https://www.npmjs.com/package/react-router-dom" target='blank' style={{textDecoration:'none', color:'black'}}>React Router</a>
             </div>
             {/* contact */}
             <div className='d-flex flex-column'>
@@ -37,12 +37,12 @@ export const Footer = () => {
                 <button className='btn btn-info'><i className="fa-solid fa-arrow-right"></i></button>
               </div>
               <div className='d-flex justify-content-between mt-3'>
-                 <a href="https://x.com/?lang=en&mx=2" target='_blank' style={{textDecoration:'none', color:'white'}}><i class="fa-brands fa-twitter"></i></a>
-                 <a href="https://www.instagram.com/" target='_blank' style={{textDecoration:'none', color:'white'}}><i class="fa-brands fa-instagram"></i></a>
-                 <a href="https://www.facebook.com/" target='_blank' style={{textDecoration:'none', color:'white'}}><i class="fa-brands fa-facebook"></i></a>
-                 <a href="https://www.linkedin.com/" target='_blank' style={{textDecoration:'none', color:'white'}}><i class="fa-brands fa-linkedin"></i></a>
-                 <a href="https://github.com/login" target='_blank' style={{textDecoration:'none', color:'white'}}><i class="fa-brands fa-github"></i></a>
-                 <a href="https://www.freeconferencecallhd.com/dialer" target='_blank' style={{textDecoration:'none', color:'white'}}><i class="fa-solid fa-phone"></i></a>
+                 <a href="https://x.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-twitter"></i></a>
+                 <a href="https://www.instagram.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-instagram"></i></a>
+                 <a href="https://www.facebook.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-facebook"></i></a>
+                 <a href="https://www.linkedin.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-linkedin"></i></a>
+                 <a href="https://github.com/login" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-github"></i></a>
+                 <a href="https://www.freeconferencecallhd.com/dialer" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-solid fa-phone"></i></a>
               </div>
             </div>
           </div>
