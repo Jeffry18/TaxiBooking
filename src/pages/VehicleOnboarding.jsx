@@ -8,7 +8,7 @@ export default function VehicleOnboarding() {
     number: "",
     type: "",
     capacity: "",
-    fare: "",
+    contactNumber: "",
     image: null
   });
 
@@ -39,7 +39,7 @@ export default function VehicleOnboarding() {
       formData.append("number", form.number);
       formData.append("type", form.type);
       formData.append("capacity", form.capacity);
-      formData.append("fare", form.fare);
+      formData.append("contactNumber", form.contactNumber);
       if (form.image) formData.append("image", form.image);
 
       await axios.post("http://localhost:5000/vehicles", formData, {
@@ -52,7 +52,7 @@ export default function VehicleOnboarding() {
         number: "",
         type: "",
         capacity: "",
-        fare: "",
+        contactNumber: "",
         image: null
       });
     } catch (err) {
@@ -107,10 +107,11 @@ export default function VehicleOnboarding() {
           <Row className="mt-2">
             <Col>
               <Form.Control
-                name="fare"
-                value={form.fare}
+                name="contactNumber"
+                value={form.contactNumber}
                 onChange={handleChange}
-                placeholder="Fare per km"
+                placeholder="Contact Number"
+                required
               />
             </Col>
             <Col>

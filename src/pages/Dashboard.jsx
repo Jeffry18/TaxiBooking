@@ -1,18 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Container,
-  Table,
-  Button,
-  Form,
-  Row,
-  Col,
-  Card,
-  Nav,
-  Alert,
-  Badge,
-  Modal,
-} from "react-bootstrap";
+import { Container, Table, Button, Form, Row, Col, Card, Nav, Alert, Badge, Modal } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
 
 
@@ -46,6 +34,14 @@ export default function AdminPage() {
     bookings: null,
     trips: null,
   });
+  const [cabTypes, setCabTypes] = useState([]);
+  const [newCab, setNewCab] = useState({
+    name: "",
+    description: "",
+    seats: "",
+    image: null
+  });
+
 
   // Fetch data
   useEffect(() => {
@@ -54,6 +50,7 @@ export default function AdminPage() {
     fetchPackages();
     fetchBookings();
     fetchTrips();
+    fetchCabs();
   }, []);
 
   const fetchVehicles = async () => {
@@ -220,15 +217,25 @@ export default function AdminPage() {
     }
   };
 
+  // Handle input
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setNewCab({ ...newCab, image: files[0] });
+    } else {
+      setNewCab({ ...newCab, [name]: value });
+    }
+  };
+
   const addPackage = async (e) => {
     e.preventDefault();
-    
+
     // Validate that we have a valid image file
     if (!newPackage.image || !(newPackage.image instanceof File)) {
       alert("Please select a valid image file");
       return;
     }
-    
+
     try {
       const formData = new FormData();
       formData.append("name", newPackage.name);
@@ -240,7 +247,7 @@ export default function AdminPage() {
       await axios.post(`${SERVER_URL}/packages`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      
+
       setNewPackage({
         name: "",
         description: "",
@@ -248,11 +255,11 @@ export default function AdminPage() {
         price: "",
         image: null,
       });
-      
+
       // Reset file input
       const fileInput = document.querySelector('input[name="image"]');
       if (fileInput) fileInput.value = "";
-      
+
       fetchPackages();
     } catch (err) {
       console.error("Failed to add package:", err);
@@ -267,6 +274,39 @@ export default function AdminPage() {
     } catch (err) {
       console.error('Failed to delete package:', err);
       alert('Failed to delete package. Please try again.');
+    }
+  };
+
+  const fetchCabs = async () => {
+    try {
+      const res = await axios.get(`${SERVER_URL}/cabtypes`);
+      setCabTypes(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Failed to fetch cab types:", err);
+      setCabTypes([]);
+    }
+  };
+
+  // Submit form
+  const addCabType = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("name", newCab.name);
+      formData.append("description", newCab.description);
+      formData.append("seats", newCab.seats);
+      formData.append("image", newCab.image);
+
+      await axios.post(`${SERVER_URL}/cabtypes`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("Cab type added successfully!");
+      setNewCab({ name: "", description: "", seats: "", image: null });
+      if (fetchCabs) fetchCabs(); // refresh list
+    } catch (err) {
+      console.error("Failed to add cab:", err);
+      alert("Error adding cab type. Please try again.");
     }
   };
 
@@ -306,8 +346,7 @@ export default function AdminPage() {
               <th>Number</th>
               <th>Type</th>
               <th>Capacity</th>
-              <th>Fare/km</th>
-              {/* <th>Driver</th> */}
+              <th>Contact</th>
               <th>Image</th>
               <th>Status</th>
               <th>Action</th>
@@ -321,8 +360,7 @@ export default function AdminPage() {
                   <td>{v.number}</td>
                   <td>{v.type}</td>
                   <td>{v.capacity}</td>
-                  <td>₹{v.fare}</td>
-                  {/* <td>{v.driver?.name || "N/A"}</td> */}
+                  <td>{v.contactNumber || "-"}</td>
                   <td>
                     {v.imageUrl ? (
                       <Button
@@ -641,6 +679,134 @@ export default function AdminPage() {
     </>
   );
 
+  const renderCabTypes = () => (
+    <>
+              {/* Add Cab Form */}
+              <Card className="p-4 shadow mt-3">
+                <h4 className="mb-3 fw-bold">Add New Cab Type</h4>
+                <Form onSubmit={addCabType}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Cab Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="name"
+                      value={newCab.name}
+                      onChange={handleChange}
+                      placeholder="Enter cab name (e.g., Sedan)"
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Description</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={2}
+                      name="description"
+                      value={newCab.description}
+                      onChange={handleChange}
+                      placeholder="Enter cab description"
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Seats</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="seats"
+                      value={newCab.seats}
+                      onChange={handleChange}
+                      placeholder="Number of seats"
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Cab Image</Form.Label>
+                    <Form.Control
+                      type="file"
+                      name="image"
+                      accept="image/*"
+                      onChange={handleChange}
+                    />
+                    {newCab.image && (
+                      <div className="mt-2">
+                        <small className="text-muted">
+                          Selected: {newCab.image.name}
+                        </small>
+                      </div>
+                    )}
+                  </Form.Group>
+
+                  <Button type="submit" variant="success">
+                    Add Cab
+                  </Button>
+                </Form>
+              </Card>
+
+              {/* Cab Types List */}
+              <Card className="p-4 shadow mt-4">
+                <h4 className="mb-3 fw-bold">Available Cab Types</h4>
+                {cabTypes.length > 0 ? (
+                  <Table striped bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Cab Name</th>
+                        <th>Description</th>
+                        <th>Seats</th>
+                        <th>Image</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cabTypes.map((cab, index) => (
+                        <tr key={cab._id}>
+                          <td>{index + 1}</td>
+                          <td>{cab.name}</td>
+                          <td>{cab.description}</td>
+                          <td>{cab.seats}</td>
+                          <td>
+                            {cab.image ? (
+                              <img
+                                src={`${SERVER_URL}/uploads/${cab.image}`}
+                                alt={cab.name}
+                                style={{ width: "80px", height: "50px", objectFit: "cover" }}
+                              />
+                            ) : (
+                              "No Image"
+                            )}
+                          </td>
+                          <td>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={async () => {
+                                if (window.confirm("Are you sure you want to delete this cab type?")) {
+                                  try {
+                                    await axios.delete(`${SERVER_URL}/cabtypes/${cab._id}`);
+                                    fetchCabs();
+                                  } catch (err) {
+                                    console.error("Failed to delete cab type:", err);
+                                    alert("Error deleting cab type.");
+                                  }
+                                }
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                ) : (
+                  <Alert variant="warning">No cab types available.</Alert>
+                )}
+              </Card>
+            </>
+  )
+
   const handleViewImage = (imageUrl) => {
     setSelectedImage(`${SERVER_URL}/uploads/${imageUrl}`);
     setShowImageModal(true);
@@ -652,7 +818,7 @@ export default function AdminPage() {
   };
 
   return (
-    <Container fluid className="p-0" style={{marginTop:"100px"}}>
+    <Container fluid className="p-0" style={{ marginTop: "100px" }}>
       <Row>
         {/* Sidebar */}
         <Col md={2} className="bg-light text-dark vh-100 sticky-top p-3">
@@ -665,6 +831,14 @@ export default function AdminPage() {
               }
             >
               Onboarded Vehicles
+            </Nav.Link>
+            <Nav.Link
+              onClick={() => setActiveTab("cabtypes")}
+              className={
+                activeTab === "cabtypes" ? "active text-light" : "text-dark"
+              }
+            >
+              Cab Type Management
             </Nav.Link>
             <Nav.Link
               onClick={() => setActiveTab("drivers")}
@@ -707,6 +881,8 @@ export default function AdminPage() {
           {activeTab === "drivers" && renderDriversTable()}
           {activeTab === "bookings" && renderBookingsTable()}
           {activeTab === "trips" && renderTripsTable()}
+          {activeTab === "cabtypes" && renderCabTypes()}
+
           {activeTab === "packages" && (
             <>
               <h4>Add New Package</h4>
@@ -782,8 +958,8 @@ export default function AdminPage() {
                     <Col md={4} key={pkg._id} className="mb-3">
                       <Card>
                         {pkg.image && (
-                          <Card.Img 
-                            variant="top" 
+                          <Card.Img
+                            variant="top"
                             src={`${SERVER_URL}/uploads/${pkg.image}`}
                             style={{ height: "200px", objectFit: "cover" }}
                           />
@@ -823,3 +999,4 @@ export default function AdminPage() {
     </Container>
   );
 }
+

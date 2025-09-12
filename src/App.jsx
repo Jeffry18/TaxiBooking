@@ -10,6 +10,7 @@ import Header from './components/Header.jsx'
 import Driver from './pages/DriverOnboarding.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import  AboutUs from './pages/AboutUs.jsx'
+import  Corporate  from './pages/Corporate.jsx'
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path='/login' element={<Auth/>}/>
         <Route path='/register' element={<Auth insideRegister={true}/>}/>
         <Route path='/aboutus' element={<AboutUs/>}/>
+        <Route path='/corporate' element={<Corporate/>}/>
       </Routes>
       <Footer/>
     </>

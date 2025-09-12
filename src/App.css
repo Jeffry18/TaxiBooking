@@ -153,16 +153,49 @@ html, body { overflow-x: hidden; }
 
 /* ----- Trip type cards ----- */
 .trip-card {
+  position: relative;
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 40px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  transition: transform 260ms ease, box-shadow 260ms ease, background 260ms ease;
+}
+
+/* Subtle gradient edge using a glow layer */
+.trip-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  background: radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0) 50%),
+              linear-gradient(135deg, rgba(255, 0, 92, 0.25), rgba(13, 110, 253, 0.25));
+  filter: blur(14px);
+  opacity: 0.0;
+  transition: opacity 260ms ease;
+}
+
+.trip-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.trip-card:hover::before {
+  opacity: 0.6;
 }
 
 .trip-card-img {
   height: 350px;
   width: 100%;
   object-fit: cover;
+  transform-origin: center;
+  transition: transform 320ms ease;
 }
 
 .trip-card .card-body {
@@ -171,13 +204,19 @@ html, body { overflow-x: hidden; }
   flex-direction: column;
 }
 .trip-card { overflow: hidden; }
-.trip-card-img {
-  transition: transform 0.35s ease;
-  will-change: transform;
-}
-.trip-card:hover .vehicle-card-img {
+.trip-card:hover .trip-card-img {
   transform: scale(1.06);
 }
+
+.trip-card .card-body {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0.45) 100%);
+}
+
+.trip-card .card-title { color: #fff; letter-spacing: 0.3px; }
+.trip-card .card-text { color: rgba(255,255,255,0.85); }
 /* ----- Vehicle listing card image hover ----- */
 .vehicle-card { overflow: hidden; }
 .vehicle-card-img {
@@ -188,12 +227,55 @@ html, body { overflow-x: hidden; }
   transform: scale(1.06);
 }
 
+/* ----- Cab type grid & card styles ----- */
+.cabtype-grid { row-gap: 1.25rem; }
+.cabtype-card {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.25s ease;
+}
+.cabtype-card-imgwrap {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+.cabtype-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.cabtype-card:hover {
+  background-color: #dc3545; /* red */
+  color: #ffffff;
+}
+.cabtype-card:hover .cabtype-card-title,
+.cabtype-card:hover .cabtype-card-text,
+.cabtype-card:hover .cabtype-card-meta {
+  color: #ffffff !important;
+}
+.cabtype-card:hover .cabtype-card-img {
+  transform: scale(1.08);
+}
+
+/* Responsive: ensure nice centering and widths */
+@media (min-width: 992px) {
+  .cabtype-card { max-width: 300px; }
+}
+@media (max-width: 576px) {
+  .cabtype-card { max-width: 100%; }
+  .cabtype-card-imgwrap { height: 200px; }
+}
+
 @media (max-width: 768px) {
   .carousel-item img { height: 440px; }
   .hero-caption { left: 6%; bottom: 14%; }
   .hero-heading { font-size: 36px; }
   .hero-subtitle { font-size: 16px; }
   .hero-heading::after { height: 3px; }
+  .trip-card-img { height: 280px; }
 }
 
 @media (max-width: 576px) {
@@ -202,6 +284,8 @@ html, body { overflow-x: hidden; }
   .hero-heading { font-size: 28px; }
   .hero-subtitle { font-size: 15px; }
   .hero-heading::after { margin-left: auto; margin-right: auto; width: 96px; }
+  .trip-card { border-radius: 18px; }
+  .trip-card-img { height: 220px; }
 }
 
 /* Caption styling */
@@ -237,3 +321,4 @@ html, body { overflow-x: hidden; }
   background-color: #ff0000;  /* active bullet color */
   opacity: 1;
 }
+

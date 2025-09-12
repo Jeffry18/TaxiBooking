@@ -14,12 +14,13 @@ import oneway from '../assets/oneway.jpg';
 
 
 export const Home = () => {
-  const [vehicles, setVehicles] = useState([]);
+  const [vehicles, setVehicles] = useState([]); // kept for backward compatibility (no longer used)
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cabTypes, setCabTypes] = useState([]);
   const [form, setForm] = useState({
-    vehicle: "",
+    vehicle: "", // will hold selected cab type id now
     pickup: "",
     drop: "",
     date: "",
@@ -28,6 +29,7 @@ export const Home = () => {
     vehicleType: "",
     passengerCount: "",
     tripType: "",
+    selectedCabType: null,
   });
   const [message, setMessage] = useState("");
   const [places, setPlaces] = useState([]);
@@ -65,7 +67,7 @@ export const Home = () => {
 
     const fetchPlaces = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/places/kerala-places");
+        const res = await axios.get(`${SERVER_URL}/places/kerala-places`);
         setPlaces(res.data); // store in state
       } catch (err) {
         console.error("Error loading places:", err);
@@ -91,6 +93,24 @@ export const Home = () => {
       }
     };
     fetchRecentBookings();
+    const fetchCabTypes = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`${SERVER_URL}/cabtypes`);
+        setCabTypes(res.data);
+        setError(null);
+      } catch (err) {
+        const errorMessage =
+          err.response?.status === 500
+            ? "Server error occurred. Please try again later."
+            : "Failed to load cab types. Please check your connection.";
+        setError(errorMessage);
+        setCabTypes([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCabTypes();
 
   }, []);
 
@@ -101,8 +121,7 @@ export const Home = () => {
     const { name, value } = e.target;
 
     if (name === "passengerCount") {
-      const selectedVehicle = vehicles.find((v) => v._id === form.vehicle);
-      const maxCapacity = selectedVehicle?.capacity || 10;
+      const maxCapacity = form.selectedCabType?.seats || 10;
       const numValue = parseInt(value) || "";
 
       setForm((prev) => ({
@@ -125,7 +144,7 @@ export const Home = () => {
       }
 
       if (!form.vehicle) {
-        setMessage("❌ Please select a vehicle first");
+        setMessage("❌ Please select a cab type");
         return;
       }
 
@@ -142,10 +161,12 @@ export const Home = () => {
         status: "pending",
       };
 
+      // cab types are already loaded on mount
 
-      const selectedVehicle = vehicles.find((v) => v._id === form.vehicle);
-      if (selectedVehicle && bookingData.passengerCount > selectedVehicle.capacity) {
-        setMessage(`❌ Maximum ${selectedVehicle.capacity} passengers allowed for this vehicle`);
+
+      const selectedCabType = form.selectedCabType;
+      if (selectedCabType && bookingData.passengerCount > (selectedCabType.seats || 10)) {
+        setMessage(`❌ Maximum ${selectedCabType.seats} passengers allowed for this cab type`);
         return;
       }
 
@@ -196,34 +217,35 @@ export const Home = () => {
   return (
     <div>
 
-      <Container fluid className=" " style={{ width: "100%", minHeight: "100vh", paddingTop: "70px", paddingRight: "0px", paddingLeft: "0px" }}>
+      <Container fluid className="" style={{ width: "100%", minHeight: "100vh", paddingTop: "70px", paddingRight: "0px", paddingLeft: "0px" }}>
 
         <div style={{ position: "relative", width: "100%" }}>
           {/* Banner Carousel */}
           <HomeCarousel />
 
-          {/* Booking Form */}
-          <Row>
+          {/* Booking Form for large screens (overlay) */}
+          <Row className="d-none d-md-block">
             <Col md={12} className="mb-4 ">
               <Card className="booking-form-card d-flex  booking-form-card  shadow"
                 style={{
-                  position: "absolute",   // position it over the carousel
-                  bottom: "-180px",        // adjust how much it overlaps
+                  position: "absolute",
+                  bottom: "-180px",
                   left: "50%",
                   transform: "translateX(-50%)",
-                  width: "85%",         // width within viewport
-                  zIndex: 10,             // ensure it’s on top
+                  width: "85%",
+                  zIndex: 10,
                   borderRadius: "10px",
-                  height: "290px"
+                  height: "auto",
+                  padding: "12px"
                 }}>
 
 
                 <Card style={{ border: "none" }}>
                   <div
                     className="mt-3 mb-2  rounded  justify-content-center align-items-center text-center "
-                    style={{ maxWidth: "1350px", width: "100px" }}
+                    style={{ maxWidth: "1350px", width: "100%" }}
                   >
-                    <Nav variant="" activeKey={tripType} className=" justify-content-center align-items-center text-center  " style={{ width: "500px" }}>
+                    <Nav variant="" activeKey={tripType} className=" justify-content-center align-items-center text-center  " style={{ width: "100%" }}>
                       <Nav.Item>
                         <Nav.Link eventKey="oneway" onClick={() => setTripType("oneway")}>
                           ONE WAY
@@ -259,7 +281,6 @@ export const Home = () => {
                           className="booking-input"
                           value={airportTripType}
                           onChange={(e) => setAirportTripType(e.target.value)}
-
                         >
                           <option value="pickup">Pickup from Airport</option>
                           <option value="drop">Drop to Airport</option>
@@ -319,32 +340,27 @@ export const Home = () => {
                     )}
 
                     <Col lg={row2Lg} md={6} className="mb-1 booking-field">
-                      <Form.Label className="booking-label">Vehicle</Form.Label>
+                      <Form.Label className="booking-label">Cab Type</Form.Label>
                       <Form.Select
                         className="booking-input"
                         name="vehicle"
                         value={form.vehicle}
                         onChange={(e) => {
-                          const selectedVehicle = vehicles.find(
-                            (v) => v._id === e.target.value
-                          );
+                          const selected = cabTypes.find((c) => c._id === e.target.value);
                           setForm((prev) => ({
                             ...prev,
                             vehicle: e.target.value,
-                            vehicleType: selectedVehicle?.type || "",
-                            selectedVehicle,
+                            selectedCabType: selected || null,
                           }));
                         }}
                         required
                       >
-                        <option value="">-- Select a Vehicle --</option>
-                        {vehicles
-                          .filter((v) => v.status === "approved")
-                          .map((vehicle) => (
-                            <option key={vehicle._id} value={vehicle._id}>
-                              {vehicle.model} ({vehicle.type}) - ₹{vehicle.fare}/km
-                            </option>
-                          ))}
+                        <option value="">-- Select a Cab Type --</option>
+                        {cabTypes.map((cab) => (
+                          <option key={cab._id} value={cab._id}>
+                            {cab.name}{cab.seats ? ` (Seats: ${cab.seats})` : ""}
+                          </option>
+                        ))}
                       </Form.Select>
                     </Col>
 
@@ -358,7 +374,7 @@ export const Home = () => {
                         onChange={handleChange}
                         type="number"
                         min="1"
-                        max={form.selectedVehicle?.capacity || 10}
+                        max={form.selectedCabType?.seats || 10}
                         required
                       />
                     </Col>
@@ -385,6 +401,158 @@ export const Home = () => {
               </Card>
             </Col>
           </Row>
+
+          {/* Booking Form for small screens (stacked, no overlay) */}
+          <Row className="d-block d-md-none">
+            <Col xs={12} className="mb-3 px-3">
+              <Card className="shadow" style={{ borderRadius: "10px" }}>
+                <Card.Body>
+                  <div className="mb-2 text-center">
+                    <Nav activeKey={tripType} className="justify-content-center">
+                      <Nav.Item>
+                        <Nav.Link eventKey="oneway" onClick={() => setTripType("oneway")}>ONE WAY</Nav.Link>
+                      </Nav.Item>
+                      <Nav.Item>
+                        <Nav.Link eventKey="round" onClick={() => setTripType("round")}>ROUND TRIP</Nav.Link>
+                      </Nav.Item>
+                      <Nav.Item>
+                        <Nav.Link eventKey="local" onClick={() => setTripType("local")}>LOCAL</Nav.Link>
+                      </Nav.Item>
+                      <Nav.Item>
+                        <Nav.Link eventKey="airport" onClick={() => setTripType("airport")}>AIRPORT</Nav.Link>
+                      </Nav.Item>
+                    </Nav>
+                  </div>
+
+                  <Form onSubmit={handleSubmit}>
+                    <Row>
+                      {isAirport && (
+                        <Col xs={12} className="mb-2">
+                          <Form.Label className="booking-label mb-1">Trip Type</Form.Label>
+                          <Form.Select
+                            className="booking-input"
+                            value={airportTripType}
+                            onChange={(e) => setAirportTripType(e.target.value)}
+                          >
+                            <option value="pickup">Pickup from Airport</option>
+                            <option value="drop">Drop to Airport</option>
+                          </Form.Select>
+                        </Col>
+                      )}
+
+                      <Col xs={12} className="mb-2">
+                        <Form.Label className="booking-label mb-1">From</Form.Label>
+                        <Select
+                          classNamePrefix="rs"
+                          className="booking-select"
+                          options={places.map((p) => ({ value: p.name, label: p.name }))}
+                          value={form.pickup ? { value: form.pickup, label: form.pickup } : null}
+                          onChange={(selected) => setForm({ ...form, pickup: selected.value })}
+                          placeholder="Select Pickup Location"
+                          isSearchable
+                        />
+                      </Col>
+                      <Col xs={12} className="mb-2">
+                        <Form.Label className="booking-label">To</Form.Label>
+                        <Select
+                          classNamePrefix="rs"
+                          className="booking-select"
+                          options={places.map((p) => ({ value: p.name, label: p.name }))}
+                          value={form.drop ? { value: form.drop, label: form.drop } : null}
+                          onChange={(selected) => setForm({ ...form, drop: selected.value })}
+                          placeholder="Select Drop Location"
+                          isSearchable
+                        />
+                      </Col>
+                      <Col xs={12} className="mb-2">
+                        <Form.Label className="booking-label">Pick Up Date</Form.Label>
+                        <Form.Control
+                          className="booking-input"
+                          type="date"
+                          name="date"
+                          value={form.date}
+                          onChange={handleChange}
+                          required
+                        />
+                      </Col>
+
+                      {isRound && (
+                        <Col xs={12} className="mb-2">
+                          <Form.Label className="booking-label">Return Date</Form.Label>
+                          <Form.Control
+                            className="booking-input"
+                            type="date"
+                            value={form.returnDate || ""}
+                            min={form.date || new Date().toISOString().split("T")[0]}
+                            onChange={(e) => setForm({ ...form, returnDate: e.target.value })}
+                          />
+                        </Col>
+                      )}
+
+                      <Col xs={12} className="mb-2">
+                        <Form.Label className="booking-label">Cab Type</Form.Label>
+                        <Form.Select
+                          className="booking-input"
+                          name="vehicle"
+                          value={form.vehicle}
+                          onChange={(e) => {
+                            const selected = cabTypes.find((c) => c._id === e.target.value);
+                            setForm((prev) => ({
+                              ...prev,
+                              vehicle: e.target.value,
+                              selectedCabType: selected || null,
+                            }));
+                          }}
+                          required
+                        >
+                          <option value="">-- Select a Cab Type --</option>
+                          {cabTypes.map((cab) => (
+                            <option key={cab._id} value={cab._id}>
+                              {cab.name}{cab.seats ? ` (Seats: ${cab.seats})` : ""}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Col>
+
+                      <Col xs={12} className="mb-2">
+                        <Form.Label className="booking-label">Passengers</Form.Label>
+                        <Form.Control
+                          className="booking-input"
+                          placeholder="Passenger Count"
+                          name="passengerCount"
+                          value={form.passengerCount}
+                          onChange={handleChange}
+                          type="number"
+                          min="1"
+                          max={form.selectedCabType?.seats || 10}
+                          required
+                        />
+                      </Col>
+                      <Col xs={12} className="mb-2">
+                        <Form.Label className="booking-label">Pick Up Time</Form.Label>
+                        <Form.Control
+                          className="booking-input"
+                          type="time"
+                          name="time"
+                          value={form.time}
+                          onChange={handleChange}
+                          required
+                        />
+                      </Col>
+
+                      <Col xs={12}>
+                        <div className="d-grid">
+                          <Button type="submit" className="book-btn">
+                            Book Now
+                          </Button>
+                        </div>
+                      </Col>
+                    </Row>
+                  </Form>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
         </div>
 
 
@@ -392,7 +560,7 @@ export const Home = () => {
         {loading && (
           <Row className="mb-4" style={{ marginTop: "250px" }}>
             <Col>
-              <Alert variant="info">Loading vehicles...</Alert>
+              <Alert variant="info">Loading cab types...</Alert>
             </Col>
           </Row>
         )}
@@ -419,7 +587,7 @@ export const Home = () => {
 
         {/* Recent Bookings */}
 
-        <div className="" style={{ marginTop: "250px", marginLeft: "100px", marginRight: "100px" }}>
+        <Container className="px-3 px-md-4" style={{marginTop:"200px"}}>
           <h4 className="fw-bold  text-center">Recent Bookings</h4>
 
           {loading && (
@@ -446,7 +614,6 @@ export const Home = () => {
                   <th>Passengers</th>
                   <th>Trip Type</th>
                   <th>Vehicle</th>
-                  {/* <th>Status</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -470,24 +637,12 @@ export const Home = () => {
                     <td>
                       {b.vehicle.name} ({b.vehicle.type})
                     </td>
-                    {/* <td>
-                      <span
-                        className={`badge ${b.status === "confirmed"
-                            ? "bg-success"
-                            : b.status === "pending"
-                              ? "bg-warning text-dark"
-                              : "bg-secondary"
-                          }`}
-                      >
-                        {b.status}
-                      </span>
-                    </td> */}
                   </tr>
                 ))}
               </tbody>
             </Table>
           )}
-        </div>
+        </Container>
 
 
         {/* Trip Types */}
@@ -536,37 +691,29 @@ export const Home = () => {
         </div>
 
 
-        {/* Vehicle Preview List */}
-        <h5 className=" fw-bold text-center" style={{ fontSize: "50px", marginTop: "150px" }}>Available Vehicles</h5>
-        <Row className="justify-content-center mt-3" style={{marginLeft:"100px", marginRight:"100px"}}>
-          {vehicles
-            .filter((vehicle) => vehicle.status === "approved")
-            .map((vehicle) => (
-              <Col md={3} key={vehicle._id} className="mb-3 d-flex justify-content-center">
-                <Card className="shadow vehicle-card">
-                  <Card.Img
-                    className="vehicle-card-img"
-                    variant="top"
-                    src={vehicle.imageUrl ? `${SERVER_URL}/uploads/${vehicle.imageUrl}` : defaultVehicleImage}
-                    alt={vehicle.model}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = defaultVehicleImage;
-                    }}
-                    style={{ height: '200px', objectFit: 'cover' }}
-                  />
+        {/* Cab Type Preview List */}
+        <h5 className=" fw-bold text-center" style={{ fontSize: "2rem", marginTop: "150px" }}>Available Cab Types</h5>
+
+        <Container className="px-3 px-md-4 mt-3">
+          <Row className="g-3 justify-content-center cabtype-grid">
+            {cabTypes.map(cab => (
+              <Col key={cab._id} xs={12} sm={6} md={4} lg={3} className="d-flex justify-content-center">
+                <Card className="text-center h-100 shadow-sm cabtype-card">
+                  <div className="cabtype-card-imgwrap">
+                    <Card.Img className="cabtype-card-img" variant="top" src={`${SERVER_URL}/uploads/${cab.image}`} />
+                  </div>
                   <Card.Body>
-                    <Card.Title>{vehicle.model}</Card.Title>
-                    <Card.Text>
-                      Type: {vehicle.type}<br />
-                      Capacity: {vehicle.capacity} seats<br />
-                      Fare: ₹{vehicle.fare}/km
-                    </Card.Text>
+                    <Card.Title className="cabtype-card-title">{cab.name}</Card.Title>
+                    <Card.Text className="cabtype-card-text" style={{ minHeight: '48px' }}>{cab.description}</Card.Text>
+                    <small className="cabtype-card-meta">Seats: {cab.seats}</small>
                   </Card.Body>
                 </Card>
               </Col>
             ))}
-        </Row>
+          </Row>
+        </Container>
+
+
       </Container>
     </div>
   );
