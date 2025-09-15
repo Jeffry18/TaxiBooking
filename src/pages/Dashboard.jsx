@@ -144,6 +144,16 @@ export default function AdminPage() {
     }
   };
 
+  const fetchCabs = async () => {
+    try {
+      const res = await axios.get(`${SERVER_URL}/cabtypes`);
+      setCabTypes(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Failed to fetch cab types:", err);
+      setCabTypes([]);
+    }
+  };
+
   const approveVehicle = async (id) => {
     try {
       await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "approved" });
@@ -217,7 +227,7 @@ export default function AdminPage() {
     }
   };
 
-  // Handle input
+  //Handle input
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
@@ -277,15 +287,7 @@ export default function AdminPage() {
     }
   };
 
-  const fetchCabs = async () => {
-    try {
-      const res = await axios.get(`${SERVER_URL}/cabtypes`);
-      setCabTypes(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error("Failed to fetch cab types:", err);
-      setCabTypes([]);
-    }
-  };
+
 
   // Submit form
   const addCabType = async (e) => {
@@ -294,21 +296,28 @@ export default function AdminPage() {
       const formData = new FormData();
       formData.append("name", newCab.name);
       formData.append("description", newCab.description);
-      formData.append("seats", newCab.seats);
-      formData.append("image", newCab.image);
-
+      formData.append("seats", Number(newCab.seats));
+      if (newCab.image) {
+        formData.append("image", newCab.image); // must be File object
+      }
+  
       await axios.post(`${SERVER_URL}/cabtypes`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
+  
       alert("Cab type added successfully!");
       setNewCab({ name: "", description: "", seats: "", image: null });
+  
+      // Reset file input field
+      e.target.reset();
+  
       if (fetchCabs) fetchCabs(); // refresh list
     } catch (err) {
-      console.error("Failed to add cab:", err);
+      console.error("Failed to add cab:", err.response?.data || err.message);
       alert("Error adding cab type. Please try again.");
     }
   };
+  
 
   // Move these declarations outside of renderVehiclesTable
   const grouped = bookings.reduce((acc, b) => {

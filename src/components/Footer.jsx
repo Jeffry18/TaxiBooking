@@ -37,12 +37,12 @@ export const Footer = () => {
                 <button className='btn btn-info'><i className="fa-solid fa-arrow-right"></i></button>
               </div>
               <div className='d-flex justify-content-between mt-3'>
-                 <a href="https://x.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-twitter"></i></a>
-                 <a href="https://www.instagram.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-instagram"></i></a>
-                 <a href="https://www.facebook.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-facebook"></i></a>
-                 <a href="https://www.linkedin.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-linkedin"></i></a>
-                 <a href="https://github.com/login" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-brands fa-github"></i></a>
-                 <a href="https://www.freeconferencecallhd.com/dialer" target='_blank' style={{textDecoration:'none', color:'dark'}}><i class="fa-solid fa-phone"></i></a>
+                 <a href="https://x.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i className="fa-brands fa-twitter"></i></a>
+                 <a href="https://www.instagram.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i className="fa-brands fa-instagram"></i></a>
+                 <a href="https://www.facebook.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i className="fa-brands fa-facebook"></i></a>
+                 <a href="https://www.linkedin.com/" target='_blank' style={{textDecoration:'none', color:'dark'}}><i className="fa-brands fa-linkedin"></i></a>
+                 <a href="https://github.com/login" target='_blank' style={{textDecoration:'none', color:'dark'}}><i className="fa-brands fa-github"></i></a>
+                 <a href="https://www.freeconferencecallhd.com/dialer" target='_blank' style={{textDecoration:'none', color:'dark'}}><i className="fa-solid fa-phone"></i></a>
               </div>
             </div>
           </div>
