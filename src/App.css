@@ -1,3 +1,14 @@
+/* Responsive helpers */
+.about-img { border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+
+@media (max-width: 768px) {
+  .navbar .nav-link { padding: 8px 12px; }
+  .booking-form-card { width: 94% !important; left: 3% !important; transform: none !important; }
+}
+
+@media (max-width: 576px) {
+  .navbar-brand img { height: 48px !important; }
+}
 /* ---------- FORM CONTAINER ---------- */
 
 *{
@@ -333,4 +344,5 @@ html, body { overflow-x: hidden; }
   background-color: #ff0000;  /* active bullet color */
   opacity: 1;
 }
+
 

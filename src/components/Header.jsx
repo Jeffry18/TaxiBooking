@@ -20,13 +20,13 @@ export const Header = () => {
               src={logo}
               alt="Logo"
               className="img-fluid d-inline-block align-top"
-              style={{ height: "70px", width: "auto" }}
+              style={{ height: "70px", width: "auto" , marginTop: "0px" }}
             />
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="main-navbar" />
           <Navbar.Collapse id="main-navbar">
-            <Nav className="ms-auto fw-semibold gap-3 align-items-lg-center">
+            <Nav className="ms-auto bg-white fw-semibold gap-3 align-items-lg-center">
               <Nav.Link as={Link} to="/">Home</Nav.Link>
               <Nav.Link as={Link} to="/packages">Trip Packages</Nav.Link>
               <NavDropdown title="Onboarding" id="onboarding-dropdown" className="px-lg-3">

@@ -66,18 +66,18 @@ export const AboutUs = () => {
         </div>
 
         {/* Right Column */}
-        <div className="col-md-4">
+        <div className="col-md-4 d-flex flex-column align-items-center">
           <img
             src={aboutus1}
             alt="About Us 1"
-            className="img-fluid mb-3"
-            style={{ height: "400px", width: "400px" }}
+            className="img-fluid mb-3 about-img"
+            style={{ maxWidth: "100%", height: "auto" }}
           />
           <img
             src={aboutus2}
             alt="About Us 2"
-            className="img-fluid"
-            style={{ height: "400px", width: "400px" }}
+            className="img-fluid about-img"
+            style={{ maxWidth: "100%", height: "auto" }}
           />
         </div>
       </div>

@@ -314,6 +314,20 @@ export const Home = () => {
                     )} */}
 
                     <Col lg={3} md={6} className="mb-1 booking-field">
+                      <Form.Label className="booking-label">To</Form.Label>
+                      <Select
+                        classNamePrefix="rs"
+                        className="booking-select booking-field "
+                        options={places.map((p) => ({ value: p.name, label: p.name }))}
+                        value={form.drop ? { value: form.drop, label: form.drop } : null}
+                        onChange={(selected) => setForm({ ...form, drop: selected.value })}
+                        placeholder="Select Drop Location"
+                        isSearchable
+                        
+                      />
+                    </Col>
+
+                    <Col lg={3} md={6} className="mb-1 booking-field">
                       <Form.Label className="booking-label mb-1">From</Form.Label>
                       <Select
                         classNamePrefix="rs"
@@ -326,25 +340,10 @@ export const Home = () => {
                       />
                     </Col>
                     {/* Small Add button column in the same row */}
-                    
-                      <Col lg={1} md={3} className="mb-3 d-flex align-items-end justify-content-center">
-                        <Button variant="outline-primary" size="sm" onClick={addStop} className="px-2 py-1">
-                          +
-                        </Button>
-                      </Col>
-                    
-                    
-                    <Col lg={3} md={6} className="mb-1 booking-field">
-                      <Form.Label className="booking-label">To</Form.Label>
-                      <Select
-                        classNamePrefix="rs"
-                        className="booking-select booking-field"
-                        options={places.map((p) => ({ value: p.name, label: p.name }))}
-                        value={form.drop ? { value: form.drop, label: form.drop } : null}
-                        onChange={(selected) => setForm({ ...form, drop: selected.value })}
-                        placeholder="Select Drop Location"
-                        isSearchable
-                      />
+                    <Col lg={1} md={3} className="mb-3 d-flex align-items-end justify-content-center">
+                      <Button variant="outline-primary" size="sm" onClick={addStop} className="px-2 py-1">
+                        +
+                      </Button>
                     </Col>
 
                     {/* Cab Type column to complete 4 columns in the row */}
