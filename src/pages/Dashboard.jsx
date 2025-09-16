@@ -103,9 +103,19 @@ export default function AdminPage() {
   const fetchBookings = async () => {
     try {
       setLoading((prev) => ({ ...prev, bookings: true }));
-      const res = await axios.get(`${SERVER_URL}/bookings`);
+
+      const token = sessionStorage.getItem("token")
+
+      const res = await axios.get(`${SERVER_URL}/bookings`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setBookings(Array.isArray(res.data) ? res.data : []);
+
       setError((prev) => ({ ...prev, bookings: null }));
+
     } catch (err) {
       console.error("Error fetching bookings:", err);
       setBookings([]);
@@ -202,7 +212,10 @@ export default function AdminPage() {
 
   const updateBookingStatus = async (id, status) => {
     try {
-      await axios.patch(`${SERVER_URL}/bookings/${id}`, { status });
+      const token = sessionStorage.getItem("token");
+      await axios.patch(`${SERVER_URL}/bookings/${id}`, { status }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       fetchBookings();
     } catch (err) {
       console.error("Error updating booking:", err);
@@ -227,7 +240,7 @@ export default function AdminPage() {
     }
   };
 
-  //Handle input
+  // Handle input
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
@@ -300,24 +313,24 @@ export default function AdminPage() {
       if (newCab.image) {
         formData.append("image", newCab.image); // must be File object
       }
-  
+
       await axios.post(`${SERVER_URL}/cabtypes`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-  
+
       alert("Cab type added successfully!");
       setNewCab({ name: "", description: "", seats: "", image: null });
-  
+
       // Reset file input field
       e.target.reset();
-  
+
       if (fetchCabs) fetchCabs(); // refresh list
     } catch (err) {
       console.error("Failed to add cab:", err.response?.data || err.message);
       alert("Error adding cab type. Please try again.");
     }
   };
-  
+
 
   // Move these declarations outside of renderVehiclesTable
   const grouped = bookings.reduce((acc, b) => {
@@ -517,7 +530,7 @@ export default function AdminPage() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Vehicle</th>
+                    <th>Cab Type</th>
                     <th>Pickup</th>
                     <th>Drop</th>
                     <th>Time</th>
@@ -530,7 +543,7 @@ export default function AdminPage() {
                   {grouped[date].map((b, idx) => (
                     <tr key={b._id}>
                       <td>{idx + 1}</td>
-                      <td>{b.vehicle?.model || "N/A"}</td>
+                      <td>{b.cabType?.name || "N/A"}</td>
                       <td>{b.pickup}</td>
                       <td>{b.drop}</td>
                       <td>{b.time}</td>
@@ -690,130 +703,130 @@ export default function AdminPage() {
 
   const renderCabTypes = () => (
     <>
-              {/* Add Cab Form */}
-              <Card className="p-4 shadow mt-3">
-                <h4 className="mb-3 fw-bold">Add New Cab Type</h4>
-                <Form onSubmit={addCabType}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Cab Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="name"
-                      value={newCab.name}
-                      onChange={handleChange}
-                      placeholder="Enter cab name (e.g., Sedan)"
-                      required
-                    />
-                  </Form.Group>
+      {/* Add Cab Form */}
+      <Card className="p-4 shadow mt-3">
+        <h4 className="mb-3 fw-bold">Add New Cab Type</h4>
+        <Form onSubmit={addCabType}>
+          <Form.Group className="mb-3">
+            <Form.Label>Cab Name</Form.Label>
+            <Form.Control
+              type="text"
+              name="name"
+              value={newCab.name}
+              onChange={handleChange}
+              placeholder="Enter cab name (e.g., Sedan)"
+              required
+            />
+          </Form.Group>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={2}
-                      name="description"
-                      value={newCab.description}
-                      onChange={handleChange}
-                      placeholder="Enter cab description"
-                    />
-                  </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={2}
+              name="description"
+              value={newCab.description}
+              onChange={handleChange}
+              placeholder="Enter cab description"
+            />
+          </Form.Group>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Seats</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="seats"
-                      value={newCab.seats}
-                      onChange={handleChange}
-                      placeholder="Number of seats"
-                      required
-                    />
-                  </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Seats</Form.Label>
+            <Form.Control
+              type="number"
+              name="seats"
+              value={newCab.seats}
+              onChange={handleChange}
+              placeholder="Number of seats"
+              required
+            />
+          </Form.Group>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Cab Image</Form.Label>
-                    <Form.Control
-                      type="file"
-                      name="image"
-                      accept="image/*"
-                      onChange={handleChange}
-                    />
-                    {newCab.image && (
-                      <div className="mt-2">
-                        <small className="text-muted">
-                          Selected: {newCab.image.name}
-                        </small>
-                      </div>
+          <Form.Group className="mb-3">
+            <Form.Label>Cab Image</Form.Label>
+            <Form.Control
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleChange}
+            />
+            {newCab.image && (
+              <div className="mt-2">
+                <small className="text-muted">
+                  Selected: {newCab.image.name}
+                </small>
+              </div>
+            )}
+          </Form.Group>
+
+          <Button type="submit" variant="success">
+            Add Cab
+          </Button>
+        </Form>
+      </Card>
+
+      {/* Cab Types List */}
+      <Card className="p-4 shadow mt-4">
+        <h4 className="mb-3 fw-bold">Available Cab Types</h4>
+        {cabTypes.length > 0 ? (
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Cab Name</th>
+                <th>Description</th>
+                <th>Seats</th>
+                <th>Image</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cabTypes.map((cab, index) => (
+                <tr key={cab._id}>
+                  <td>{index + 1}</td>
+                  <td>{cab.name}</td>
+                  <td>{cab.description}</td>
+                  <td>{cab.seats}</td>
+                  <td>
+                    {cab.image ? (
+                      <img
+                        src={`${SERVER_URL}/uploads/${cab.image}`}
+                        alt={cab.name}
+                        style={{ width: "80px", height: "50px", objectFit: "cover" }}
+                      />
+                    ) : (
+                      "No Image"
                     )}
-                  </Form.Group>
-
-                  <Button type="submit" variant="success">
-                    Add Cab
-                  </Button>
-                </Form>
-              </Card>
-
-              {/* Cab Types List */}
-              <Card className="p-4 shadow mt-4">
-                <h4 className="mb-3 fw-bold">Available Cab Types</h4>
-                {cabTypes.length > 0 ? (
-                  <Table striped bordered hover responsive>
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Cab Name</th>
-                        <th>Description</th>
-                        <th>Seats</th>
-                        <th>Image</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {cabTypes.map((cab, index) => (
-                        <tr key={cab._id}>
-                          <td>{index + 1}</td>
-                          <td>{cab.name}</td>
-                          <td>{cab.description}</td>
-                          <td>{cab.seats}</td>
-                          <td>
-                            {cab.image ? (
-                              <img
-                                src={`${SERVER_URL}/uploads/${cab.image}`}
-                                alt={cab.name}
-                                style={{ width: "80px", height: "50px", objectFit: "cover" }}
-                              />
-                            ) : (
-                              "No Image"
-                            )}
-                          </td>
-                          <td>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={async () => {
-                                if (window.confirm("Are you sure you want to delete this cab type?")) {
-                                  try {
-                                    await axios.delete(`${SERVER_URL}/cabtypes/${cab._id}`);
-                                    fetchCabs();
-                                  } catch (err) {
-                                    console.error("Failed to delete cab type:", err);
-                                    alert("Error deleting cab type.");
-                                  }
-                                }
-                              }}
-                            >
-                              Delete
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                ) : (
-                  <Alert variant="warning">No cab types available.</Alert>
-                )}
-              </Card>
-            </>
+                  </td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={async () => {
+                        if (window.confirm("Are you sure you want to delete this cab type?")) {
+                          try {
+                            await axios.delete(`${SERVER_URL}/cabtypes/${cab._id}`);
+                            fetchCabs();
+                          } catch (err) {
+                            console.error("Failed to delete cab type:", err);
+                            alert("Error deleting cab type.");
+                          }
+                        }
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <Alert variant="warning">No cab types available.</Alert>
+        )}
+      </Card>
+    </>
   )
 
   const handleViewImage = (imageUrl) => {

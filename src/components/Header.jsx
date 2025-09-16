@@ -1,7 +1,7 @@
 import React from "react";
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo 2.png";
 
 
 
@@ -20,7 +20,7 @@ export const Header = () => {
               src={logo}
               alt="Logo"
               className="img-fluid d-inline-block align-top"
-              style={{ height: "48px", width: "auto" }}
+              style={{ height: "70px", width: "auto" }}
             />
           </Navbar.Brand>
 

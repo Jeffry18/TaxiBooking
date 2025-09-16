@@ -23,12 +23,13 @@ export const Home = () => {
     vehicle: "", // will hold selected cab type id now
     pickup: "",
     drop: "",
+    extraStops: [],
     date: "",
     returnDate: "",
     time: "",
     vehicleType: "",
     passengerCount: "",
-    tripType: "",
+    //tripType: "",
     selectedCabType: null,
   });
   const [message, setMessage] = useState("");
@@ -37,6 +38,7 @@ export const Home = () => {
   const [selectedAirport, setSelectedAirport] = useState(null);
   const [airportTripType, setAirportTripType] = useState("pickup");
   const [recent, setRecent] = useState([]);
+  const [extraStops, setExtraStops] = useState([]); // for extra locations
 
   const keralaAirports = [
     { value: "COK", label: "Cochin International Airport (COK)" },
@@ -114,6 +116,20 @@ export const Home = () => {
 
   }, []);
 
+  const addStop = () => {
+    setExtraStops([...extraStops, ""]);
+  };
+
+  const updateStop = (index, value) => {
+    const updatedStops = [...extraStops];
+    updatedStops[index] = value;
+    setExtraStops(updatedStops);
+  };
+
+  const removeStop = (index) => {
+    const updatedStops = extraStops.filter((_, i) => i !== index);
+    setExtraStops(updatedStops);
+  };
 
 
 
@@ -149,17 +165,19 @@ export const Home = () => {
       }
 
       const bookingData = {
-        vehicle: form.vehicle,
+        cabType: form.vehicle,
         pickup: form.pickup,
         drop: form.drop,
+        extraStops: extraStops.filter(s => s.trim() !== "") || [], // ✅ include extra stops
         date: form.date,
-        returnDate: tripType === "round" ? form.returnDate : null,
+        returnDate:  form.returnDate,
         time: form.time,
         passengerCount: parseInt(form.passengerCount) || 1,
-        tripType,
-        airportTripType: tripType === "airport" ? airportTripType : null, // ✅
+        // tripType,
+        // airportTripType: tripType === "airport" ? airportTripType : null,
         status: "pending",
       };
+
 
       // cab types are already loaded on mount
 
@@ -179,12 +197,13 @@ export const Home = () => {
           vehicle: "",
           pickup: "",
           drop: "",
+          extraStops: [],
           date: "",
           returnDate: "",
           time: "",
           vehicleType: "",
           passengerCount: "",
-          tripType: "",
+          // tripType: "",
         });
         // refresh bookings after new booking
         const res = await axios.get(`${SERVER_URL}/bookings`, {
@@ -207,11 +226,11 @@ export const Home = () => {
 
 
 
-  const isAirport = tripType === "airport";
-  const isRound = tripType === "round";
-  const row1Cols = isAirport ? 4 : 3;
+  // const isAirport = tripType === "airport";
+  // const isRound = tripType === "round";
+  const row1Cols = 4;
   const row1Lg = 12 / row1Cols;
-  const row2Cols = isRound ? 4 : 3;
+  const row2Cols = 4;
   const row2Lg = 12 / row2Cols;
 
   return (
@@ -241,6 +260,11 @@ export const Home = () => {
 
 
                 <Card style={{ border: "none" }}>
+
+                  <h2 className="text-center booking-heading red-shadow mb-3">BOOK YOUR TRIP</h2>
+
+
+                  {/*
                   <div
                     className="mt-3 mb-2  rounded  justify-content-center align-items-center text-center "
                     style={{ maxWidth: "1350px", width: "100%" }}
@@ -268,13 +292,14 @@ export const Home = () => {
                       </Nav.Item>
                     </Nav>
                   </div>
+                  */}
                 </Card>
 
 
                 <Form onSubmit={handleSubmit}>
                   {/* Row 1: Trip Type (airport) | From | To | Pick Up Date */}
                   <Row className=" justify-content-center">
-                    {isAirport && (
+                    {/* {isAirport && (
                       <Col lg={row1Lg} md={6} className="mb-1 booking-field">
                         <Form.Label className="booking-label mb-1">Trip Type</Form.Label>
                         <Form.Select
@@ -286,8 +311,9 @@ export const Home = () => {
                           <option value="drop">Drop to Airport</option>
                         </Form.Select>
                       </Col>
-                    )}
-                    <Col lg={row1Lg} md={6} className="mb-1 booking-field">
+                    )} */}
+
+                    <Col lg={3} md={6} className="mb-1 booking-field">
                       <Form.Label className="booking-label mb-1">From</Form.Label>
                       <Select
                         classNamePrefix="rs"
@@ -299,7 +325,16 @@ export const Home = () => {
                         isSearchable
                       />
                     </Col>
-                    <Col lg={row1Lg} md={6} className="mb-1 booking-field">
+                    {/* Small Add button column in the same row */}
+                    
+                      <Col lg={1} md={3} className="mb-3 d-flex align-items-end justify-content-center">
+                        <Button variant="outline-primary" size="sm" onClick={addStop} className="px-2 py-1">
+                          +
+                        </Button>
+                      </Col>
+                    
+                    
+                    <Col lg={3} md={6} className="mb-1 booking-field">
                       <Form.Label className="booking-label">To</Form.Label>
                       <Select
                         classNamePrefix="rs"
@@ -311,35 +346,9 @@ export const Home = () => {
                         isSearchable
                       />
                     </Col>
-                    <Col lg={row1Lg} md={6} className="mb-1 booking-field">
-                      <Form.Label className="booking-label">Pick Up Date</Form.Label>
-                      <Form.Control
-                        className="booking-input"
-                        type="date"
-                        name="date"
-                        value={form.date}
-                        onChange={handleChange}
-                        required
-                      />
-                    </Col>
-                  </Row>
 
-                  {/* Row 2: Return Date | Vehicle | Passengers | Pick Up Time */}
-                  <Row className="mb-2 justify-content-center">
-                    {isRound && (
-                      <Col lg={row2Lg} md={6} className="mb-1 booking-field">
-                        <Form.Label className="booking-label">Return Date</Form.Label>
-                        <Form.Control
-                          className="booking-input"
-                          type="date"
-                          value={form.returnDate || ""}
-                          min={form.date || new Date().toISOString().split("T")[0]}
-                          onChange={(e) => setForm({ ...form, returnDate: e.target.value })}
-                        />
-                      </Col>
-                    )}
-
-                    <Col lg={row2Lg} md={6} className="mb-1 booking-field">
+                    {/* Cab Type column to complete 4 columns in the row */}
+                    <Col lg={3} md={6} className="mb-1 booking-field">
                       <Form.Label className="booking-label">Cab Type</Form.Label>
                       <Form.Select
                         className="booking-input"
@@ -363,6 +372,67 @@ export const Home = () => {
                         ))}
                       </Form.Select>
                     </Col>
+                    
+
+
+
+                    {/* Extra Stops */}
+                    {extraStops.map((stop, index) => (
+                      <Col key={index} lg={row1Lg} md={6} className="mb-1 booking-field d-flex align-items-end">
+                        <div style={{ flexGrow: 1 }}>
+                          <Form.Label className="booking-label">Stop {index + 1}</Form.Label>
+                          <Select
+                            classNamePrefix="rs"
+                            className="booking-select booking-field"
+                            options={places.map((p) => ({ value: p.name, label: p.name }))}
+                            value={stop ? { value: stop, label: stop } : null}
+                            onChange={(selected) => updateStop(index, selected.value)}
+                            placeholder="Select Extra Stop"
+                            isSearchable
+                          />
+                        </div>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          className="mb-2"
+                          onClick={() => removeStop(index)}
+                        >
+                          x
+                        </Button>
+                      </Col>
+                    ))}
+
+                    
+
+
+
+                    
+                  </Row>
+
+                  {/* Row 2: Pick Up Date | Return Date | Passengers | Pick Up Time */}
+                  <Row className="mb-2 justify-content-center">
+                    <Col lg={row2Lg} md={6} className="mb-1 booking-field">
+                      <Form.Label className="booking-label">Pick Up Date</Form.Label>
+                      <Form.Control
+                        className="booking-input"
+                        type="date"
+                        name="date"
+                        value={form.date}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                    <Col lg={row2Lg} md={6} className="mb-1 booking-field">
+                      <Form.Label className="booking-label">Return Date</Form.Label>
+                      <Form.Control
+                        className="booking-input"
+                        type="date"
+                        value={form.returnDate || ""}
+                        min={form.date || new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setForm({ ...form, returnDate: e.target.value })}
+                      />
+                    </Col>
+
 
                     <Col lg={row2Lg} md={6} className="mb-1 booking-field">
                       <Form.Label className="booking-label">Passengers</Form.Label>
@@ -407,6 +477,7 @@ export const Home = () => {
             <Col xs={12} className="mb-3 px-3">
               <Card className="shadow" style={{ borderRadius: "10px" }}>
                 <Card.Body>
+                  {/**
                   <div className="mb-2 text-center">
                     <Nav activeKey={tripType} className="justify-content-center">
                       <Nav.Item>
@@ -423,10 +494,11 @@ export const Home = () => {
                       </Nav.Item>
                     </Nav>
                   </div>
+                  */}
 
                   <Form onSubmit={handleSubmit}>
                     <Row>
-                      {isAirport && (
+                      {/* {isAirport && (
                         <Col xs={12} className="mb-2">
                           <Form.Label className="booking-label mb-1">Trip Type</Form.Label>
                           <Form.Select
@@ -438,7 +510,7 @@ export const Home = () => {
                             <option value="drop">Drop to Airport</option>
                           </Form.Select>
                         </Col>
-                      )}
+                      )} */}
 
                       <Col xs={12} className="mb-2">
                         <Form.Label className="booking-label mb-1">From</Form.Label>
@@ -464,6 +536,40 @@ export const Home = () => {
                           isSearchable
                         />
                       </Col>
+                      {/* Extra Stops - only visible in round trip */}
+                      { extraStops.map((stop, index) => (
+                        <Form.Group key={index} className="mb-2 booking-field d-flex align-items-end">
+                          <div style={{ flexGrow: 1 }}>
+                            <Form.Label className="booking-label">Stop {index + 1}</Form.Label>
+                            <Select
+                              classNamePrefix="rs"
+                              className="booking-select booking-field"
+                              options={places.map((p) => ({ value: p.name, label: p.name }))}
+                              value={stop ? { value: stop, label: stop } : null}
+                              onChange={(selected) => updateStop(index, selected.value)}
+                              placeholder="Select Extra Stop"
+                              isSearchable
+                            />
+                          </div>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="ms-2 mb-1"
+                            onClick={() => removeStop(index)}
+                          >
+                            x
+                          </Button>
+                        </Form.Group>
+                      ))}
+
+                      {/* Add Stop button */}
+                      
+                        <div className="text-center mb-3">
+                          <Button variant="outline-primary" size="sm" onClick={addStop}>
+                            +
+                          </Button>
+                        </div>
+                      
                       <Col xs={12} className="mb-2">
                         <Form.Label className="booking-label">Pick Up Date</Form.Label>
                         <Form.Control
@@ -476,7 +582,7 @@ export const Home = () => {
                         />
                       </Col>
 
-                      {isRound && (
+                      
                         <Col xs={12} className="mb-2">
                           <Form.Label className="booking-label">Return Date</Form.Label>
                           <Form.Control
@@ -487,7 +593,7 @@ export const Home = () => {
                             onChange={(e) => setForm({ ...form, returnDate: e.target.value })}
                           />
                         </Col>
-                      )}
+                      
 
                       <Col xs={12} className="mb-2">
                         <Form.Label className="booking-label">Cab Type</Form.Label>
@@ -558,7 +664,7 @@ export const Home = () => {
 
         {/* Error and Loading States */}
         {loading && (
-          <Row className="mb-4" style={{ marginTop: "250px" }}>
+          <Row className="mb-2" style={{ marginTop: "250px" }}>
             <Col>
               <Alert variant="info">Loading cab types...</Alert>
             </Col>
@@ -566,7 +672,7 @@ export const Home = () => {
         )}
 
         {error && (
-          <Row className="mb-4">
+          <Row className="mb-2">
             <Col>
               <Alert variant="danger">{error}</Alert>
             </Col>
@@ -574,7 +680,7 @@ export const Home = () => {
         )}
 
         {message && (
-          <Row className="mb-4">
+          <Row className="mb-2" style={{marginTop:"250px"}}>
             <Col>
               <Alert variant={message.includes("✅") ? "success" : "danger"}>
                 {message}
@@ -587,7 +693,7 @@ export const Home = () => {
 
         {/* Recent Bookings */}
 
-        <Container className="px-3 px-md-4" style={{marginTop:"200px"}}>
+        <Container className="px-3 px-md-4" style={{ marginTop: "200px" }}>
           <h4 className="fw-bold  text-center">Recent Bookings</h4>
 
           {loading && (
@@ -612,7 +718,7 @@ export const Home = () => {
                   <th>Return Date</th>
                   <th>Time</th>
                   <th>Passengers</th>
-                  <th>Trip Type</th>
+                  {/* <th>Trip Type</th> */}
                   <th>Vehicle</th>
                 </tr>
               </thead>
@@ -629,13 +735,17 @@ export const Home = () => {
                     </td>
                     <td>{b.time}</td>
                     <td>{b.passengerCount}</td>
-                    <td>
+                    {/* <td>
                       {b.tripType === "airport"
                         ? `Airport (${b.airportTripType})`
                         : b.tripType}
-                    </td>
+                    </td> */}
                     <td>
-                      {b.vehicle.name} ({b.vehicle.type})
+                      {b.cabType
+                        ? `${b.cabType.name || ''}`
+                        : b.vehicle
+                          ? `${b.vehicle.model || b.vehicle.name || ''} (${b.vehicle.type || ''})`
+                          : '-'}
                     </td>
                   </tr>
                 ))}

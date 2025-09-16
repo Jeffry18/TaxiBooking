@@ -87,6 +87,18 @@ html, body { overflow-x: hidden; }
   box-shadow: 0px 10px 20px rgba(0, 123, 255, 0.4);
 }
 
+/* Booking title styling */
+.booking-heading {
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  margin: 6px 0 10px 0;
+  background: linear-gradient(90deg, #111, #dc3545);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 14px rgba(255, 0, 0, 0.25);
+}
+
 
 /* Carousel container full width */
 .carousel-item img {
