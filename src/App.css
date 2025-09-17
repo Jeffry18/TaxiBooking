@@ -333,3 +333,35 @@ html, body { overflow-x: hidden; }
   background-color: #ff0000;  /* active bullet color */
   opacity: 1;
 }
+
+
+
+/* ✅ Logo styling */
+.navbar-logo {
+  max-height: 70px;  /* keeps it within navbar height */
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Tablet view */
+@media (max-width: 992px) {
+  .navbar-logo {
+    max-height: 50px;
+  }
+}
+
+/* Mobile view */
+@media (max-width: 576px) {
+  .navbar-logo {
+    max-height: 45px;
+  }
+}
+
+/* ✅ Ensure logo & toggler align side by side */
+.navbar-brand,
+.navbar-toggler {
+  display: flex;
+  align-items: center;
+}
+

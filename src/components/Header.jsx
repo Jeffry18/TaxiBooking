@@ -5,6 +5,7 @@ import logo from "../assets/logo 2.png";
 
 
 
+
 export const Header = () => {
   const navigate = useNavigate();
   const logout = () => {
@@ -13,15 +14,15 @@ export const Header = () => {
   }
   return (
     <div>
-      <Navbar bg="white" variant="light" expand="lg" fixed="top" collapseOnSelect className="shadow" style={{ minHeight: "20px", maxHeight: "70px" }}>
+      <Navbar bg="white" variant="light" expand="lg" fixed="top" collapseOnSelect className="shadow" >
         <Container>
-          <Navbar.Brand as={Link} to="/" className="fw-bold">
+          <Navbar.Brand as={Link} to="/" className="">
             <img
               src={logo}
               alt="Logo"
-              className="img-fluid d-inline-block align-top"
-              style={{ height: "70px", width: "auto" , marginTop: "0px" }}
+              className="navbar-logo img-fluid d-inline-block align-top"
             />
+
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="main-navbar" />
@@ -40,9 +41,9 @@ export const Header = () => {
               <Nav.Link as={Link} to="/aboutus">About us</Nav.Link>
 
               {
-                sessionStorage.getItem("role")=== "admin" ?(
-                <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
-                ):null
+                sessionStorage.getItem("role") === "admin" ? (
+                  <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
+                ) : null
               }
 
               <NavDropdown title="Contact Us" id="contact" className="px-lg-3">
