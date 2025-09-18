@@ -41,6 +41,15 @@ export default function AdminPage() {
     seats: "",
     image: null
   });
+  const [cabVehicles, setCabVehicles] = useState([]);
+  const [newCabVehicle, setNewCabVehicle] = useState({
+    cabTypeName: "",
+    modelName: "",
+    capacity: "",
+    pricePerKm: ""
+  });
+  
+
 
 
   // Fetch data
@@ -51,6 +60,7 @@ export default function AdminPage() {
     fetchBookings();
     fetchTrips();
     fetchCabs();
+    fetchCabVehicles();
   }, []);
 
   const fetchVehicles = async () => {
@@ -164,6 +174,17 @@ export default function AdminPage() {
     }
   };
 
+  const fetchCabVehicles = async () => {
+    try {
+      const res = await axios.get(`${SERVER_URL}/cabvehicles`);
+      setCabVehicles(Array.isArray(res.data) ? res.data : []);
+
+    } catch (err) {
+      console.error("Failed to fetch cab vehicles:", err);
+      setCabVehicles([]);
+    }
+  }
+
   const approveVehicle = async (id) => {
     try {
       await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "approved" });
@@ -241,12 +262,21 @@ export default function AdminPage() {
   };
 
   // Handle input
-  const handleChange = (e) => {
+  const handleCabChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
       setNewCab({ ...newCab, image: files[0] });
     } else {
       setNewCab({ ...newCab, [name]: value });
+    }
+  };
+
+  const handleCabVehicleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setNewCabVehicle({ ...newCabVehicle, image: files[0] });
+    } else {
+      setNewCabVehicle({ ...newCabVehicle, [name]: value });
     }
   };
 
@@ -330,6 +360,37 @@ export default function AdminPage() {
       alert("Error adding cab type. Please try again.");
     }
   };
+
+  const addCabVehicle = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("cabTypeName", newCabVehicle.cabTypeName);
+      formData.append("modelName", newCabVehicle.modelName);
+      formData.append("capacity", Number(newCabVehicle.capacity));
+      formData.append("pricePerKm", Number(newCabVehicle.pricePerKm));
+      if (newCabVehicle.image) {
+        formData.append("image", newCabVehicle.image);
+      }
+
+      await axios.post(`${SERVER_URL}/cabvehicles`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("Cab vehicle added successfully!");
+      setNewCabVehicle({ cabTypeName: "", modelName: "", capacity: "", pricePerKm: "", image: null });
+      e.target.reset();
+      if (fetchCabVehicles) fetchCabVehicles(); // refresh list
+    } catch (err) {
+      console.error("Failed to add cab vehicle:", err.response?.data || err.message);
+      alert("Error adding cab vehicle. Please try again.");
+    }
+  };
+
+
+
+
+
 
 
   // Move these declarations outside of renderVehiclesTable
@@ -530,6 +591,7 @@ export default function AdminPage() {
                 <thead>
                   <tr>
                     <th>#</th>
+                    <th>User</th>
                     <th>Cab Type</th>
                     <th>Pickup</th>
                     <th>Drop</th>
@@ -543,6 +605,7 @@ export default function AdminPage() {
                   {grouped[date].map((b, idx) => (
                     <tr key={b._id}>
                       <td>{idx + 1}</td>
+                      <td>{b.username}</td>
                       <td>{b.cabType?.name || "N/A"}</td>
                       <td>{b.pickup}</td>
                       <td>{b.drop}</td>
@@ -713,11 +776,13 @@ export default function AdminPage() {
               type="text"
               name="name"
               value={newCab.name}
-              onChange={handleChange}
+              onChange={handleCabChange}
               placeholder="Enter cab name (e.g., Sedan)"
               required
             />
           </Form.Group>
+
+
 
           <Form.Group className="mb-3">
             <Form.Label>Description</Form.Label>
@@ -726,10 +791,12 @@ export default function AdminPage() {
               rows={2}
               name="description"
               value={newCab.description}
-              onChange={handleChange}
+              onChange={handleCabChange}
               placeholder="Enter cab description"
             />
           </Form.Group>
+
+
 
           <Form.Group className="mb-3">
             <Form.Label>Seats</Form.Label>
@@ -737,7 +804,7 @@ export default function AdminPage() {
               type="number"
               name="seats"
               value={newCab.seats}
-              onChange={handleChange}
+              onChange={handleCabChange}
               placeholder="Number of seats"
               required
             />
@@ -749,7 +816,7 @@ export default function AdminPage() {
               type="file"
               name="image"
               accept="image/*"
-              onChange={handleChange}
+              onChange={handleCabChange}
             />
             {newCab.image && (
               <div className="mt-2">
@@ -762,6 +829,82 @@ export default function AdminPage() {
 
           <Button type="submit" variant="success">
             Add Cab
+          </Button>
+        </Form>
+      </Card>
+
+      <Card className="p-4 shadow mt-3">
+        <h4 className="mb-3 fw-bold">Add New Cab Vehicle</h4>
+        <Form onSubmit={addCabVehicle}>
+          <Form.Group className="mb-3">
+            <Form.Label>Vehicle Name</Form.Label>
+            <Form.Control
+              type="text"
+              name="modelName"
+              value={newCabVehicle.modelName}
+              onChange={handleCabVehicleChange}
+              placeholder="Enter Vehicle name (e.g., Toyota Innova)"
+              required
+            />
+          </Form.Group>
+
+
+
+          <Form.Group className="mb-3">
+            <Form.Label>Cab Type</Form.Label>
+            <Form.Select
+              name="cabTypeName"
+              value={newCabVehicle.cabTypeName}
+              onChange={handleCabVehicleChange}
+              required
+            >
+              <option value="">-- Select Cab Type --</option>
+              {cabTypes.map((cab) => (
+                <option key={cab._id} value={cab.name}>
+                  {cab.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+
+
+
+          <Form.Group className="mb-3">
+            <Form.Label>Capacity</Form.Label>
+            <Form.Control
+              type="number"
+              name="capacity"
+              value={newCabVehicle.capacity}
+              onChange={handleCabVehicleChange}
+              placeholder="Number of seats"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Price Per Km</Form.Label>
+            <Form.Control
+              type="number"
+              name="pricePerKm"
+              value={newCabVehicle.pricePerKm}
+              onChange={handleCabVehicleChange}
+              placeholder="Price Per Km"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group>
+            <Form.Label>Image</Form.Label>
+            <Form.Control
+              type="file"
+              onChange={(e) => setNewCabVehicle({ ...newCabVehicle, image: e.target.files[0] })}
+            />
+          </Form.Group>
+
+
+
+          <Button type="submit" variant="success">
+            Add Cab Vehicle
           </Button>
         </Form>
       </Card>
@@ -826,8 +969,74 @@ export default function AdminPage() {
           <Alert variant="warning">No cab types available.</Alert>
         )}
       </Card>
+
+      {/* cab vehicle list */}
+      <Card className="p-4 shadow mt-4">
+        <h4 className="mb-3 fw-bold">Available Cab Vehicles</h4>
+        {cabVehicles.length > 0 ? (
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Cab Type</th>
+                <th>Vehicle Name</th>
+                <th>Capacity</th>
+                <th>Price Per Km</th>
+                <th>Image</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cabVehicles.map((vehicle, index) => (
+                <tr key={vehicle._id}>
+                  <td>{index + 1}</td>
+                  <td>{vehicle.cabTypeName}</td>
+                  <td>{vehicle.modelName}</td>
+                  <td>{vehicle.capacity}</td>
+                  <td>₹{vehicle.pricePerKm}</td>
+                  <td>
+                    {vehicle.image ? (
+                      <img
+                        src={`${SERVER_URL}/uploads/${vehicle.image}`}
+                        alt={vehicle.modelName}
+                        style={{ width: "80px", height: "50px", objectFit: "cover" }}
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={async () => {
+                        if (window.confirm("Are you sure you want to delete this cab vehicle?")) {
+                          try {
+                            await axios.delete(`${SERVER_URL}/cabvehicles/${vehicle._id}`);
+                            fetchCabVehicles(); // refresh after delete
+                          } catch (err) {
+                            console.error("Failed to delete cab vehicle:", err);
+                            alert("Error deleting cab vehicle.");
+                          }
+                        }
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <Alert variant="warning">No cab vehicles available.</Alert>
+        )}
+      </Card>
+
     </>
-  )
+  );
+
+
 
   const handleViewImage = (imageUrl) => {
     setSelectedImage(`${SERVER_URL}/uploads/${imageUrl}`);
@@ -893,6 +1102,14 @@ export default function AdminPage() {
               }
             >
               Package Bookings
+            </Nav.Link>
+            <Nav.Link
+              onClick={() => setActiveTab("state")}
+              className={
+                activeTab === "state" ? "active text-light" : "text-dark"
+              }
+            >
+              States & Places
             </Nav.Link>
           </Nav>
         </Col>
@@ -1016,6 +1233,8 @@ export default function AdminPage() {
               </Row>
             </>
           )}
+          {/* {activeTab === "state" && renderState()} */}
+
         </Col>
       </Row>
     </Container>

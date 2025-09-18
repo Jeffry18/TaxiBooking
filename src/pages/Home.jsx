@@ -10,6 +10,8 @@ import local from '../assets/local.jpg';
 import round from '../assets/round.jpg';
 import airport from '../assets/airport.jpg';
 import oneway from '../assets/oneway.jpg';
+import { useNavigate } from "react-router-dom";
+
 
 
 
@@ -32,6 +34,8 @@ export const Home = () => {
     //tripType: "",
     selectedCabType: null,
   });
+
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [places, setPlaces] = useState([]);
   const [tripType, setTripType] = useState("round");
@@ -149,6 +153,10 @@ export const Home = () => {
     }
   };
 
+  const handleViewVehicles = (cabTypeName) => {
+    navigate(`/view-vehicles/${cabTypeName}`);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -170,7 +178,7 @@ export const Home = () => {
         drop: form.drop,
         extraStops: extraStops.filter(s => s.trim() !== "") || [], // ✅ include extra stops
         date: form.date,
-        returnDate:  form.returnDate,
+        returnDate: form.returnDate,
         time: form.time,
         passengerCount: parseInt(form.passengerCount) || 1,
         // tripType,
@@ -323,7 +331,7 @@ export const Home = () => {
                         onChange={(selected) => setForm({ ...form, drop: selected.value })}
                         placeholder="Select Drop Location"
                         isSearchable
-                        
+
                       />
                     </Col>
 
@@ -340,8 +348,8 @@ export const Home = () => {
                       />
                     </Col>
                     {/* Small Add button column in the same row */}
-                    <Col lg={1} md={3} className="mb-3 d-flex align-items-end justify-content-center">
-                      <Button variant="outline-primary" size="sm" onClick={addStop} className="px-2 py-1">
+                    <Col lg={1} md={3} className="mb-3 mt-3 d-flex align-items-end justify-content-center">
+                      <Button variant="outline-primary" size="sm" onClick={addStop} className="px-3 py-1">
                         +
                       </Button>
                     </Col>
@@ -371,7 +379,7 @@ export const Home = () => {
                         ))}
                       </Form.Select>
                     </Col>
-                    
+
 
 
 
@@ -401,16 +409,17 @@ export const Home = () => {
                       </Col>
                     ))}
 
-                    
 
 
 
-                    
+
+
                   </Row>
 
                   {/* Row 2: Pick Up Date | Return Date | Passengers | Pick Up Time */}
-                  <Row className="mb-2 justify-content-center">
-                    <Col lg={row2Lg} md={6} className="mb-1 booking-field">
+                  <Row className="justify-content-center g-3">
+                    {/* Pick Up Date */}
+                    <Col lg={3} md={6} className="booking-field">
                       <Form.Label className="booking-label">Pick Up Date</Form.Label>
                       <Form.Control
                         className="booking-input"
@@ -421,7 +430,9 @@ export const Home = () => {
                         required
                       />
                     </Col>
-                    <Col lg={row2Lg} md={6} className="mb-1 booking-field">
+
+                    {/* Return Date */}
+                    <Col lg={3} md={6} className="booking-field">
                       <Form.Label className="booking-label">Return Date</Form.Label>
                       <Form.Control
                         className="booking-input"
@@ -432,12 +443,12 @@ export const Home = () => {
                       />
                     </Col>
 
-
-                    <Col lg={row2Lg} md={6} className="mb-1 booking-field">
-                      <Form.Label className="booking-label">Passengers</Form.Label>
+                    {/* Members */}
+                    <Col lg={2} md={6} className="booking-field">
+                      <Form.Label className="booking-label">Members</Form.Label>
                       <Form.Control
                         className="booking-input"
-                        placeholder="Passenger Count"
+                        placeholder="Members Count"
                         name="passengerCount"
                         value={form.passengerCount}
                         onChange={handleChange}
@@ -447,7 +458,9 @@ export const Home = () => {
                         required
                       />
                     </Col>
-                    <Col lg={row2Lg} md={6} className="mb-1 booking-field">
+
+                    {/* Pick Up Time */}
+                    <Col lg={2} md={6} className="booking-field">
                       <Form.Label className="booking-label">Pick Up Time</Form.Label>
                       <Form.Control
                         className="booking-input"
@@ -460,8 +473,9 @@ export const Home = () => {
                     </Col>
                   </Row>
 
+
                   {/* Submit Button */}
-                  <div className="d-flex justify-content-center">
+                  <div className="d-flex justify-content-center mt-3">
                     <Button type="submit" className="book-btn">
                       Book Now
                     </Button>
@@ -536,7 +550,7 @@ export const Home = () => {
                         />
                       </Col>
                       {/* Extra Stops - only visible in round trip */}
-                      { extraStops.map((stop, index) => (
+                      {extraStops.map((stop, index) => (
                         <Form.Group key={index} className="mb-2 booking-field d-flex align-items-end">
                           <div style={{ flexGrow: 1 }}>
                             <Form.Label className="booking-label">Stop {index + 1}</Form.Label>
@@ -562,13 +576,13 @@ export const Home = () => {
                       ))}
 
                       {/* Add Stop button */}
-                      
-                        <div className="text-center mb-3">
-                          <Button variant="outline-primary" size="sm" onClick={addStop}>
-                            +
-                          </Button>
-                        </div>
-                      
+
+                      <div className="text-center mb-3">
+                        <Button variant="outline-primary" size="sm" onClick={addStop}>
+                          +
+                        </Button>
+                      </div>
+
                       <Col xs={12} className="mb-2">
                         <Form.Label className="booking-label">Pick Up Date</Form.Label>
                         <Form.Control
@@ -581,18 +595,18 @@ export const Home = () => {
                         />
                       </Col>
 
-                      
-                        <Col xs={12} className="mb-2">
-                          <Form.Label className="booking-label">Return Date</Form.Label>
-                          <Form.Control
-                            className="booking-input"
-                            type="date"
-                            value={form.returnDate || ""}
-                            min={form.date || new Date().toISOString().split("T")[0]}
-                            onChange={(e) => setForm({ ...form, returnDate: e.target.value })}
-                          />
-                        </Col>
-                      
+
+                      <Col xs={12} className="mb-2">
+                        <Form.Label className="booking-label">Return Date</Form.Label>
+                        <Form.Control
+                          className="booking-input"
+                          type="date"
+                          value={form.returnDate || ""}
+                          min={form.date || new Date().toISOString().split("T")[0]}
+                          onChange={(e) => setForm({ ...form, returnDate: e.target.value })}
+                        />
+                      </Col>
+
 
                       <Col xs={12} className="mb-2">
                         <Form.Label className="booking-label">Cab Type</Form.Label>
@@ -663,7 +677,7 @@ export const Home = () => {
 
         {/* Error and Loading States */}
         {loading && (
-          <Row className="mb-2" style={{ marginTop: "250px" }}>
+          <Row className="" style={{ marginTop: "250px" }}>
             <Col>
               <Alert variant="info">Loading cab types...</Alert>
             </Col>
@@ -671,7 +685,7 @@ export const Home = () => {
         )}
 
         {error && (
-          <Row className="mb-2">
+          <Row className="">
             <Col>
               <Alert variant="danger">{error}</Alert>
             </Col>
@@ -679,7 +693,7 @@ export const Home = () => {
         )}
 
         {message && (
-          <Row className="mb-2" style={{marginTop:"250px"}}>
+          <Row className="" style={{ marginTop: "250px" }}>
             <Col>
               <Alert variant={message.includes("✅") ? "success" : "danger"}>
                 {message}
@@ -718,7 +732,7 @@ export const Home = () => {
                   <th>Time</th>
                   <th>Passengers</th>
                   {/* <th>Trip Type</th> */}
-                  <th>Vehicle</th>
+                  <th>Cab Type</th>
                 </tr>
               </thead>
               <tbody>
@@ -754,15 +768,40 @@ export const Home = () => {
         </Container>
 
 
+        
+
+
+        {/* Cab Type Preview List */}
+        <h5 className=" fw-bold text-center" style={{ fontSize: "2rem", marginTop: "150px" }}>Available Cab Types</h5>
+
+        <Container className="px-3 px-md-4 mt-3 ">
+          <Row className="g-3 justify-content-center cabtype-grid">
+            {cabTypes.map(cab => (
+              <Col key={cab._id} xs={12} sm={6} md={4} lg={3} className="d-flex justify-content-center">
+                <Card className="h-100 shadow-sm cabtype-card" onClick={() => handleViewVehicles(cab.name)} style={{ cursor: 'pointer' }}>
+                  <div className="cabtype-card-imgwrap">
+                    <Card.Img className="cabtype-card-img" variant="top" src={`${SERVER_URL}/uploads/${cab.image}`} />
+                  </div>
+                  <Card.Body>
+                    <Card.Title className="cabtype-card-title">{cab.name}</Card.Title>
+                    <Card.Text className="cabtype-card-text" style={{ minHeight: '8px' }}>{cab.description}</Card.Text>
+                    <small className="cabtype-card-meta">Seats: {cab.seats}</small>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Container>
+
         {/* Trip Types */}
         <div className="text-center" style={{ marginTop: "50px" }}>
-          <h1 className="fw-bold mb-3">TRIP TYPES</h1>
-          <Row className="g-3 m-2">
+          <h1 className="fw-bold mb-3">STATES</h1>
+          <Row className="g-3 m-2 justify-content-center triptype-grid">
             <Col md={3} sm={6} xs={12}>
               <Card className="trip-card shadow ">
                 <Card.Img className="trip-card-img" variant="top" src={local} alt="Local trips" />
                 <Card.Body>
-                  <Card.Title>LOCAL TRIPS</Card.Title>
+                  <Card.Title>KERALA</Card.Title>
                   <Card.Text>
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
                   </Card.Text>
@@ -773,7 +812,7 @@ export const Home = () => {
               <Card className="trip-card shadow ">
                 <Card.Img className="trip-card-img" variant="top" src={round} alt="Round trips" />
                 <Card.Body>
-                  <Card.Title>ROUND TRIPS</Card.Title>
+                  <Card.Title>TAMILNADU</Card.Title>
                   <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
                 </Card.Body>
               </Card>
@@ -782,12 +821,12 @@ export const Home = () => {
               <Card className="trip-card shadow ">
                 <Card.Img className="trip-card-img" variant="top" src={oneway} alt="One-way trips" />
                 <Card.Body>
-                  <Card.Title>ONE WAY TRIPS</Card.Title>
+                  <Card.Title>KARNATAKA</Card.Title>
                   <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
                 </Card.Body>
               </Card>
             </Col>
-            <Col md={3} sm={6} xs={12}>
+            {/* <Col md={3} sm={6} xs={12}>
               <Card className="trip-card shadow">
                 <Card.Img className="trip-card-img" variant="top" src={airport} alt="Airport trips" />
                 <Card.Body>
@@ -795,32 +834,9 @@ export const Home = () => {
                   <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
                 </Card.Body>
               </Card>
-            </Col>
+            </Col> */}
           </Row>
         </div>
-
-
-        {/* Cab Type Preview List */}
-        <h5 className=" fw-bold text-center" style={{ fontSize: "2rem", marginTop: "150px" }}>Available Cab Types</h5>
-
-        <Container className="px-3 px-md-4 mt-3">
-          <Row className="g-3 justify-content-center cabtype-grid">
-            {cabTypes.map(cab => (
-              <Col key={cab._id} xs={12} sm={6} md={4} lg={3} className="d-flex justify-content-center">
-                <Card className="text-center h-100 shadow-sm cabtype-card">
-                  <div className="cabtype-card-imgwrap">
-                    <Card.Img className="cabtype-card-img" variant="top" src={`${SERVER_URL}/uploads/${cab.image}`} />
-                  </div>
-                  <Card.Body>
-                    <Card.Title className="cabtype-card-title">{cab.name}</Card.Title>
-                    <Card.Text className="cabtype-card-text" style={{ minHeight: '48px' }}>{cab.description}</Card.Text>
-                    <small className="cabtype-card-meta">Seats: {cab.seats}</small>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </Container>
 
 
       </Container>

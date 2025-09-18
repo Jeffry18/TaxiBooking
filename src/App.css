@@ -365,3 +365,22 @@ html, body { overflow-x: hidden; }
   align-items: center;
 }
 
+
+.cabtype-card {
+  transition: transform 0.2s;
+}
+
+.cabtype-card:hover {
+  transform: scale(1.05);
+}
+
+.cabtype-card-imgwrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+.cabtype-card-img {
+  width: 100%;
+  height: auto;
+}
+
