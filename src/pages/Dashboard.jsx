@@ -48,7 +48,29 @@ export default function AdminPage() {
     capacity: "",
     pricePerKm: ""
   });
-  
+  const [states, setStates] = useState([])
+  const [newStates, setNewStates] = useState({
+    name: "",
+    description: "",
+    image: null,
+  });
+  const [city, setCity] = useState([])
+  const [newCity, setNewCity] = useState({
+    name: "",
+    state: "",
+    description: "",
+    image: null,
+  });
+  const [place, setPlace] = useState([])
+  const [newPlace, setNewPlace] = useState({
+    name: "",
+    city: "",
+    description: "",
+    rate: "",
+    image: null,
+  });
+
+
 
 
 
@@ -61,6 +83,9 @@ export default function AdminPage() {
     fetchTrips();
     fetchCabs();
     fetchCabVehicles();
+    fetchStates();
+    fetchCtiy();
+    fetchPlace();
   }, []);
 
   const fetchVehicles = async () => {
@@ -185,6 +210,37 @@ export default function AdminPage() {
     }
   }
 
+  const fetchStates = async () => {
+    try {
+      const res = await axios.get(`${SERVER_URL}/states`);
+      setStates(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      console.error("Failed to fetch states:", err);
+      setStates([]);
+    }
+  }
+
+  const fetchCtiy = async () => {
+    try {
+      const res = await axios.get(`${SERVER_URL}/city`);
+      setCity(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      console.error("Failed to fetch city:", err);
+      setCity([]);
+    }
+  }
+
+
+  const fetchPlace = async () => {
+    try {
+      const res = await axios.get(`${SERVER_URL}/place`);
+      setPlace(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      console.error("Failed to fetch place:", err);
+      setPlace([]);
+    }
+  }
+
   const approveVehicle = async (id) => {
     try {
       await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "approved" });
@@ -280,6 +336,33 @@ export default function AdminPage() {
     }
   };
 
+  const handleStatesChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setNewStates({ ...newStates, image: files[0] });
+    } else {
+      setNewStates({ ...newStates, [name]: value });
+    }
+  }
+
+  const handleCityChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setNewCity({ ...newCity, image: files[0] });
+    } else {
+      setNewCity({ ...newCity, [name]: value });
+    }
+  }
+
+  const handlePlaceChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setNewPlace({ ...newPlace, image: files[0] });
+    } else {
+      setNewPlace({ ...newPlace, [name]: value });
+    }
+  }
+
   const addPackage = async (e) => {
     e.preventDefault();
 
@@ -321,12 +404,21 @@ export default function AdminPage() {
 
   const deletePackageById = async (id) => {
     try {
-      if (!window.confirm('Are you sure you want to delete this package?')) return;
-      await axios.delete(`${SERVER_URL}/packages/${id}`);
-      fetchPackages();
+      if (!window.confirm("Are you sure you want to delete this package?")) return;
+
+      const response = await axios.delete(`${SERVER_URL}/packages/${id}`);
+
+      if (response.status === 200) {
+        alert(response.data.message); // "Package deleted successfully"
+        fetchPackages(); // Refresh the list after deletion
+      } else {
+        alert("Failed to delete package. Please try again.");
+      }
     } catch (err) {
-      console.error('Failed to delete package:', err);
-      alert('Failed to delete package. Please try again.');
+      console.error("Failed to delete package:", err);
+      // If backend sends a specific error message
+      const errorMessage = err.response?.data?.message || "Failed to delete package. Please try again.";
+      alert(errorMessage);
     }
   };
 
@@ -387,6 +479,80 @@ export default function AdminPage() {
     }
   };
 
+  const AddStates = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("name", newStates.name);
+      formData.append("description", newStates.description)
+      if (newStates.image) {
+        formData.append("image", newStates.image);
+      }
+
+      await axios.post(`${SERVER_URL}/states`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("State added!");
+      setNewStates({ name: "", description: "", image: null });
+      e.target.reset();
+
+    } catch (err) {
+      console.error("Failed to add state:", err.response?.data || err.message);
+      alert("Error adding state. Please try again.");
+    }
+  }
+
+  const AddCities = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("name", newCity.name)
+      formData.append("state", newCity.state)
+      formData.append("description", newCity.description)
+      if (newCity.image) {
+        formData.append("image", newCity.image);
+      }
+
+      await axios.post(`${SERVER_URL}/city`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("City added!");
+      setNewCity({ name: "", states: "", description: "", image: null });
+      e.target.reset();
+
+    } catch (err) {
+      console.error("Failed to add city:", err.response?.data || err.message);
+      alert("Error adding city. Please try again.");
+    }
+  }
+
+  const AddPlace = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("name", newPlace.name)
+      formData.append("city", newPlace.city)
+      formData.append("description", newPlace.description)
+      formData.append("rate", newPlace.rate)
+      if (newPlace.image) {
+        formData.append("image", newPlace.image);
+      }
+
+      await axios.post(`${SERVER_URL}/place`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("place added!");
+      setNewPlace({ name: "", city: "", description: "", rate: "", image: null });
+      e.target.reset();
+
+    } catch (err) {
+      console.error("Failed to add place:", err.response?.data || err.message);
+      alert("Error adding place. Please try again.");
+    }
+  }
 
 
 
@@ -1036,6 +1202,405 @@ export default function AdminPage() {
     </>
   );
 
+  const renderStates = () => (
+    <>
+      {/* Add State Form */}
+      <Card className="p-4 shadow mt-3">
+        <h4 className="mb-3 fw-bold">Add New State</h4>
+        <Form onSubmit={AddStates}>
+          <Form.Group className="mb-3">
+            <Form.Label>State Name</Form.Label>
+            <Form.Control
+              type="text"
+              name="name"
+              value={newStates.name}
+              onChange={(e) =>
+                setNewStates({ ...newStates, name: e.target.value })
+              }
+              placeholder="Enter state name"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              name="description"
+              as="textarea"
+              value={newStates.description}
+              onChange={handleStatesChange}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>State Image</Form.Label>
+            <Form.Control
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={(e) =>
+                setNewStates({ ...newStates, image: e.target.files[0] })
+              }
+            />
+            {newStates.image && (
+              <div className="mt-2">
+                <small className="text-muted">
+                  Selected: {newStates.image.name}
+                </small>
+              </div>
+            )}
+          </Form.Group>
+
+          <Button type="submit" variant="success">
+            Add State
+          </Button>
+        </Form>
+      </Card>
+
+
+
+      {/* States List */}
+      <Card className="p-4 shadow mt-4">
+        <h4 className="mb-3 fw-bold">Available States</h4>
+        {states.length > 0 ? (
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>State Name</th>
+                <th>Description</th>
+                <th>image</th>
+              </tr>
+            </thead>
+            <tbody>
+              {states.map((state, index) => (
+                <tr key={state._id}>
+                  <td>{index + 1}</td>
+                  <td>{state.name}</td>
+                  <td>{state.description}</td>
+                  <td>
+                    {state.image ? (
+                      <img
+                        src={`${SERVER_URL}/uploads/${state.image}`}
+                        alt={state.name}
+                        style={{ width: "80px", height: "50px", objectFit: "cover" }}
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={async () => {
+                        if (window.confirm("Are you sure you want to delete this state")) {
+                          try {
+                            await axios.delete(`${SERVER_URL}/states/${state._id}`);
+                            fetchStates(); // refresh after delete
+                          } catch (err) {
+                            console.error("Failed to delete state:", err);
+                            alert("Error deleting cab vehicle.");
+                          }
+                        }
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <Alert variant="warning">No states available.</Alert>
+        )}
+      </Card>
+
+      {/* Add City Form */}
+      <Card className="p-4 shadow mt-3">
+        <h4 className="mb-3 fw-bold">Add New City</h4>
+        <Form onSubmit={AddCities}>
+          <Form.Group className="mb-3">
+            <Form.Label>City Name</Form.Label>
+            <Form.Control
+              type="text"
+              name="name"
+              value={newCity.name}
+              onChange={(e) => setNewCity({ ...newCity, name: e.target.value })}
+              placeholder="Enter city name"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>State</Form.Label>
+            <Form.Select
+              name="state"
+              value={newCity.state}
+              onChange={(e) => setNewCity({ ...newCity, state: e.target.value })}
+              required
+            >
+              <option value="">-- Select State --</option>
+              {states.map((state) => (
+                <option key={state._id} value={state.name}>
+                  {state.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              name="description"
+              as="textarea"
+              value={newCity.description}
+              onChange={(e) => setNewCity({ ...newCity, description: e.target.value })}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>City Image</Form.Label>
+            <Form.Control
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={(e) => setNewCity({ ...newCity, image: e.target.files[0] })}
+            />
+            {newCity.image && (
+              <div className="mt-2">
+                <small className="text-muted">
+                  Selected: {newCity.image.name}
+                </small>
+              </div>
+            )}
+          </Form.Group>
+
+          <Button type="submit" variant="success">
+            Add City
+          </Button>
+        </Form>
+      </Card>
+
+      {/* Cities List */}
+      <Card className="p-4 shadow mt-4">
+        <h4 className="mb-3 fw-bold">Available Cities</h4>
+        {city.length > 0 ? (
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>City Name</th>
+                <th>State</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {city.map((city, index) => (
+                <tr key={city._id}>
+                  <td>{index + 1}</td>
+                  <td>{city.name}</td>
+                  <td>{city.state}</td>
+                  <td>{city.description}</td>
+                  <td>
+                    {city.image ? (
+                      <img
+                        src={`${SERVER_URL}/uploads/${city.image}`}
+                        alt={city.name}
+                        style={{
+                          width: "80px",
+                          height: "50px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={async () => {
+                        if (window.confirm("Are you sure you want to delete this city?")) {
+                          try {
+                            await axios.delete(`${SERVER_URL}/city/${city._id}`);
+                            fetchCities(); // refresh list after delete
+                          } catch (err) {
+                            console.error("Failed to delete city:", err);
+                            alert("Error deleting city.");
+                          }
+                        }
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <Alert variant="warning">No cities available.</Alert>
+        )}
+      </Card>
+
+      {/* Add Place Form */}
+      <Card className="p-4 shadow mt-3">
+        <h4 className="mb-3 fw-bold">Add New Place</h4>
+        <Form onSubmit={AddPlace}>
+          <Form.Group className="mb-3">
+            <Form.Label>Place Name</Form.Label>
+            <Form.Control
+              type="text"
+              name="name"
+              value={newPlace.name}
+              onChange={(e) => setNewPlace({ ...newPlace, name: e.target.value })}
+              placeholder="Enter place name"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>City</Form.Label>
+            <Form.Select
+              name="city"
+              value={newPlace.city}
+              onChange={(e) => setNewPlace({ ...newPlace, city: e.target.value })}
+              required
+            >
+              <option value="">-- Select City --</option>
+              {city.map((city) => (
+                <option key={city._id} value={city.name}>
+                  {city.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              name="description"
+              as="textarea"
+              value={newPlace.description}
+              onChange={(e) =>
+                setNewPlace({ ...newPlace, description: e.target.value })
+              }
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Rate from the city</Form.Label>
+            <Form.Control
+              type="number"
+              name="rate"
+              value={newPlace.rate}
+              onChange={(e) => setNewPlace({ ...newPlace, rate: e.target.value })}
+              placeholder="Enter rate"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Place Image</Form.Label>
+            <Form.Control
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={(e) =>
+                setNewPlace({ ...newPlace, image: e.target.files[0] })
+              }
+            />
+            {newPlace.image && (
+              <div className="mt-2">
+                <small className="text-muted">
+                  Selected: {newPlace.image.name}
+                </small>
+              </div>
+            )}
+          </Form.Group>
+
+          <Button type="submit" variant="success">
+            Add Place
+          </Button>
+        </Form>
+      </Card>
+
+      {/* Places List */}
+      <Card className="p-4 shadow mt-4">
+        <h4 className="mb-3 fw-bold">Available Places</h4>
+        {place.length > 0 ? (
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Place Name</th>
+                <th>City</th>
+                <th>Description</th>
+                <th>Rate</th>
+                <th>Image</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {place.map((place, index) => (
+                <tr key={place._id}>
+                  <td>{index + 1}</td>
+                  <td>{place.name}</td>
+                  <td>{place.city}</td>
+                  <td>{place.description}</td>
+                  <td>{place.rate}</td>
+                  <td>
+                    {place.image ? (
+                      <img
+                        src={`${SERVER_URL}/uploads/${place.image}`}
+                        alt={place.name}
+                        style={{
+                          width: "80px",
+                          height: "50px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={async () => {
+                        if (window.confirm("Are you sure you want to delete this place?")) {
+                          try {
+                            await axios.delete(`${SERVER_URL}/place/${place._id}`);
+                            fetchPlace(); // refresh list after delete
+                          } catch (err) {
+                            console.error("Failed to delete place:", err);
+                            alert("Error deleting place.");
+                          }
+                        }
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <Alert variant="warning">No places available.</Alert>
+        )}
+      </Card>
+
+
+    </>
+  )
+
 
 
   const handleViewImage = (imageUrl) => {
@@ -1233,7 +1798,7 @@ export default function AdminPage() {
               </Row>
             </>
           )}
-          {/* {activeTab === "state" && renderState()} */}
+          {activeTab === "state" && renderStates()}
 
         </Col>
       </Row>
