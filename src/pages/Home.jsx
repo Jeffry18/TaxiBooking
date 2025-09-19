@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Form, Button, Container, Row, Col, Card, Alert, Nav, Table, Spinner, Carousel, } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Card, Alert, Nav, Table, Spinner, Carousel, CardTitle, } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
 import '../App.css'
 import Select from 'react-select';
@@ -10,6 +10,7 @@ import local from '../assets/local.jpg';
 import round from '../assets/round.jpg';
 import airport from '../assets/airport.jpg';
 import oneway from '../assets/oneway.jpg';
+import innova from '../assets/innova-crysta.jpg'
 import { useNavigate } from "react-router-dom";
 
 
@@ -768,7 +769,7 @@ export const Home = () => {
         </Container>
 
 
-        
+
 
 
         {/* Cab Type Preview List */}
@@ -793,7 +794,7 @@ export const Home = () => {
           </Row>
         </Container>
 
-        {/* Trip Types */}
+        {/* States */}
         <div className="text-center" style={{ marginTop: "50px" }}>
           <h1 className="fw-bold mb-3">STATES</h1>
           <Row className="g-3 m-2 justify-content-center triptype-grid">
@@ -837,6 +838,157 @@ export const Home = () => {
             </Col> */}
           </Row>
         </div>
+
+        <div className="container mt-5">
+          <Row className="align-items-center">
+            {/* Left side - Car Image */}
+            <Col md={6} className=" justify-content-center">
+              <Card
+                className="shadow-sm"
+                style={{ width: '100%', maxWidth: '600px', border: 'none' }}
+              >
+                <Card.Img
+                  variant="top"
+                  src={innova}
+                  style={{ height: '400px', objectFit: 'contain' }}
+                />
+              </Card>
+
+              <div>
+                <h1 className="mt-2 fw-bold" style={{fontSize:'35px'}}>We Are Trusted Name in Car Renting Services</h1>
+                <p className="text-muted">Taxi Services - Discover the beauty of Kerala with our expertly curated tour packages. From tranquil backwaters to vibrant cities and exciting wildlife encounters, our itineraries offer a diverse range of experiences. Whether you're seeking a pre-planned adventure or a personalized journey, our dedicated team will ensure a hassle-free trip filled with unforgettable memories. Book your Kerala taxi service today and embark on a magical exploration of God's Own Country.</p>
+              </div>
+
+              <button className="rounded bg-primary text-white fw-bold" style={{ width: '150px', height: '40px' }}>Enquire Now</button>
+
+
+            </Col>
+
+            {/* Right side - Contact + Features */}
+            <Col md={6}>
+              {/* Contact Info */}
+              <div className="text-center mb-4">
+                <h5 className="fw-bold mt-5">CALL US OR CHAT WITH US ON WHATSAPP</h5>
+                <h4 className="text-primary fw-bold">+91 8089084080</h4>
+              </div>
+
+              {/* Features Grid */}
+              <Row className="g-3">
+                <Col xs={12} md={6}>
+                  <Card className="h-100 text-center p-3 border-0 feature-card">
+                    <div className="mb-2 text-primary fs-2">
+                      <i className="fa-regular fa-circle-check"></i>
+                    </div>
+                    <Card.Title style={{ fontSize: '18px' }}>Government Accredited</Card.Title>
+                    <Card.Text className="text-muted">
+                      Kerala Tourism certified tour operator
+                    </Card.Text>
+                  </Card>
+                </Col>
+
+                <Col xs={12} md={6}>
+                  <Card className="h-100 text-center p-3 border-0 feature-card">
+                    <div className="mb-2 text-primary fs-2">
+                      <i className="fa-regular fa-clock"></i>
+                    </div>
+                    <Card.Title style={{ fontSize: '18px' }}>25 Years Experience</Card.Title>
+                    <Card.Text className="text-muted">
+                      Trusted taxi services since 1999
+                    </Card.Text>
+                  </Card>
+                </Col>
+
+                <Col xs={12} md={6}>
+                  <Card className="h-100 text-center p-3 border-0 feature-card">
+                    <div className="mb-2 text-primary fs-2">
+                      <i className="fa-solid fa-shield"></i>
+                    </div>
+                    <Card.Title style={{ fontSize: '18px' }}>Safe & Reliable</Card.Title>
+                    <Card.Text className="text-muted">
+                      Well-maintained vehicles and experienced drivers
+                    </Card.Text>
+                  </Card>
+                </Col>
+
+                <Col xs={12} md={6}>
+                  <Card className="h-100 text-center p-3 border-0 feature-card">
+                    <div className="mb-2 text-primary fs-2">
+                      <i className="fa-solid fa-award"></i>
+                    </div>
+                    <Card.Title style={{ fontSize: '18px' }}>Best Service</Card.Title>
+                    <Card.Text className="text-muted">
+                      Customer satisfaction guaranteed
+                    </Card.Text>
+                  </Card>
+                </Col>
+              </Row>
+
+
+              <div className="container mt-4">
+                <div className="p-4 rounded shadow-sm bg-light">
+                  {/* Heading */}
+                  <h5 className="fw-bold" style={{ fontSize: '20px' }}>
+                    Taxi Services - Ideal Travel Experience Through Personalized Taxi Packages
+                  </h5>
+
+                  {/* Description */}
+                  <p className="mt-4 text-muted" style={{ fontSize: '15px' }}>
+                    <span className="fw-bold">Taxi Services – FlyMallu.com</span> offers personalized taxi services
+                    for exploring Kerala's vibrant cities and serene landscapes. From the bustling streets of Kochi
+                    and Trivandrum to the natural beauty of Munnar, Thekkady, Kumarakom, Alleppey, and Wayanad, our
+                    tailored packages cater to your unique travel desires.
+                  </p>
+
+                  {/* City Buttons */}
+                  <div className="d-flex flex-wrap gap-2 mt-3">
+                    <span className="badge bg-light text-dark border rounded-pill px-3 py-2">Munnar</span>
+                    <span className="badge bg-light text-dark border rounded-pill px-3 py-2">Thekkady</span>
+                    <span className="badge bg-light text-dark border rounded-pill px-3 py-2">Kumarakom</span>
+                    <span className="badge bg-light text-dark border rounded-pill px-3 py-2">Alleppey</span>
+                    <span className="badge bg-light text-dark border rounded-pill px-3 py-2">Wayanad</span>
+                    <span className="badge bg-light text-dark border rounded-pill px-3 py-2">Kochi</span>
+                    <span className="badge bg-light text-dark border rounded-pill px-3 py-2">Trivandrum</span>
+                  </div>
+                </div>
+              </div>
+
+            </Col>
+          </Row>
+        </div>
+
+        <div className="container" style={{ marginTop: '100px' }}>
+          <Row className="align-items-center">
+            {/* Left Column - Text */}
+            <Col md={7}>
+              <h2 className=" mb-4" style={{ fontFamily: "inherit", fontSize: '25px', fontWeight: '850' }}>FlyMallu is your one stop solution</h2>
+              <h5 className="text-primary mt-2">Tired of searching Taxi services nearby</h5>
+              <h6 className="fw-bold mt-4">FlyMallu.com - Your Key to a Hassle-Free</h6>
+              <p className="text-muted mt-3">
+                FlyMallu.com provides reliable and convenient taxi services for all your travel needs
+                in Kerala, 24 hours a day, 7 days a week. Whether you're planning a quick city tour
+                or an extended exploration across the state, our taxi rentals are the perfect solution.
+                Our user-friendly booking system makes hiring a taxi a breeze, taking the stress out of
+                transportation planning. This allows you to focus on what truly matters: immersing
+                yourself in Kerala's vibrant cities, breathtaking landscapes, and rich cultural experiences.
+              </p>
+            </Col>
+
+            {/* Right Column - Image Card */}
+            <Col md={5} className="text-center">
+              <Card className="shadow-sm border-0">
+                <Card.Img
+                  variant="top"
+                  src={innova}
+                  style={{ height: "300px", objectFit: "cover" }}
+                />
+
+              </Card>
+              <h4 className="mt-2">Taxi Services</h4>
+            </Col>
+          </Row>
+        </div>
+
+
 
 
       </Container>
