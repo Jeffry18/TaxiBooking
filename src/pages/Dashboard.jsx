@@ -1494,7 +1494,7 @@ export default function AdminPage() {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Rate from the city</Form.Label>
+            <Form.Label>Rate</Form.Label>
             <Form.Control
               type="number"
               name="rate"

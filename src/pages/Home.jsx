@@ -11,7 +11,7 @@ import round from '../assets/round.jpg';
 import airport from '../assets/airport.jpg';
 import oneway from '../assets/oneway.jpg';
 import innova from '../assets/innova-crysta.jpg'
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 
@@ -44,6 +44,7 @@ export const Home = () => {
   const [airportTripType, setAirportTripType] = useState("pickup");
   const [recent, setRecent] = useState([]);
   const [extraStops, setExtraStops] = useState([]); // for extra locations
+  const [states, setStates] = useState([])
 
   const keralaAirports = [
     { value: "COK", label: "Cochin International Airport (COK)" },
@@ -100,6 +101,7 @@ export const Home = () => {
       }
     };
     fetchRecentBookings();
+
     const fetchCabTypes = async () => {
       try {
         setLoading(true);
@@ -118,6 +120,17 @@ export const Home = () => {
       }
     };
     fetchCabTypes();
+
+    const fetchStates = async () => {
+      try {
+        const res = await axios.get(`${SERVER_URL}/states`);
+        setStates(Array.isArray(res.data) ? res.data : []);
+      } catch {
+        console.error("Failed to fetch states:", err);
+        setStates([]);
+      }
+    };
+    fetchStates();
 
   }, []);
 
@@ -798,47 +811,40 @@ export const Home = () => {
         <div className="text-center" style={{ marginTop: "50px" }}>
           <h1 className="fw-bold mb-3">STATES</h1>
           <Row className="g-3 m-2 justify-content-center triptype-grid">
-            <Col md={3} sm={6} xs={12}>
-              <Card className="trip-card shadow ">
-                <Card.Img className="trip-card-img" variant="top" src={local} alt="Local trips" />
-                <Card.Body>
-                  <Card.Title>KERALA</Card.Title>
-                  <Card.Text>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-                  </Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={3} sm={6} xs={12}>
-              <Card className="trip-card shadow ">
-                <Card.Img className="trip-card-img" variant="top" src={round} alt="Round trips" />
-                <Card.Body>
-                  <Card.Title>TAMILNADU</Card.Title>
-                  <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={3} sm={6} xs={12}>
-              <Card className="trip-card shadow ">
-                <Card.Img className="trip-card-img" variant="top" src={oneway} alt="One-way trips" />
-                <Card.Body>
-                  <Card.Title>KARNATAKA</Card.Title>
-                  <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-            {/* <Col md={3} sm={6} xs={12}>
-              <Card className="trip-card shadow">
-                <Card.Img className="trip-card-img" variant="top" src={airport} alt="Airport trips" />
-                <Card.Body>
-                  <Card.Title>AIRPORT TRIPS</Card.Title>
-                  <Card.Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col> */}
+            {states.length > 0 ? (
+              states.map((state) => (
+                <Col key={state._id} md={3} sm={6} xs={12}>
+                  <Link
+                    to={`/viewstate/${state._id}`}
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    <Card className="trip-card shadow h-100">
+                      <Card.Img
+                        className="trip-card-img"
+                        variant="top"
+                        src={`${SERVER_URL}/uploads/${state.image}`}
+                        alt={state.name}
+                        style={{
+                          height: "180px",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <Card.Body className="d-flex flex-column text-center">
+                        <Card.Title className="fw-bold">{state.name}</Card.Title>
+                        <Card.Text className="flex-grow-1">{state.description}</Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Link>
+                </Col>
+              ))
+            ) : (
+              <p>No states available</p>
+            )}
           </Row>
+
         </div>
 
+        {/* Default Data */}
         <div className="container mt-5">
           <Row className="align-items-center">
             {/* Left side - Car Image */}
@@ -855,7 +861,7 @@ export const Home = () => {
               </Card>
 
               <div>
-                <h1 className="mt-2 fw-bold" style={{fontSize:'35px'}}>We Are Trusted Name in Car Renting Services</h1>
+                <h1 className="mt-2 fw-bold" style={{ fontSize: '35px' }}>We Are Trusted Name in Car Renting Services</h1>
                 <p className="text-muted">Taxi Services - Discover the beauty of Kerala with our expertly curated tour packages. From tranquil backwaters to vibrant cities and exciting wildlife encounters, our itineraries offer a diverse range of experiences. Whether you're seeking a pre-planned adventure or a personalized journey, our dedicated team will ensure a hassle-free trip filled with unforgettable memories. Book your Kerala taxi service today and embark on a magical exploration of God's Own Country.</p>
               </div>
 

@@ -12,6 +12,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import  AboutUs from './pages/AboutUs.jsx'
 import  Corporate  from './pages/Corporate.jsx'
 import ViewVehicle from './pages/ViewVehicle.jsx'
+import ViewStates from './pages/ViewStates.jsx'
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
         <Route path='/aboutus' element={<AboutUs/>}/>
         <Route path='/corporate' element={<Corporate/>}/>
         <Route path='/view-vehicles/:cabTypeName' element={<ViewVehicle/>}/>
+        <Route path="/viewstate/:id" element={<ViewStates />} />
       </Routes>
       <Footer/>
     </>
