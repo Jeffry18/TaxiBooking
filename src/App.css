@@ -408,4 +408,25 @@ html, body { overflow-x: hidden; }
   cursor: pointer;
 }
 
+.table-hover-custom:hover {
+  background-color: #f8f9fa; /* light gray hover */
+  transition: background-color 0.2s ease;
+}
+
+.table td, .table th {
+  border-top: none; /* remove top borders */
+  padding: 12px 15px; /* nicer spacing */
+}
+
+.table thead th {
+  border-bottom: none; /* remove header bottom border */
+}
+
+.table-hover-custom {
+  border-bottom: 10px solid transparent; /* Adds vertical spacing */
+}
+
+.table-hover-custom td {
+  padding: 15px 8px; /* Increase top/bottom padding for more spacing */
+}
 

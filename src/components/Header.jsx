@@ -30,6 +30,7 @@ export const Header = () => {
             <Nav className="ms-auto bg-white fw-semibold gap-3 align-items-lg-center">
               <Nav.Link as={Link} to="/">Home</Nav.Link>
               <Nav.Link as={Link} to="/packages">Trip Packages</Nav.Link>
+              <Nav.Link as={Link} to="/tariffs">Tariffs</Nav.Link>
               <NavDropdown title="Onboarding" id="onboarding-dropdown" className="px-lg-3">
                 <NavDropdown.Item as={Link} to="/vehicle-onboarding">
                   Onboard Vehicle

@@ -13,6 +13,7 @@ import  AboutUs from './pages/AboutUs.jsx'
 import  Corporate  from './pages/Corporate.jsx'
 import ViewVehicle from './pages/ViewVehicle.jsx'
 import ViewStates from './pages/ViewStates.jsx'
+import Tariffs from './pages/Tariffs.jsx'
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
         <Route path='/corporate' element={<Corporate/>}/>
         <Route path='/view-vehicles/:cabTypeName' element={<ViewVehicle/>}/>
         <Route path="/viewstate/:id" element={<ViewStates />} />
+        <Route path='/tariffs' element={<Tariffs/>}/>
       </Routes>
       <Footer/>
     </>
