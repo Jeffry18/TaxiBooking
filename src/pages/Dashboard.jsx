@@ -69,6 +69,15 @@ export default function AdminPage() {
     rate: "",
     image: null,
   });
+  const [tariff, setTariff] = useState([])
+  const [newTariff, setNewTariff] = useState({
+    cabType: "",
+    seats: "",
+    rate: "",
+    allowedKm: "",
+    extraKmRate: "",
+    details: "",
+  });
 
 
 
@@ -86,6 +95,7 @@ export default function AdminPage() {
     fetchStates();
     fetchCtiy();
     fetchPlace();
+    fetchTariff();
   }, []);
 
   const fetchVehicles = async () => {
@@ -241,6 +251,16 @@ export default function AdminPage() {
     }
   }
 
+  const fetchTariff = async () => {
+    try {
+      const res = await axios.get(`${SERVER_URL}/tariff`);
+      setTariff(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      console.error("Failed to fetch tariff:", err);
+      setTariff([]);
+    }
+  }
+
   const approveVehicle = async (id) => {
     try {
       await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "approved" });
@@ -362,6 +382,29 @@ export default function AdminPage() {
       setNewPlace({ ...newPlace, [name]: value });
     }
   }
+
+  const handleTariffChange = (e) => {
+
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setNewTariff({ ...newTariff, image: files[0] });
+    } else {
+      setNewTariff({ ...newTariff, [name]: value });
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this tariff?")) {
+      try {
+        await axios.delete(`${SERVER_URL}/tariff/${id}`); // Connects to your existing controller
+        setTariff(tariff.filter((t) => t._id !== id)); // Remove from frontend state
+      } catch (err) {
+        console.error("Failed to delete tariff:", err);
+        alert("Error deleting tariff.");
+      }
+    }
+  };
+
 
   const addPackage = async (e) => {
     e.preventDefault();
@@ -496,6 +539,7 @@ export default function AdminPage() {
       alert("State added!");
       setNewStates({ name: "", description: "", image: null });
       e.target.reset();
+      fetchStates();
 
     } catch (err) {
       console.error("Failed to add state:", err.response?.data || err.message);
@@ -521,7 +565,7 @@ export default function AdminPage() {
       alert("City added!");
       setNewCity({ name: "", states: "", description: "", image: null });
       e.target.reset();
-
+      fetchCtiy();
     } catch (err) {
       console.error("Failed to add city:", err.response?.data || err.message);
       alert("Error adding city. Please try again.");
@@ -547,6 +591,7 @@ export default function AdminPage() {
       alert("place added!");
       setNewPlace({ name: "", city: "", description: "", rate: "", image: null });
       e.target.reset();
+      fetchPlace();
 
     } catch (err) {
       console.error("Failed to add place:", err.response?.data || err.message);
@@ -554,7 +599,33 @@ export default function AdminPage() {
     }
   }
 
+  const AddTariff = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("cabType", newTariff.cabType);
+      formData.append("seats", newTariff.seats);
+      formData.append("rate", newTariff.rate);
+      formData.append("allowedKm", newTariff.allowedKm);
+      formData.append("extraKmRate", newTariff.extraKmRate);
+      formData.append("details", newTariff.details);
 
+      await axios.post(`${SERVER_URL}/tariff`, formData, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      alert("Tariff added!");
+      setNewTariff({ cabType: "", seats: "", rate: "", allowedKm: "", extraKmRate: "", details: "" });
+      e.target.reset();
+
+      // Auto-refresh the tariff table
+      fetchTariff();
+    }
+    catch (err) {
+      console.error("Failed to add tariff:", err.response?.data || err.message);
+      alert("Error adding tariff. Please try again.");
+    }
+  }
 
 
 
@@ -1601,6 +1672,77 @@ export default function AdminPage() {
     </>
   )
 
+  const renderTariffTable = () => (
+    <>
+      <h4>Add New Tariff</h4>
+      <Form onSubmit={AddTariff}>
+        <Form.Group className="mb-3">
+          <Form.Label>Cab Type</Form.Label>
+          <Form.Select
+            name="cabType"
+            value={newTariff.cabType}
+            onChange={handleTariffChange}
+            required
+          >
+            <option value="">Select Cab Type</option>
+            {cabTypes.map((type) => (
+              <option key={type._id || type} value={type.name || type}>
+                {type.name || type}
+              </option>
+            ))}
+          </Form.Select>
+
+          <Form.Label>Seats</Form.Label>
+          <Form.Control type="number" name="seats" value={newTariff.seats} onChange={handleTariffChange} required />
+          <Form.Label>Rate</Form.Label>
+          <Form.Control type="number" name="rate" value={newTariff.rate} onChange={handleTariffChange} required />
+          <Form.Label>Allowed Km</Form.Label>
+          <Form.Control type="number" name="allowedKm" value={newTariff.allowedKm} onChange={handleTariffChange} required />
+          <Form.Label>Extra Km Rate</Form.Label>
+          <Form.Control type="number" name="extraKmRate" value={newTariff.extraKmRate} onChange={handleTariffChange} required />
+          <Form.Label>Details</Form.Label>
+          <Form.Control type="text" name="details" value={newTariff.details} onChange={handleTariffChange} required />
+          <Button type="submit" variant="primary">Add Tariff</Button>
+        </Form.Group>
+      </Form>
+      <h4>Tariffs</h4>
+      <Table striped bordered hover responsive>
+        <thead>
+          <tr>
+            <th>Cab Type</th>
+            <th>Seats</th>
+            <th>Rate</th>
+            <th>Allowed Km</th>
+            <th>Extra Km Rate</th>
+            <th>Details</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tariff.map((t) => (
+            <tr key={t._id}>
+              <td>{t.cabType}</td>
+              <td>{t.seats}</td>
+              <td>{t.rate}</td>
+              <td>{t.allowedKm}</td>
+              <td>{t.extraKmRate}</td>
+              <td>{t.details}</td>
+              <td>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => handleDelete(t._id)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+    </>
+  )
+
 
 
   const handleViewImage = (imageUrl) => {
@@ -1612,6 +1754,8 @@ export default function AdminPage() {
     setShowImageModal(false);
     setSelectedImage(null);
   };
+
+
 
   return (
     <Container fluid className="p-0" style={{ marginTop: "100px" }}>
@@ -1675,6 +1819,14 @@ export default function AdminPage() {
               }
             >
               States & Places
+            </Nav.Link>
+            <Nav.Link
+              onClick={() => setActiveTab("tariff")}
+              className={
+                activeTab === "tariff" ? "active text-light" : "text-dark"
+              }
+            >
+              Tariff
             </Nav.Link>
           </Nav>
         </Col>
@@ -1799,7 +1951,7 @@ export default function AdminPage() {
             </>
           )}
           {activeTab === "state" && renderStates()}
-
+          {activeTab === "tariff" && renderTariffTable()}
         </Col>
       </Row>
     </Container>

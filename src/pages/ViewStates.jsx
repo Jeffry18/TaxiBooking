@@ -31,27 +31,35 @@ export default function ViewStates() {
         fetchState();
     }, [id]);
 
-    // Fetch cities for state
-    useEffect(() => {
-        const fetchCities = async () => {
-            try {
-                const res = await axios.get(`${SERVER_URL}/city?state=${id}`);
-                setCities(res.data);
-            } catch (err) {
-                console.error("Error fetching cities:", err);
-            } finally {
-                setLoadingCities(false);
-            }
-        };
-        fetchCities();
-    }, [id]);
+    // Fetch all cities and filter by state name
+    // Fetch all cities and filter by stateId
+useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const res = await axios.get(`${SERVER_URL}/city`);
+        if (id) {
+          // assuming each city has a field `stateId` referencing the state._id
+          const filtered = res.data.filter((c) => c.state === state.name);
+          setCities(filtered);
+        }
+      } catch (err) {
+        console.error("Error fetching cities:", err);
+      } finally {
+        setLoadingCities(false);
+      }
+    };
+  
+    fetchCities();
+  }, [state]);
+  
 
-    // Fetch places for a city
-    const fetchPlaces = async (cityId) => {
+    // Fetch all places and filter by city name
+    const fetchPlaces = async (cityName) => {
         setLoadingPlaces(true);
         try {
-            const res = await axios.get(`${SERVER_URL}/place?city=${cityId}`);
-            setPlaces(res.data);
+            const res = await axios.get(`${SERVER_URL}/place`);
+            const filtered = res.data.filter((p) => p.city === cityName);
+            setPlaces(filtered);
         } catch (err) {
             console.error("Error fetching places:", err);
         } finally {
@@ -62,12 +70,12 @@ export default function ViewStates() {
     // Open city modal
     const handleCityClick = (city) => {
         setSelectedCity(city);
-        fetchPlaces(city._id);
+        fetchPlaces(city.name);
         setShowModal(true);
     };
 
     return (
-        <Container fluid style={{ marginTop: '100px' }}>
+        <Container fluid style={{ marginTop: "100px" }}>
             {/* State card full width */}
             {loadingState ? (
                 <div className="text-center my-5">
@@ -135,12 +143,7 @@ export default function ViewStates() {
             )}
 
             {/* City Modal */}
-            <Modal
-                show={showModal}
-                onHide={() => setShowModal(false)}
-                size="lg"
-                centered
-            >
+            <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
                 {selectedCity && (
                     <>
                         <Modal.Header closeButton>
@@ -182,8 +185,9 @@ export default function ViewStates() {
                                                     />
                                                     <Card.Body className="text-center">
                                                         <Card.Title>{place.name}</Card.Title>
-                                                        
-                                                        <p className="fw-bold">Rate from the City: ₹{place.rate}</p>
+                                                        <p className="fw-bold">
+                                                            Rate from the City: ₹{place.rate}
+                                                        </p>
                                                     </Card.Body>
                                                 </Card>
                                             </Col>
