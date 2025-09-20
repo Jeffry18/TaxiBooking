@@ -4,7 +4,7 @@
   margin: 0px;
   padding: 0px;
   box-sizing: border-box;
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-family: Garamond, Georgia, 'Times New Roman', Times, serif;
 }
 html, body { overflow-x: hidden; }
 .booking-form-card {
@@ -56,7 +56,7 @@ html, body { overflow-x: hidden; }
 /* react-select tweaks */
 .booking-select .rs__value-container { padding-left: 0 !important; }
 .booking-select .rs__single-value,
-.booking-select .rs__placeholder { margin-left: 0 !important; }
+.booking-select .rs__placeholder { margin-left: 5px !important; }
 .booking-select .rs__indicator-separator { display: none !important; }
 
 /* ---------- FIELD GROUPING ---------- */
@@ -164,7 +164,7 @@ html, body { overflow-x: hidden; }
 }
 
 /* ----- Trip type cards ----- */
-.trip-card {
+.state-card {
   position: relative;
   height: 100%;
   display: flex;
@@ -180,7 +180,7 @@ html, body { overflow-x: hidden; }
 }
 
 /* Subtle gradient edge using a glow layer */
-.trip-card::before {
+.state-card::before {
   content: "";
   position: absolute;
   inset: -1px;
@@ -190,19 +190,21 @@ html, body { overflow-x: hidden; }
   filter: blur(14px);
   opacity: 0.0;
   transition: opacity 260ms ease;
+  color: #ffffff;
 }
 
-.trip-card:hover {
+.state-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  color: white;
   background: rgb(255, 0, 0);
 }
 
-.trip-card:hover::before {
+.state-card:hover::before {
   opacity: 0.6;
 }
 
-.trip-card-img {
+.state-card-img {
   height: 350px;
   width: 100%;
   object-fit: cover;
@@ -210,36 +212,42 @@ html, body { overflow-x: hidden; }
   transition: transform 320ms ease;
 }
 
-.trip-card .card-body {
+.state-card .card-body {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-.trip-card { overflow: hidden; }
-.trip-card:hover .trip-card-img {
+.state-card { overflow: hidden; }
+.state-card:hover .trip-card-img {
   transform: scale(1.06);
 }
 
-.trip-card .card-body {
+.state-card .card-body {
   position: relative;
   z-index: 1;
-  color: #fff;
+  color: #000000;
   background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0.45) 100%);
 }
 
-.trip-card {
+.state-card {
   min-height: 320px;   /* same height for all cards */
   display: flex;
   flex-direction: column;
 }
 
-.trip-card-img {
+.state-card-img {
   border-bottom: 1px solid #ddd;
 }
 
 
-.trip-card .card-title { color: #fff; letter-spacing: 0.3px; }
-.trip-card .card-text { color: rgba(255,255,255,0.85); }
+.state-card .card-title { color: #000000; letter-spacing: 0.3px; }
+.state-card .card-text { color: rgb(0, 0, 0); }
+
+/* State card hover text color */
+.state-card:hover .card-title,
+.state-card:hover .card-text {
+  color: #ffffff !important;
+}
 /* ----- Vehicle listing card image hover ----- */
 .vehicle-card { overflow: hidden; }
 .vehicle-card-img {

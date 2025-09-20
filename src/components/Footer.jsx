@@ -1,5 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import logo from "../assets/logo 2.png";
+
 
 export const Footer = () => {
   return (
@@ -8,70 +10,111 @@ export const Footer = () => {
         <div className="row gy-4">
           {/* intro */}
           <div className="col-12 col-md-6 col-lg-3">
-            <h5>
-              <i className="fa-solid fa-taxi"></i> Taxi Booking
-            </h5>
+          <img
+              src={logo}
+              alt="Logo"
+              className="navbar-logo img-fluid d-inline-block align-top"
+            />
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Necessitatibus perspiciatis consequatur doloribus dolores, quae
-              recusandae quos ipsam repellat facere odio.
+            Your trusted taxi partner for 25 years. Kerala Tourism accredited tour operator providing reliable and safe transportation services across God's Own Country.
             </p>
-            <p>Lorem ipsum dolor sit amet</p>
-            <p>Lorem ipsum dolor sit amet.</p>
+            
           </div>
 
           {/* links */}
           <div className="col-6 col-md-3 col-lg-2">
-            <h5>Links</h5>
-            <Link to="/" className="text-decoration-none text-dark d-block">
+            <h5 className="mb-4 mt-3">Quick Links</h5>
+            <Link to="/" className="text-decoration-none text-dark d-block mb-2">
               Home Page
             </Link>
             <Link
               to="/login"
-              className="text-decoration-none text-dark d-block"
+              className="text-decoration-none text-dark d-block mb-2"
             >
               Login Page
             </Link>
             <Link
               to="/register"
-              className="text-decoration-none text-dark d-block"
+              className="text-decoration-none text-dark d-block mb-2"
             >
               Register Page
             </Link>
+            <Link
+              to="/register"
+              className="text-decoration-none text-dark d-block mb-2"
+            >
+              About Us
+            </Link>
+            <Link
+              to="/register"
+              className="text-decoration-none text-dark d-block mb-2"
+            >
+              Tariff
+            </Link>
+            <Link
+              to="/register"
+              className="text-decoration-none text-dark d-block mb-2"
+            >
+              Trip Packages
+            </Link>
           </div>
 
-          {/* guides */}
+          {/* services */}
           <div className="col-6 col-md-3 col-lg-2">
-            <h5>Guides</h5>
+            <h5 className="mt-3 mb-4">OUR SERVICES</h5>
             <a
               href="https://react.dev/"
               target="_blank"
               rel="noreferrer"
-              className="text-decoration-none text-dark d-block"
+              className="text-decoration-none text-dark d-block mb-2"
             >
-              React
+              Weekend Trips
             </a>
             <a
               href="https://react-bootstrap.netlify.app/"
               target="_blank"
               rel="noreferrer"
-              className="text-decoration-none text-dark d-block"
+              className="text-decoration-none text-dark d-block mb-2"
             >
-              React Bootstrap
+              Airport Transfers
             </a>
             <a
               href="https://www.npmjs.com/package/react-router-dom"
               target="_blank"
               rel="noreferrer"
-              className="text-decoration-none text-dark d-block"
+              className="text-decoration-none text-dark d-block mb-2"
             >
-              React Router
+              Group Travel
+            </a>
+            <a
+              href="https://www.npmjs.com/package/react-router-dom"
+              target="_blank"
+              rel="noreferrer"
+              className="text-decoration-none text-dark d-block mb-2"
+            >
+              Corperate Travels
+            </a>
+            <a
+              href="https://www.npmjs.com/package/react-router-dom"
+              target="_blank"
+              rel="noreferrer"
+              className="text-decoration-none text-dark d-block mb-2"
+            >
+              South India Packages
+            </a>
+            <a
+              href="https://www.npmjs.com/package/react-router-dom"
+              target="_blank"
+              rel="noreferrer"
+              className="text-decoration-none text-dark d-block mb-2"
+            >
+              Weddings & Events Transport
             </a>
           </div>
 
           {/* contact */}
-          <div className="col-12 col-md-6 col-lg-5">
-            <h5>Contacts</h5>
+          <div className="col-12 col-md-6 col-lg-5 ms-2">
+            <h5 className="mt-3 mb-4">Contacts</h5>
             <div className="d-flex flex-column flex-sm-row">
               <input
                 type="text"

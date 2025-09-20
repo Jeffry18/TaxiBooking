@@ -19,7 +19,7 @@ const banners = [
 
 function HomeCarousel() {
   return (
-    <Carousel fade interval={5000} pause={false} controls indicators>
+    <Carousel fade interval={5000} pause={false} controls indicators >
       {banners.map((b) => (
         <Carousel.Item key={b.id} className="hero-slide">
           <img
@@ -28,7 +28,7 @@ function HomeCarousel() {
             alt={`Slide ${b.id}`}
           />
           <div className="hero-overlay" />
-          <Carousel.Caption className="hero-caption mb-5">
+          <Carousel.Caption className="hero-caption" style={{marginBottom:'100px'}}>
             <h1 className="hero-heading">{b.title}</h1>
             <p className="hero-subtitle">{b.subtitle}</p>
           </Carousel.Caption>

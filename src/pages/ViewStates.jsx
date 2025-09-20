@@ -37,7 +37,8 @@ useEffect(() => {
     const fetchCities = async () => {
       try {
         const res = await axios.get(`${SERVER_URL}/city`);
-        if (id) {
+        if (id && state && state.name) {
+            console.log(state);
           // assuming each city has a field `stateId` referencing the state._id
           const filtered = res.data.filter((c) => c.state === state.name);
           setCities(filtered);
@@ -50,7 +51,7 @@ useEffect(() => {
     };
   
     fetchCities();
-  }, [state]);
+  }, [state, id]);
   
 
     // Fetch all places and filter by city name
@@ -120,7 +121,7 @@ useEffect(() => {
                         cities.map((city) => (
                             <Col md={3} sm={6} xs={12} key={city._id}>
                                 <Card
-                                    className="shadow h-100"
+                                    className="state-card shadow h-100"
                                     onClick={() => handleCityClick(city)}
                                     style={{ cursor: "pointer" }}
                                 >
@@ -128,6 +129,7 @@ useEffect(() => {
                                         variant="top"
                                         src={`${SERVER_URL}/uploads/${city.image}`}
                                         alt={city.name}
+                                        className="state-card-img"
                                         style={{ height: "200px", objectFit: "cover" }}
                                     />
                                     <Card.Body className="text-center">

@@ -135,7 +135,11 @@ export const Home = () => {
   }, []);
 
   const addStop = () => {
-    setExtraStops([...extraStops, ""]);
+    if (extraStops.length < 3) {
+      setExtraStops([...extraStops, ""]);
+    } else {
+      alert("You can add a maximum of 3 stops.");
+    }
   };
 
   const updateStop = (index, value) => {
@@ -283,67 +287,26 @@ export const Home = () => {
 
                 <Card style={{ border: "none" }}>
 
-                  <h2 className="text-center booking-heading red-shadow mb-3">BOOK YOUR TRIP</h2>
+                  <h2 className="text-center booking-heading red-shadow mb-3" style={{fontFamily:"garamond"}}>BOOK YOUR TRIP</h2>
 
 
-                  {/*
-                  <div
-                    className="mt-3 mb-2  rounded  justify-content-center align-items-center text-center "
-                    style={{ maxWidth: "1350px", width: "100%" }}
-                  >
-                    <Nav variant="" activeKey={tripType} className=" justify-content-center align-items-center text-center  " style={{ width: "100%" }}>
-                      <Nav.Item>
-                        <Nav.Link eventKey="oneway" onClick={() => setTripType("oneway")}>
-                          ONE WAY
-                        </Nav.Link>
-                      </Nav.Item>
-                      <Nav.Item>
-                        <Nav.Link eventKey="round" onClick={() => setTripType("round")}>
-                          ROUND TRIP
-                        </Nav.Link>
-                      </Nav.Item>
-                      <Nav.Item>
-                        <Nav.Link eventKey="local" onClick={() => setTripType("local")}>
-                          LOCAL
-                        </Nav.Link>
-                      </Nav.Item>
-                      <Nav.Item>
-                        <Nav.Link eventKey="airport" onClick={() => setTripType("airport")}>
-                          AIRPORT
-                        </Nav.Link>
-                      </Nav.Item>
-                    </Nav>
-                  </div>
-                  */}
+
                 </Card>
 
 
                 <Form onSubmit={handleSubmit}>
-                  {/* Row 1: Trip Type (airport) | From | To | Pick Up Date */}
-                  <Row className=" justify-content-center">
-                    {/* {isAirport && (
-                      <Col lg={row1Lg} md={6} className="mb-1 booking-field">
-                        <Form.Label className="booking-label mb-1">Trip Type</Form.Label>
-                        <Form.Select
-                          className="booking-input"
-                          value={airportTripType}
-                          onChange={(e) => setAirportTripType(e.target.value)}
-                        >
-                          <option value="pickup">Pickup from Airport</option>
-                          <option value="drop">Drop to Airport</option>
-                        </Form.Select>
-                      </Col>
-                    )} */}
+                  <Row className=" justify-content-center mb-2">
+
 
                     <Col lg={3} md={6} className="mb-1 booking-field">
-                      <Form.Label className="booking-label">To</Form.Label>
+                      <Form.Label className="booking-label mb-1">To</Form.Label>
                       <Select
                         classNamePrefix="rs"
                         className="booking-select booking-field "
                         options={places.map((p) => ({ value: p.name, label: p.name }))}
                         value={form.drop ? { value: form.drop, label: form.drop } : null}
                         onChange={(selected) => setForm({ ...form, drop: selected.value })}
-                        placeholder="Select Drop Location"
+                        placeholder="--Select Drop Location--"
                         isSearchable
 
                       />
@@ -357,7 +320,7 @@ export const Home = () => {
                         options={places.map((p) => ({ value: p.name, label: p.name }))}
                         value={form.pickup ? { value: form.pickup, label: form.pickup } : null}
                         onChange={(selected) => setForm({ ...form, pickup: selected.value })}
-                        placeholder="Select Pickup Location"
+                        placeholder="--Select Pickup Location--"
                         isSearchable
                       />
                     </Col>
@@ -370,7 +333,7 @@ export const Home = () => {
 
                     {/* Cab Type column to complete 4 columns in the row */}
                     <Col lg={3} md={6} className="mb-1 booking-field">
-                      <Form.Label className="booking-label">Cab Type</Form.Label>
+                      <Form.Label className="booking-label mb-1">Cab Type</Form.Label>
                       <Form.Select
                         className="booking-input"
                         name="vehicle"
@@ -408,7 +371,7 @@ export const Home = () => {
                             options={places.map((p) => ({ value: p.name, label: p.name }))}
                             value={stop ? { value: stop, label: stop } : null}
                             onChange={(selected) => updateStop(index, selected.value)}
-                            placeholder="Select Extra Stop"
+                            placeholder="--Select Extra Stop--"
                             isSearchable
                           />
                         </div>
@@ -431,12 +394,12 @@ export const Home = () => {
                   </Row>
 
                   {/* Row 2: Pick Up Date | Return Date | Passengers | Pick Up Time */}
-                  <Row className="justify-content-center g-3">
+                  <Row className="justify-content-center g-5 ps-4 pe-3">
                     {/* Pick Up Date */}
                     <Col lg={3} md={6} className="booking-field">
                       <Form.Label className="booking-label">Pick Up Date</Form.Label>
                       <Form.Control
-                        className="booking-input"
+                        className="booking-input ps-2"
                         type="date"
                         name="date"
                         value={form.date}
@@ -449,7 +412,7 @@ export const Home = () => {
                     <Col lg={3} md={6} className="booking-field">
                       <Form.Label className="booking-label">Return Date</Form.Label>
                       <Form.Control
-                        className="booking-input"
+                        className="booking-input ps-2"
                         type="date"
                         value={form.returnDate || ""}
                         min={form.date || new Date().toISOString().split("T")[0]}
@@ -461,8 +424,8 @@ export const Home = () => {
                     <Col lg={2} md={6} className="booking-field">
                       <Form.Label className="booking-label">Members</Form.Label>
                       <Form.Control
-                        className="booking-input"
-                        placeholder="Members Count"
+                        className="booking-input ps-2"
+                        placeholder="--Members Count--"
                         name="passengerCount"
                         value={form.passengerCount}
                         onChange={handleChange}
@@ -477,7 +440,7 @@ export const Home = () => {
                     <Col lg={2} md={6} className="booking-field">
                       <Form.Label className="booking-label">Pick Up Time</Form.Label>
                       <Form.Control
-                        className="booking-input"
+                        className="booking-input ps-2"
                         type="time"
                         name="time"
                         value={form.time}
@@ -500,44 +463,23 @@ export const Home = () => {
           </Row>
 
           {/* Booking Form for small screens (stacked, no overlay) */}
+
           <Row className="d-block d-md-none">
             <Col xs={12} className="mb-3 px-3">
               <Card className="shadow" style={{ borderRadius: "10px" }}>
+                <Card style={{ border: "none" }}>
+
+                  <h2 className="text-center booking-heading red-shadow mb-3">BOOK YOUR TRIP</h2>
+
+
+
+                </Card>
                 <Card.Body>
-                  {/**
-                  <div className="mb-2 text-center">
-                    <Nav activeKey={tripType} className="justify-content-center">
-                      <Nav.Item>
-                        <Nav.Link eventKey="oneway" onClick={() => setTripType("oneway")}>ONE WAY</Nav.Link>
-                      </Nav.Item>
-                      <Nav.Item>
-                        <Nav.Link eventKey="round" onClick={() => setTripType("round")}>ROUND TRIP</Nav.Link>
-                      </Nav.Item>
-                      <Nav.Item>
-                        <Nav.Link eventKey="local" onClick={() => setTripType("local")}>LOCAL</Nav.Link>
-                      </Nav.Item>
-                      <Nav.Item>
-                        <Nav.Link eventKey="airport" onClick={() => setTripType("airport")}>AIRPORT</Nav.Link>
-                      </Nav.Item>
-                    </Nav>
-                  </div>
-                  */}
+
 
                   <Form onSubmit={handleSubmit}>
                     <Row>
-                      {/* {isAirport && (
-                        <Col xs={12} className="mb-2">
-                          <Form.Label className="booking-label mb-1">Trip Type</Form.Label>
-                          <Form.Select
-                            className="booking-input"
-                            value={airportTripType}
-                            onChange={(e) => setAirportTripType(e.target.value)}
-                          >
-                            <option value="pickup">Pickup from Airport</option>
-                            <option value="drop">Drop to Airport</option>
-                          </Form.Select>
-                        </Col>
-                      )} */}
+
 
                       <Col xs={12} className="mb-2">
                         <Form.Label className="booking-label mb-1">From</Form.Label>
@@ -720,7 +662,7 @@ export const Home = () => {
 
         {/* Recent Bookings */}
 
-        <Container className="px-3 px-md-4" style={{ marginTop: "200px" }}>
+        <Container className="px-3 px-md-4" style={{ marginTop: "220px" }}>
           <h4 className="fw-bold  text-center">Recent Bookings</h4>
 
           {loading && (
@@ -736,7 +678,7 @@ export const Home = () => {
           )}
 
           {!loading && recent.length > 0 && (
-            <Table striped bordered hover responsive className="text-center">
+            <Table striped bordered hover responsive className="text-center mt-2">
               <thead className="table-dark">
                 <tr>
                   <th>Pickup</th>
@@ -810,7 +752,7 @@ export const Home = () => {
         {/* States */}
         <div className="text-center" style={{ marginTop: "50px" }}>
           <h1 className="fw-bold mb-3">STATES</h1>
-          <Row className="g-3 m-2 justify-content-center triptype-grid">
+          <Row className="g-3 m-2 justify-content-center state-grid">
             {states.length > 0 ? (
               states.map((state) => (
                 <Col key={state._id} md={3} sm={6} xs={12}>
@@ -818,9 +760,9 @@ export const Home = () => {
                     to={`/viewstate/${state._id}`}
                     style={{ textDecoration: "none", color: "inherit" }}
                   >
-                    <Card className="trip-card shadow h-100">
+                    <Card className="state-card shadow h-100">
                       <Card.Img
-                        className="trip-card-img"
+                        className="state-card-img"
                         variant="top"
                         src={`${SERVER_URL}/uploads/${state.image}`}
                         alt={state.name}
@@ -831,7 +773,7 @@ export const Home = () => {
                       />
                       <Card.Body className="d-flex flex-column text-center">
                         <Card.Title className="fw-bold">{state.name}</Card.Title>
-                        <Card.Text className="flex-grow-1">{state.description}</Card.Text>
+                        <Card.Text className="flex-grow-1 ">{state.description}</Card.Text>
                       </Card.Body>
                     </Card>
                   </Link>
