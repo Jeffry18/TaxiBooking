@@ -92,7 +92,7 @@ export const Footer = () => {
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
             >
-              Corperate Travels
+              Corporate Travels
             </a>
             <a
               href="https://www.npmjs.com/package/react-router-dom"
@@ -113,7 +113,7 @@ export const Footer = () => {
           </div>
 
           {/* contact */}
-          <div className="col-12 col-md-6 col-lg-5 ms-2">
+          <div className="col-12 col-md-6 col-lg-5">
             <h5 className="mt-3 mb-4">Contacts</h5>
             <div className="d-flex flex-column flex-sm-row">
               <input
