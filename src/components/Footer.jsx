@@ -40,19 +40,19 @@ export const Footer = () => {
               Register Page
             </Link>
             <Link
-              to="/register"
+              to="/aboutus"
               className="text-decoration-none text-dark d-block mb-2"
             >
               About Us
             </Link>
             <Link
-              to="/register"
+              to="/tariffs"
               className="text-decoration-none text-dark d-block mb-2"
             >
               Tariff
             </Link>
             <Link
-              to="/register"
+              to="/packages"
               className="text-decoration-none text-dark d-block mb-2"
             >
               Trip Packages
@@ -63,7 +63,7 @@ export const Footer = () => {
           <div className="col-6 col-md-3 col-lg-2">
             <h5 className="mt-3 mb-4">OUR SERVICES</h5>
             <a
-              href="https://react.dev/"
+              href="/packages"
               target="_blank"
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
@@ -71,7 +71,7 @@ export const Footer = () => {
               Weekend Trips
             </a>
             <a
-              href="https://react-bootstrap.netlify.app/"
+              href="/packages"
               target="_blank"
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
@@ -79,7 +79,7 @@ export const Footer = () => {
               Airport Transfers
             </a>
             <a
-              href="https://www.npmjs.com/package/react-router-dom"
+              href="/packages"
               target="_blank"
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
@@ -87,7 +87,7 @@ export const Footer = () => {
               Group Travel
             </a>
             <a
-              href="https://www.npmjs.com/package/react-router-dom"
+              href="/packages"
               target="_blank"
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
@@ -95,7 +95,7 @@ export const Footer = () => {
               Corporate Travels
             </a>
             <a
-              href="https://www.npmjs.com/package/react-router-dom"
+              href="/packages"
               target="_blank"
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
@@ -103,7 +103,7 @@ export const Footer = () => {
               South India Packages
             </a>
             <a
-              href="https://www.npmjs.com/package/react-router-dom"
+              href="/packages"
               target="_blank"
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
@@ -116,6 +116,7 @@ export const Footer = () => {
           <div className="col-12 col-md-6 col-lg-5">
             <h5 className="mt-3 mb-4">Contacts</h5>
             <div className="d-flex flex-column flex-sm-row">
+
               <input
                 type="text"
                 placeholder="Enter Your Email Here.."

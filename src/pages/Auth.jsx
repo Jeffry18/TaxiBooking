@@ -80,51 +80,199 @@ const Auth = ({ insideRegister }) => {
   }
 
   return (
-    <div className='d-flex  ' style={{ minHeight: '70vh', width: '100%' }}>
-
-      <div className='p-5 mt-5' style={{ width: '100%', height: '100%' }}>
-        <div className='card shadow ' style={{ border: 'none', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
-          <div className='row align-items-center'>
-            <div className='col-lg-4 text-dark fw-bolder'>
-              <h2 className='ps-5 pb-3'>Let's Make It Better</h2>
-              <h4 className='ps-5' style={{ fontSize: '1500' }}>Push harder than yesterday if you want a different tomorrow.</h4>
-              <p className='ps-5'>Take care of your body. It's the only place you have to live.</p>
-            </div>
-            <div className='col-lg-4 text-dark fw-bolder'>
-              <h1 className='mt-5'>Start Today</h1>
-              <h4 className='mt-2'>Sign {insideRegister ? 'up' : 'in'} to your Account</h4>
-              <Form>
-                {
-                  insideRegister &&
-                  <FloatingLabel controlId="floatingInputName" label="Username" className="mb-3">
-                    <Form.Control value={inputData.username} onChange={e => setInputData({ ...inputData, username: e.target.value })} type="text" placeholder="Username" />
-                  </FloatingLabel>
-                }
-                <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
-                  <Form.Control value={inputData.email}  onChange={e => setInputData({ ...inputData, email: e.target.value })} type="email" placeholder="name@example.com" />
-                </FloatingLabel>
-                <FloatingLabel controlId="floatingPassword" label="Password">
-                  <Form.Control value={inputData.password} onChange={e => setInputData({ ...inputData, password: e.target.value })} type="password" placeholder="Password" />
-                </FloatingLabel>
-                {
-                  insideRegister ?
-                    <div className='mt-3 mb-5'>
-                      <button onClick={handleRegister} className='btn btn-primary md-2'>Register</button>
-                      <p>Already a user ? Please click here to <Link to={'/login'}>Login</Link></p>
+    <div className="auth-container">
+      <div className="auth-background">
+        <div className="auth-particles">
+          <div className="particle particle-1"></div>
+          <div className="particle particle-2"></div>
+          <div className="particle particle-3"></div>
+          <div className="particle particle-4"></div>
+          <div className="particle particle-5"></div>
+          <div className="particle particle-6"></div>
+        </div>
+      </div>
+      
+      <div className="auth-content">
+        <div className="container">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-lg-10 col-xl-8">
+              <div className="auth-card">
+                <div className="row g-0">
+                  {/* Left Side - Brand & Info */}
+                  <div className="col-lg-6 auth-brand-side">
+                    <div className="auth-brand-content">
+                      <div className="brand-logo mb-4">
+                        <div className="logo-icon">
+                          <i className="fas fa-taxi"></i>
+                        </div>
+                        <h3 className="brand-name">TaxiBooking</h3>
+                      </div>
+                      
+                      <div className="brand-welcome">
+                        <h2 className="welcome-title">
+                          {insideRegister ? 'Join Our Community' : 'Welcome Back'}
+                        </h2>
+                        <p className="welcome-subtitle">
+                          {insideRegister 
+                            ? 'Create your account and start booking rides with ease. Experience premium taxi services at your fingertips.'
+                            : 'Sign in to your account and continue your journey with us. Your reliable taxi service awaits.'
+                          }
+                        </p>
+                      </div>
+                      
+                      <div className="brand-features">
+                        <div className="feature-item">
+                          <div className="feature-icon">
+                            <i className="fas fa-clock"></i>
+                          </div>
+                          <span>24/7 Service</span>
+                        </div>
+                        <div className="feature-item">
+                          <div className="feature-icon">
+                            <i className="fas fa-shield-alt"></i>
+                          </div>
+                          <span>Safe & Secure</span>
+                        </div>
+                        <div className="feature-item">
+                          <div className="feature-icon">
+                            <i className="fas fa-star"></i>
+                          </div>
+                          <span>Premium Quality</span>
+                        </div>
+                      </div>
                     </div>
-                    :
-                    <div className='mt-3 mb-5'>
-                      <button onClick={handleLogin} className='btn btn-primary md-2'>Login {isLogin && <Spinner animation="border" variant="light" />}</button>
-                      <p>New user ? Please click here to <Link to={'/register'}>Register</Link></p>
+                  </div>
+                  
+                  {/* Right Side - Form */}
+                  <div className="col-lg-6 auth-form-side">
+                    <div className="auth-form-content">
+                      <div className="form-header">
+                        <h1 className="form-title">
+                          {insideRegister ? 'Create Account' : 'Sign In'}
+                        </h1>
+                        <p className="form-subtitle">
+                          {insideRegister 
+                            ? 'Fill in your information to get started'
+                            : 'Enter your credentials to access your account'
+                          }
+                        </p>
+                      </div>
+                      
+                      <Form className="auth-form">
+                        {insideRegister && (
+                          <div className="form-group">
+                            <div className="input-wrapper">
+                              <div className="input-icon">
+                                <i className="fas fa-user"></i>
+                              </div>
+                              <FloatingLabel controlId="floatingInputName" label="Username" className="floating-label">
+                                <Form.Control 
+                                  value={inputData.username} 
+                                  onChange={e => setInputData({ ...inputData, username: e.target.value })} 
+                                  type="text" 
+                                  placeholder="Username"
+                                  className="form-input"
+                                />
+                              </FloatingLabel>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="form-group">
+                          <div className="input-wrapper">
+                            <div className="input-icon">
+                              <i className="fas fa-envelope"></i>
+                            </div>
+                            <FloatingLabel controlId="floatingInput" label="Email address" className="floating-label">
+                              <Form.Control 
+                                value={inputData.email} 
+                                onChange={e => setInputData({ ...inputData, email: e.target.value })} 
+                                type="email" 
+                                placeholder="name@example.com"
+                                className="form-input"
+                              />
+                            </FloatingLabel>
+                          </div>
+                        </div>
+                        
+                        <div className="form-group">
+                          <div className="input-wrapper">
+                            <div className="input-icon">
+                              <i className="fas fa-lock"></i>
+                            </div>
+                            <FloatingLabel controlId="floatingPassword" label="Password" className="floating-label">
+                              <Form.Control 
+                                value={inputData.password} 
+                                onChange={e => setInputData({ ...inputData, password: e.target.value })} 
+                                type="password" 
+                                placeholder="Password"
+                                className="form-input"
+                              />
+                            </FloatingLabel>
+                          </div>
+                        </div>
+                        
+                        {insideRegister ? (
+                          <div className="form-actions">
+                            <button 
+                              onClick={handleRegister} 
+                              className="auth-btn primary-btn"
+                              disabled={isLogin}
+                            >
+                              <span className="btn-text">Create Account</span>
+                              <div className="btn-icon">
+                                <i className="fas fa-arrow-right"></i>
+                              </div>
+                            </button>
+                            
+                            <div className="auth-switch">
+                              <p>Already have an account? 
+                                <Link to="/login" className="switch-link"> Sign In</Link>
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="form-actions">
+                            <button 
+                              onClick={handleLogin} 
+                              className="auth-btn primary-btn"
+                              disabled={isLogin}
+                            >
+                              <span className="btn-text">
+                                {isLogin ? 'Signing In...' : 'Sign In'}
+                              </span>
+                              <div className="btn-icon">
+                                {isLogin ? (
+                                  <Spinner animation="border" size="sm" />
+                                ) : (
+                                  <i className="fas fa-arrow-right"></i>
+                                )}
+                              </div>
+                            </button>
+                            
+                            <div className="auth-switch">
+                              <p>Don't have an account? 
+                                <Link to="/register" className="switch-link"> Create Account</Link>
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </Form>
+                      
+                      <div className="form-footer">
+                        <div className="security-badge">
+                          <i className="fas fa-lock"></i>
+                          <span>Your information is protected with 256-bit SSL encryption</span>
+                        </div>
+                      </div>
                     </div>
-                }
-
-              </Form>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   )
 }

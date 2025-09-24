@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Table, Button, Form, Row, Col, Card, Nav, Alert, Badge, Modal } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
+import { useNavigate } from "react-router-dom";
 
 
 export default function AdminPage() {
+  const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
   const [packages, setPackages] = useState([]);
   const [drivers, setDrivers] = useState([]);
@@ -19,7 +21,13 @@ export default function AdminPage() {
     price: "",
     image: null,
   });
-  const [activeTab, setActiveTab] = useState("vehicles");
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Clear auth token
+    navigate("/login"); // Redirect to login page
+  };
+  const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState({
     vehicles: true,
     drivers: true,
@@ -651,82 +659,341 @@ export default function AdminPage() {
     return dateB - dateA;
   });
 
+  const renderOverview = () => (
+    <div className="dashboard-overview">
+      <div className="overview-header">
+        <h1 className="page-title">Dashboard Overview</h1>
+        <p className="page-subtitle">Welcome back! Here's what's happening with your taxi booking service.</p>
+      </div>
+      
+      <div className="overview-stats">
+        <div className="stat-card stat-success">
+          <div className="stat-icon">
+            <i className="fas fa-car"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number">{vehicles.filter(v => v.status === "approved").length}</div>
+            <div className="stat-label">Active Vehicles</div>
+            <div className="stat-change positive">
+              <i className="fas fa-arrow-up"></i>
+              +5% from last month
+            </div>
+          </div>
+        </div>
+        
+        <div className="stat-card stat-info">
+          <div className="stat-icon">
+            <i className="fas fa-id-card"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number">{drivers.filter(d => d.status === "approved").length}</div>
+            <div className="stat-label">Active Drivers</div>
+            <div className="stat-change positive">
+              <i className="fas fa-arrow-up"></i>
+              +8% from last month
+            </div>
+          </div>
+        </div>
+        
+        <div className="stat-card stat-warning">
+          <div className="stat-icon">
+            <i className="fas fa-rupee-sign"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number">₹{(bookings.length * 1250).toLocaleString()}</div>
+            <div className="stat-label">Total Revenue</div>
+            <div className="stat-change positive">
+              <i className="fas fa-arrow-up"></i>
+              +18% from last month
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="overview-charts">
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3>Pending Approvals</h3>
+            <p>Items requiring your attention</p>
+          </div>
+          <div className="pending-list">
+            {vehicles.filter(v => v.status === "pending").slice(0, 3).map(vehicle => (
+              <div key={vehicle._id} className="pending-item">
+                <i className="fas fa-car"></i>
+                <span>Vehicle {vehicle.model} - {vehicle.number}</span>
+                <button 
+                  className="approve-btn"
+                  onClick={() => approveVehicle(vehicle._id)}
+                >
+                  Approve
+                </button>
+              </div>
+            ))}
+            {drivers.filter(d => d.status === "pending").slice(0, 3).map(driver => (
+              <div key={driver._id} className="pending-item">
+                <i className="fas fa-id-card"></i>
+                <span>Driver {driver.name}</span>
+                <button 
+                  className="approve-btn"
+                  onClick={() => approveDriver(driver._id)}
+                >
+                  Approve
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPackages = () => (
+    <div className="dashboard-section">
+      <div className="section-header">
+        <h1 className="page-title">Package Management</h1>
+        <p className="page-subtitle">Manage your travel packages and offerings</p>
+      </div>
+      
+      <div className="content-card">
+        <div className="card-header">
+          <h3>Add New Package</h3>
+        </div>
+        <div className="card-content">
+          <Form onSubmit={addPackage} className="package-form">
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Package Name</label>
+                <input
+                  name="name"
+                  value={newPackage.name}
+                  onChange={handlePackageChange}
+                  className="form-input"
+                  placeholder="Enter package name"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Price (₹)</label>
+                <input
+                  name="price"
+                  type="number"
+                  value={newPackage.price}
+                  onChange={handlePackageChange}
+                  className="form-input"
+                  placeholder="Enter price"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Duration</label>
+                <input
+                  name="duration"
+                  value={newPackage.duration}
+                  onChange={handlePackageChange}
+                  className="form-input"
+                  placeholder="e.g., 3 Days 2 Nights"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Package Image</label>
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handlePackageChange}
+                  className="form-input file-input"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-group full-width">
+              <label className="form-label">Description</label>
+              <textarea
+                name="description"
+                value={newPackage.description}
+                onChange={handlePackageChange}
+                className="form-textarea"
+                placeholder="Enter package description"
+                rows={4}
+              />
+            </div>
+            
+            <button type="submit" className="btn-primary">
+              <i className="fas fa-plus"></i>
+              Add Package
+            </button>
+          </Form>
+        </div>
+      </div>
+      
+      <div className="content-card">
+        <div className="card-header">
+          <h3>Existing Packages</h3>
+          <span className="package-count">{packages.length} packages</span>
+        </div>
+        <div className="packages-grid">
+          {Array.isArray(packages) && packages.length > 0 ? (
+            packages.map((pkg) => (
+              <div key={pkg._id} className="package-card">
+                {pkg.image && (
+                  <div className="package-image">
+                    <img
+                      src={`${SERVER_URL}/uploads/${pkg.image}`}
+                      alt={pkg.name}
+                    />
+                  </div>
+                )}
+                <div className="package-content">
+                  <h4 className="package-title">{pkg.name}</h4>
+                  <p className="package-description">{pkg.description}</p>
+                  <div className="package-details">
+                    <div className="detail-item">
+                      <i className="fas fa-clock"></i>
+                      <span>{pkg.duration}</span>
+                    </div>
+                    <div className="detail-item">
+                      <i className="fas fa-rupee-sign"></i>
+                      <span>₹{pkg.price} per person</span>
+                    </div>
+                  </div>
+                  <button
+                    className="delete-btn"
+                    onClick={() => deletePackageById(pkg._id)}
+                  >
+                    <i className="fas fa-trash"></i>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="empty-state">
+              <i className="fas fa-box-open"></i>
+              <p>No packages available</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   const renderVehiclesTable = () => (
     <>
-      <h4>Vehicles</h4>
-      {loading.vehicles ? (
-        <Alert variant="info">Loading vehicles...</Alert>
-      ) : error.vehicles ? (
-        <Alert variant="danger">{error.vehicles}</Alert>
-      ) : (
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Model</th>
-              <th>Number</th>
-              <th>Type</th>
-              <th>Capacity</th>
-              <th>Contact</th>
-              <th>Image</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vehicles.length > 0 ? (
-              vehicles.map((v) => (
-                <tr key={v._id}>
-                  <td>{v.model}</td>
-                  <td>{v.number}</td>
-                  <td>{v.type}</td>
-                  <td>{v.capacity}</td>
-                  <td>{v.contactNumber || "-"}</td>
-                  <td>
-                    {v.imageUrl ? (
-                      <Button
-                        variant="link"
-                        size="sm"
-                        onClick={() => handleViewImage(v.imageUrl)}
-                        style={{ padding: 0, textDecoration: 'underline' }}
-                      >
-                        View Image
-                      </Button>
+      <div className="dashboard-section">
+        <div className="section-header">
+          <h1 className="page-title">Vehicle Management</h1>
+          <p className="page-subtitle">Manage onboarded vehicles and approvals</p>
+        </div>
+        
+        <div className="content-card">
+          {loading.vehicles ? (
+            <div className="loading-state">
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Loading vehicles...</span>
+            </div>
+          ) : error.vehicles ? (
+            <div className="error-state">
+              <i className="fas fa-exclamation-triangle"></i>
+              <span>{error.vehicles}</span>
+            </div>
+          ) : (
+            <>
+              <div className="table-header">
+                <h3>Vehicle List</h3>
+                <div className="table-stats">
+                  <span className="stat-badge stat-total">{vehicles.length} Total</span>
+                  <span className="stat-badge stat-pending">
+                    {vehicles.filter(v => v.status === "pending").length} Pending
+                  </span>
+                  <span className="stat-badge stat-approved">
+                    {vehicles.filter(v => v.status === "approved").length} Approved
+                  </span>
+                </div>
+              </div>
+              
+              <div className="table-container">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Model</th>
+                      <th>Number</th>
+                      <th>Type</th>
+                      <th>Capacity</th>
+                      <th>Contact</th>
+                      <th>Image</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vehicles.length > 0 ? (
+                      vehicles.map((v) => (
+                        <tr key={v._id}>
+                          <td>{v.model}</td>
+                          <td>{v.number}</td>
+                          <td>{v.type}</td>
+                          <td>{v.capacity}</td>
+                          <td>{v.contactNumber || "-"}</td>
+                          <td>
+                            {v.imageUrl ? (
+                              <button
+                                className="image-btn"
+                                onClick={() => handleViewImage(v.imageUrl)}
+                              >
+                                <i className="fas fa-image"></i>
+                                View
+                              </button>
+                            ) : (
+                              <span className="no-image">No Image</span>
+                            )}
+                          </td>
+                          <td>
+                            <span className={`status-badge status-${v.status}`}>
+                              {v.status}
+                            </span>
+                          </td>
+                          <td>
+                            {v.status === "approved" ? (
+                              <button
+                                className="btn-warning btn-sm"
+                                onClick={() => unapproveVehicle(v._id)}
+                              >
+                                <i className="fas fa-times"></i>
+                                Unapprove
+                              </button>
+                            ) : (
+                              <button
+                                className="btn-success btn-sm"
+                                onClick={() => approveVehicle(v._id)}
+                              >
+                                <i className="fas fa-check"></i>
+                                Approve
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))
                     ) : (
-                      "No Image"
+                      <tr>
+                        <td colSpan={8} className="empty-state">
+                          <i className="fas fa-car"></i>
+                          <span>No vehicles available</span>
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                  <td>{v.status}</td>
-                  <td>
-                    {v.status === "approved" ? (
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        onClick={() => unapproveVehicle(v._id)}
-                      >
-                        Unapprove
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="success"
-                        size="sm"
-                        onClick={() => approveVehicle(v._id)}
-                      >
-                        Approve
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={9} className="text-center">
-                  No vehicles available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      )}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Image Modal */}
       <Modal show={showImageModal} onHide={handleCloseModal} centered size="lg">
@@ -749,65 +1016,99 @@ export default function AdminPage() {
   );
 
   const renderDriversTable = () => (
-    <>
-      <h4>Drivers</h4>
-      {loading.drivers ? (
-        <Alert variant="info">Loading drivers...</Alert>
-      ) : error.drivers ? (
-        <Alert variant="danger">{error.drivers}</Alert>
-      ) : (
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Contact</th>
-              <th>License No</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {drivers.length > 0 ? (
-              drivers.map((d) => (
-                <tr key={d._id}>
-                  <td>{d.name}</td>
-                  <td>{d.email}</td>
-                  <td>{d.contact}</td>
-                  <td>{d.licenseNo}</td>
-                  <td>{d.status}</td>
-                  <td>
-                    {d.status === "approved" ? (
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        onClick={() => unapproveDriver(d._id)}
-                      >
-                        Unapprove
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="success"
-                        size="sm"
-                        onClick={() => approveDriver(d._id)}
-                      >
-                        Approve
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="text-center">
-                  No drivers available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      )}
-    </>
+    <div className="dashboard-section">
+      <div className="section-header">
+        <h1 className="page-title">Driver Management</h1>
+        <p className="page-subtitle">Manage onboarded drivers and approvals</p>
+      </div>
+      
+      <div className="content-card">
+        {loading.drivers ? (
+          <div className="loading-state">
+            <i className="fas fa-spinner fa-spin"></i>
+            <span>Loading drivers...</span>
+          </div>
+        ) : error.drivers ? (
+          <div className="error-state">
+            <i className="fas fa-exclamation-triangle"></i>
+            <span>{error.drivers}</span>
+          </div>
+        ) : (
+          <>
+            <div className="table-header">
+              <h3>Driver List</h3>
+              <div className="table-stats">
+                <span className="stat-badge stat-total">{drivers.length} Total</span>
+                <span className="stat-badge stat-pending">
+                  {drivers.filter(d => d.status === "pending").length} Pending
+                </span>
+                <span className="stat-badge stat-approved">
+                  {drivers.filter(d => d.status === "approved").length} Approved
+                </span>
+              </div>
+            </div>
+            
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>License No</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {drivers.length > 0 ? (
+                    drivers.map((d) => (
+                      <tr key={d._id}>
+                        <td>{d.name}</td>
+                        <td>{d.email}</td>
+                        <td>{d.contact}</td>
+                        <td>{d.licenseNo}</td>
+                        <td>
+                          <span className={`status-badge status-${d.status}`}>
+                            {d.status}
+                          </span>
+                        </td>
+                        <td>
+                          {d.status === "approved" ? (
+                            <button
+                              className="btn-warning btn-sm"
+                              onClick={() => unapproveDriver(d._id)}
+                            >
+                              <i className="fas fa-times"></i>
+                              Unapprove
+                            </button>
+                          ) : (
+                            <button
+                              className="btn-success btn-sm"
+                              onClick={() => approveDriver(d._id)}
+                            >
+                              <i className="fas fa-check"></i>
+                              Approve
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="empty-state">
+                        <i className="fas fa-id-card"></i>
+                        <span>No drivers available</span>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 
   const renderBookingsTable = () => (
@@ -1758,203 +2059,185 @@ export default function AdminPage() {
 
 
   return (
-    <Container fluid className="p-0" style={{ marginTop: "100px" }}>
-      <Row>
-        {/* Sidebar */}
-        <Col md={2} className="bg-light text-dark vh-100 sticky-top p-3">
-          <h4 className="mb-4 ms-3 fw-bold">Admin Dashboard</h4>
-          <Nav className="flex-column">
-            <Nav.Link
-              onClick={() => setActiveTab("vehicles")}
-              className={
-                activeTab === "vehicles" ? "active text-light" : "text-dark"
-              }
+    <div className="admin-dashboard">
+      {/* Dashboard Header */}
+      <div className="dashboard-header">
+        <div className="header-content">
+          <div className="header-left">
+            <button 
+              className="sidebar-toggle"
+              onClick={() => setActiveTab(activeTab)} // Placeholder for sidebar toggle
             >
-              Onboarded Vehicles
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => setActiveTab("cabtypes")}
-              className={
-                activeTab === "cabtypes" ? "active text-light" : "text-dark"
-              }
-            >
-              Cab Type Management
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => setActiveTab("drivers")}
-              className={
-                activeTab === "drivers" ? "active text-light" : "text-dark"
-              }
-            >
-              Onboarded Drivers
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => setActiveTab("bookings")}
-              className={
-                activeTab === "bookings" ? "active text-light" : "text-dark"
-              }
-            >
-              Booking Management
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => setActiveTab("packages")}
-              className={
-                activeTab === "packages" ? "active text-light" : "text-dark"
-              }
-            >
-              Package Entry
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => setActiveTab("trips")}
-              className={
-                activeTab === "trips" ? "active text-light" : "text-dark"
-              }
-            >
-              Package Bookings
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => setActiveTab("state")}
-              className={
-                activeTab === "state" ? "active text-light" : "text-dark"
-              }
-            >
-              States & Places
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => setActiveTab("tariff")}
-              className={
-                activeTab === "tariff" ? "active text-light" : "text-dark"
-              }
-            >
-              Tariff
-            </Nav.Link>
-          </Nav>
-        </Col>
+              <i className="fas fa-bars"></i>
+            </button>
+            <div className="header-brand">
+              <div className="brand-logo">
+                <i className="fas fa-taxi"></i>
+              </div>
+              <h2 className="brand-title">TaxiBooking Admin</h2>
+            </div>
+          </div>
+          
+          <div className="header-right">
+            <div className="header-actions">
+              <div className="notification-bell">
+                <i className="fas fa-bell"></i>
+                <span className="notification-badge">3</span>
+              </div>
+              
+              <div className="admin-profile">
+                <div className="profile-avatar">
+                  <i className="fas fa-user-shield"></i>
+                </div>
+                <div className="profile-info">
+                  <span className="profile-name">Admin User</span>
+                  <span className="profile-role">Administrator</span>
+                </div>
+              </div>
+              
+              <button className="sign-out-btn" onClick={handleLogout}>
+                <i className="fas fa-sign-out-alt"></i>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-body">
+        {/* Enhanced Sidebar */}
+        <div className="dashboard-sidebar">
+          <div className="sidebar-content">
+            <div className="sidebar-section">
+              <h3 className="section-title">
+                <i className="fas fa-chart-line"></i>
+                Overview
+              </h3>
+              <nav className="sidebar-nav">
+                <button
+                  onClick={() => setActiveTab("overview")}
+                  className={`nav-item ${activeTab === "overview" ? "active" : ""}`}
+                >
+                  <i className="fas fa-tachometer-alt"></i>
+                  <span>Dashboard</span>
+                </button>
+              </nav>
+            </div>
+
+            <div className="sidebar-section">
+              <h3 className="section-title">
+                <i className="fas fa-cogs"></i>
+                Vehicle Management
+              </h3>
+              <nav className="sidebar-nav">
+                <button
+                  onClick={() => setActiveTab("vehicles")}
+                  className={`nav-item ${activeTab === "vehicles" ? "active" : ""}`}
+                >
+                  <i className="fas fa-car"></i>
+                  <span>Onboarded Vehicles</span>
+                  {vehicles.filter(v => v.status === "pending").length > 0 && (
+                    <span className="nav-badge">{vehicles.filter(v => v.status === "pending").length}</span>
+                  )}
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab("cabtypes")}
+                  className={`nav-item ${activeTab === "cabtypes" ? "active" : ""}`}
+                >
+                  <i className="fas fa-list"></i>
+                  <span>Cab Type Management</span>
+                </button>
+              </nav>
+            </div>
+
+            <div className="sidebar-section">
+              <h3 className="section-title">
+                <i className="fas fa-users"></i>
+                User Management
+              </h3>
+              <nav className="sidebar-nav">
+                <button
+                  onClick={() => setActiveTab("drivers")}
+                  className={`nav-item ${activeTab === "drivers" ? "active" : ""}`}
+                >
+                  <i className="fas fa-id-card"></i>
+                  <span>Onboarded Drivers</span>
+                  {drivers.filter(d => d.status === "pending").length > 0 && (
+                    <span className="nav-badge">{drivers.filter(d => d.status === "pending").length}</span>
+                  )}
+                </button>
+              </nav>
+            </div>
+
+            <div className="sidebar-section">
+              <h3 className="section-title">
+                <i className="fas fa-suitcase"></i>
+                Package Bookings
+              </h3>
+              <nav className="sidebar-nav">
+                <button
+                  onClick={() => setActiveTab("trips")}
+                  className={`nav-item ${activeTab === "trips" ? "active" : ""}`}
+                >
+                  <i className="fas fa-suitcase"></i>
+                  <span>Package Bookings</span>
+                  {trips.filter(t => t.status === "pending").length > 0 && (
+                    <span className="nav-badge">{trips.filter(t => t.status === "pending").length}</span>
+                  )}
+                </button>
+              </nav>
+            </div>
+
+            <div className="sidebar-section">
+              <h3 className="section-title">
+                <i className="fas fa-box"></i>
+                Content Management
+              </h3>
+              <nav className="sidebar-nav">
+                <button
+                  onClick={() => setActiveTab("packages")}
+                  className={`nav-item ${activeTab === "packages" ? "active" : ""}`}
+                >
+                  <i className="fas fa-gift"></i>
+                  <span>Package Entry</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab("state")}
+                  className={`nav-item ${activeTab === "state" ? "active" : ""}`}
+                >
+                  <i className="fas fa-map-marked-alt"></i>
+                  <span>States & Places</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab("tariff")}
+                  className={`nav-item ${activeTab === "tariff" ? "active" : ""}`}
+                >
+                  <i className="fas fa-calculator"></i>
+                  <span>Tariff Management</span>
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
 
         {/* Main Content */}
-        <Col md={10} className="p-4">
-          {activeTab === "vehicles" && renderVehiclesTable()}
-          {activeTab === "drivers" && renderDriversTable()}
-          {activeTab === "bookings" && renderBookingsTable()}
-          {activeTab === "trips" && renderTripsTable()}
-          {activeTab === "cabtypes" && renderCabTypes()}
-
-          {activeTab === "packages" && (
-            <>
-              <h4>Add New Package</h4>
-              <Form onSubmit={addPackage}>
-                <Row>
-                  <Col md={6}>
-                    <Form.Group className="mb-2">
-                      <Form.Label>Name</Form.Label>
-                      <Form.Control
-                        name="name"
-                        value={newPackage.name}
-                        onChange={handlePackageChange}
-                        required
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-2">
-                      <Form.Label>Description</Form.Label>
-                      <Form.Control
-                        name="description"
-                        as="textarea"
-                        value={newPackage.description}
-                        onChange={handlePackageChange}
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-2">
-                      <Form.Label>Duration</Form.Label>
-                      <Form.Control
-                        name="duration"
-                        value={newPackage.duration}
-                        onChange={handlePackageChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6}>
-                    <Form.Group className="mb-2">
-                      <Form.Label>Price</Form.Label>
-                      <Form.Control
-                        name="price"
-                        type="number"
-                        value={newPackage.price}
-                        onChange={handlePackageChange}
-                        required
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-2">
-                      <Form.Label>Package Image</Form.Label>
-                      <Form.Control
-                        type="file"
-                        name="image"
-                        accept="image/*"
-                        onChange={handlePackageChange}
-                        required
-                      />
-                      {newPackage.image && (
-                        <div className="mt-2">
-                          <small className="text-muted">
-                            Selected file: {newPackage.image instanceof File ? newPackage.image.name : 'Invalid file'}
-                          </small>
-                        </div>
-                      )}
-                    </Form.Group>
-                    <Button type="submit" className="mt-3" variant="primary">
-                      Add Package
-                    </Button>
-                  </Col>
-                </Row>
-              </Form>
-
-              <h4 className="mt-4">Existing Packages</h4>
-              <Row>
-                {Array.isArray(packages) && packages.length > 0 ? (
-                  packages.map((pkg) => (
-                    <Col md={4} key={pkg._id} className="mb-3">
-                      <Card>
-                        {pkg.image && (
-                          <Card.Img
-                            variant="top"
-                            src={`${SERVER_URL}/uploads/${pkg.image}`}
-                            style={{ height: "200px", objectFit: "cover" }}
-                          />
-                        )}
-                        <Card.Body>
-                          <Card.Title>{pkg.name}</Card.Title>
-                          <Card.Text>{pkg.description}</Card.Text>
-                          <p>
-                            <strong>Duration:</strong> {pkg.duration}
-                          </p>
-                          <p>
-                            <strong>Price Per Person:</strong> ₹{pkg.price}
-                          </p>
-                          <div className="d-flex justify-content-end">
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => deletePackageById(pkg._id)}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                  ))
-                ) : (
-                  <Col>
-                    <p>No packages available.</p>
-                  </Col>
-                )}
-              </Row>
-            </>
-          )}
-          {activeTab === "state" && renderStates()}
-          {activeTab === "tariff" && renderTariffTable()}
-        </Col>
-      </Row>
-    </Container>
+        <div className="dashboard-main">
+          <div className="main-content">
+            {activeTab === "overview" && renderOverview()}
+            {activeTab === "vehicles" && renderVehiclesTable()}
+            {activeTab === "drivers" && renderDriversTable()}
+            {activeTab === "trips" && renderTripsTable()}
+            {activeTab === "cabtypes" && renderCabTypes()}
+            {activeTab === "packages" && renderPackages()}
+            {activeTab === "state" && renderStates()}
+            {activeTab === "tariff" && renderTariffTable()}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

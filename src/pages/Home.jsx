@@ -268,72 +268,54 @@ export const Home = () => {
           {/* Banner Carousel */}
           <HomeCarousel />
 
-          {/* Booking Form for large screens (overlay) */}
+          {/* Enhanced Booking Form for large screens (overlay) */}
           <Row className="d-none d-md-block">
-            <Col md={12} className="mb-4 ">
-              <Card className="booking-form-card d-flex  booking-form-card  shadow"
+            <Col md={12} className="mb-4">
+              <Card className="booking-form-card shadow-lg"
                 style={{
                   position: "absolute",
-                  bottom: "-180px",
+                  bottom: "-280px",
                   left: "50%",
                   transform: "translateX(-50%)",
-                  width: "85%",
+                  width: "90%",
                   zIndex: 10,
-                  borderRadius: "10px",
-                  height: "auto",
-                  padding: "12px"
                 }}>
 
-
-                <Card style={{ border: "none" }}>
-
-                  <h2 className="text-center booking-heading red-shadow mb-3" style={{fontFamily:"garamond"}}>BOOK YOUR TRIP</h2>
-
-
-
-                </Card>
-
+                <div>
+                  <h2 className="booking-heading">BOOK YOUR TRIP</h2>
+                </div>
 
                 <Form onSubmit={handleSubmit}>
-                  <Row className=" justify-content-center mb-2">
-
-
-                    <Col lg={3} md={6} className="mb-1 booking-field">
-                      <Form.Label className="booking-label mb-1">To</Form.Label>
+                  {/* Row 1: Location Fields + Add Stop Button */}
+                  <Row className="booking-row align-items-end mb-3">
+                    <Col lg={3} md={6} className="booking-field">
+                      <Form.Label className="booking-label">From</Form.Label>
                       <Select
                         classNamePrefix="rs"
-                        className="booking-select booking-field "
-                        options={places.map((p) => ({ value: p.name, label: p.name }))}
-                        value={form.drop ? { value: form.drop, label: form.drop } : null}
-                        onChange={(selected) => setForm({ ...form, drop: selected.value })}
-                        placeholder="--Select Drop Location--"
-                        isSearchable
-
-                      />
-                    </Col>
-
-                    <Col lg={3} md={6} className="mb-1 booking-field">
-                      <Form.Label className="booking-label mb-1">From</Form.Label>
-                      <Select
-                        classNamePrefix="rs"
-                        className="booking-select booking-field"
+                        className="booking-select"
                         options={places.map((p) => ({ value: p.name, label: p.name }))}
                         value={form.pickup ? { value: form.pickup, label: form.pickup } : null}
                         onChange={(selected) => setForm({ ...form, pickup: selected.value })}
-                        placeholder="--Select Pickup Location--"
+                        placeholder="Select pickup location"
                         isSearchable
                       />
                     </Col>
-                    {/* Small Add button column in the same row */}
-                    <Col lg={1} md={3} className="mb-3 mt-3 d-flex align-items-end justify-content-center">
-                      <Button variant="outline-primary" size="sm" onClick={addStop} className="px-3 py-1">
-                        +
-                      </Button>
+
+                    <Col lg={3} md={6} className="booking-field">
+                      <Form.Label className="booking-label">To</Form.Label>
+                      <Select
+                        classNamePrefix="rs"
+                        className="booking-select"
+                        options={places.map((p) => ({ value: p.name, label: p.name }))}
+                        value={form.drop ? { value: form.drop, label: form.drop } : null}
+                        onChange={(selected) => setForm({ ...form, drop: selected.value })}
+                        placeholder="Select destination"
+                        isSearchable
+                      />
                     </Col>
 
-                    {/* Cab Type column to complete 4 columns in the row */}
-                    <Col lg={3} md={6} className="mb-1 booking-field">
-                      <Form.Label className="booking-label mb-1">Cab Type</Form.Label>
+                    <Col lg={3} md={6} className="booking-field">
+                      <Form.Label className="booking-label">Cab Type</Form.Label>
                       <Form.Select
                         className="booking-input"
                         name="vehicle"
@@ -348,58 +330,63 @@ export const Home = () => {
                         }}
                         required
                       >
-                        <option value="">-- Select a Cab Type --</option>
+                        <option value="">Select cab type</option>
                         {cabTypes.map((cab) => (
                           <option key={cab._id} value={cab._id}>
-                            {cab.name}{cab.seats ? ` (Seats: ${cab.seats})` : ""}
+                            {cab.name}{cab.seats ? ` (${cab.seats} seats)` : ""}
                           </option>
                         ))}
                       </Form.Select>
                     </Col>
 
-
-
-
-                    {/* Extra Stops */}
-                    {extraStops.map((stop, index) => (
-                      <Col key={index} lg={row1Lg} md={6} className="mb-1 booking-field d-flex align-items-end">
-                        <div style={{ flexGrow: 1 }}>
-                          <Form.Label className="booking-label">Stop {index + 1}</Form.Label>
-                          <Select
-                            classNamePrefix="rs"
-                            className="booking-select booking-field"
-                            options={places.map((p) => ({ value: p.name, label: p.name }))}
-                            value={stop ? { value: stop, label: stop } : null}
-                            onChange={(selected) => updateStop(index, selected.value)}
-                            placeholder="--Select Extra Stop--"
-                            isSearchable
-                          />
-                        </div>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          className="mb-2"
-                          onClick={() => removeStop(index)}
-                        >
-                          x
-                        </Button>
-                      </Col>
-                    ))}
-
-
-
-
-
-
+                    <Col lg={3} md={6} className="d-flex align-items-end justify-content-center">
+                      <Button 
+                        className="add-stop-btn" 
+                        onClick={addStop}
+                        title="Add extra stop"
+                      >
+                        +
+                      </Button>
+                    </Col>
                   </Row>
 
-                  {/* Row 2: Pick Up Date | Return Date | Passengers | Pick Up Time */}
-                  <Row className="justify-content-center g-5 ps-4 pe-3">
-                    {/* Pick Up Date */}
+                  {/* Extra Stops Row */}
+                  {extraStops.length > 0 && (
+                    <Row className="booking-row mb-3">
+                      {extraStops.map((stop, index) => (
+                        <Col key={index} lg={3} md={6} className="booking-field">
+                          <div className="d-flex align-items-end">
+                            <div style={{ flexGrow: 1 }}>
+                              <Form.Label className="booking-label">Stop {index + 1}</Form.Label>
+                              <Select
+                                classNamePrefix="rs"
+                                className="booking-select"
+                                options={places.map((p) => ({ value: p.name, label: p.name }))}
+                                value={stop ? { value: stop, label: stop } : null}
+                                onChange={(selected) => updateStop(index, selected.value)}
+                                placeholder="Select extra stop"
+                                isSearchable
+                              />
+                            </div>
+                            <Button
+                              className="remove-stop-btn"
+                              onClick={() => removeStop(index)}
+                              title="Remove stop"
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        </Col>
+                      ))}
+                    </Row>
+                  )}
+
+                  {/* Row 2: Date, Time and Passenger Details */}
+                  <Row className="booking-row">
                     <Col lg={3} md={6} className="booking-field">
                       <Form.Label className="booking-label">Pick Up Date</Form.Label>
                       <Form.Control
-                        className="booking-input ps-2"
+                        className="booking-input"
                         type="date"
                         name="date"
                         value={form.date}
@@ -408,11 +395,10 @@ export const Home = () => {
                       />
                     </Col>
 
-                    {/* Return Date */}
                     <Col lg={3} md={6} className="booking-field">
                       <Form.Label className="booking-label">Return Date</Form.Label>
                       <Form.Control
-                        className="booking-input ps-2"
+                        className="booking-input"
                         type="date"
                         value={form.returnDate || ""}
                         min={form.date || new Date().toISOString().split("T")[0]}
@@ -420,12 +406,11 @@ export const Home = () => {
                       />
                     </Col>
 
-                    {/* Members */}
                     <Col lg={2} md={6} className="booking-field">
-                      <Form.Label className="booking-label">Members</Form.Label>
+                      <Form.Label className="booking-label">Passengers</Form.Label>
                       <Form.Control
-                        className="booking-input ps-2"
-                        placeholder="--Members Count--"
+                        className="booking-input"
+                        placeholder="Count"
                         name="passengerCount"
                         value={form.passengerCount}
                         onChange={handleChange}
@@ -436,11 +421,10 @@ export const Home = () => {
                       />
                     </Col>
 
-                    {/* Pick Up Time */}
                     <Col lg={2} md={6} className="booking-field">
                       <Form.Label className="booking-label">Pick Up Time</Form.Label>
                       <Form.Control
-                        className="booking-input ps-2"
+                        className="booking-input"
                         type="time"
                         name="time"
                         value={form.time}
@@ -450,181 +434,175 @@ export const Home = () => {
                     </Col>
                   </Row>
 
-
-                  {/* Submit Button */}
-                  <div className="d-flex justify-content-center mt-3">
-                    <Button type="submit" className="book-btn">
-                      Book Now
-                    </Button>
-                  </div>
+                  {/* Submit Button Row - Centered */}
+                  <Row className="mt-3">
+                    <Col xs={12} className="text-center">
+                      <Button type="submit" className="book-btn">
+                        Book Now
+                      </Button>
+                    </Col>
+                  </Row>
                 </Form>
               </Card>
             </Col>
           </Row>
 
-          {/* Booking Form for small screens (stacked, no overlay) */}
-
+          {/* Enhanced Booking Form for small screens (stacked, no overlay) */}
           <Row className="d-block d-md-none">
             <Col xs={12} className="mb-3 px-3">
-              <Card className="shadow" style={{ borderRadius: "10px" }}>
-                <Card style={{ border: "none" }}>
-
-                  <h2 className="text-center booking-heading red-shadow mb-3">BOOK YOUR TRIP</h2>
-
-
-
-                </Card>
-                <Card.Body>
-
-
-                  <Form onSubmit={handleSubmit}>
-                    <Row>
-
-
-                      <Col xs={12} className="mb-2">
-                        <Form.Label className="booking-label mb-1">From</Form.Label>
-                        <Select
-                          classNamePrefix="rs"
-                          className="booking-select"
-                          options={places.map((p) => ({ value: p.name, label: p.name }))}
-                          value={form.pickup ? { value: form.pickup, label: form.pickup } : null}
-                          onChange={(selected) => setForm({ ...form, pickup: selected.value })}
-                          placeholder="Select Pickup Location"
-                          isSearchable
-                        />
-                      </Col>
-                      <Col xs={12} className="mb-2">
-                        <Form.Label className="booking-label">To</Form.Label>
-                        <Select
-                          classNamePrefix="rs"
-                          className="booking-select"
-                          options={places.map((p) => ({ value: p.name, label: p.name }))}
-                          value={form.drop ? { value: form.drop, label: form.drop } : null}
-                          onChange={(selected) => setForm({ ...form, drop: selected.value })}
-                          placeholder="Select Drop Location"
-                          isSearchable
-                        />
-                      </Col>
-                      {/* Extra Stops - only visible in round trip */}
-                      {extraStops.map((stop, index) => (
-                        <Form.Group key={index} className="mb-2 booking-field d-flex align-items-end">
+              <Card className="booking-form-card shadow-lg">
+                <div>
+                  <h2 className="booking-heading">BOOK YOUR TRIP</h2>
+                </div>
+                
+                <Form onSubmit={handleSubmit}>
+                  <Row>
+                    <Col xs={12} className="booking-field">
+                      <Form.Label className="booking-label">From</Form.Label>
+                      <Select
+                        classNamePrefix="rs"
+                        className="booking-select"
+                        options={places.map((p) => ({ value: p.name, label: p.name }))}
+                        value={form.pickup ? { value: form.pickup, label: form.pickup } : null}
+                        onChange={(selected) => setForm({ ...form, pickup: selected.value })}
+                        placeholder="Select pickup location"
+                        isSearchable
+                      />
+                    </Col>
+                    
+                    <Col xs={12} className="booking-field">
+                      <Form.Label className="booking-label">To</Form.Label>
+                      <Select
+                        classNamePrefix="rs"
+                        className="booking-select"
+                        options={places.map((p) => ({ value: p.name, label: p.name }))}
+                        value={form.drop ? { value: form.drop, label: form.drop } : null}
+                        onChange={(selected) => setForm({ ...form, drop: selected.value })}
+                        placeholder="Select destination"
+                        isSearchable
+                      />
+                    </Col>
+                    
+                    {/* Extra Stops for mobile */}
+                    {extraStops.map((stop, index) => (
+                      <Col key={index} xs={12} className="booking-field">
+                        <div className="d-flex align-items-end">
                           <div style={{ flexGrow: 1 }}>
                             <Form.Label className="booking-label">Stop {index + 1}</Form.Label>
                             <Select
                               classNamePrefix="rs"
-                              className="booking-select booking-field"
+                              className="booking-select"
                               options={places.map((p) => ({ value: p.name, label: p.name }))}
                               value={stop ? { value: stop, label: stop } : null}
                               onChange={(selected) => updateStop(index, selected.value)}
-                              placeholder="Select Extra Stop"
+                              placeholder="Select extra stop"
                               isSearchable
                             />
                           </div>
                           <Button
-                            variant="danger"
-                            size="sm"
-                            className="ms-2 mb-1"
+                            className="remove-stop-btn"
                             onClick={() => removeStop(index)}
+                            title="Remove stop"
                           >
-                            x
-                          </Button>
-                        </Form.Group>
-                      ))}
-
-                      {/* Add Stop button */}
-
-                      <div className="text-center mb-3">
-                        <Button variant="outline-primary" size="sm" onClick={addStop}>
-                          +
-                        </Button>
-                      </div>
-
-                      <Col xs={12} className="mb-2">
-                        <Form.Label className="booking-label">Pick Up Date</Form.Label>
-                        <Form.Control
-                          className="booking-input"
-                          type="date"
-                          name="date"
-                          value={form.date}
-                          onChange={handleChange}
-                          required
-                        />
-                      </Col>
-
-
-                      <Col xs={12} className="mb-2">
-                        <Form.Label className="booking-label">Return Date</Form.Label>
-                        <Form.Control
-                          className="booking-input"
-                          type="date"
-                          value={form.returnDate || ""}
-                          min={form.date || new Date().toISOString().split("T")[0]}
-                          onChange={(e) => setForm({ ...form, returnDate: e.target.value })}
-                        />
-                      </Col>
-
-
-                      <Col xs={12} className="mb-2">
-                        <Form.Label className="booking-label">Cab Type</Form.Label>
-                        <Form.Select
-                          className="booking-input"
-                          name="vehicle"
-                          value={form.vehicle}
-                          onChange={(e) => {
-                            const selected = cabTypes.find((c) => c._id === e.target.value);
-                            setForm((prev) => ({
-                              ...prev,
-                              vehicle: e.target.value,
-                              selectedCabType: selected || null,
-                            }));
-                          }}
-                          required
-                        >
-                          <option value="">-- Select a Cab Type --</option>
-                          {cabTypes.map((cab) => (
-                            <option key={cab._id} value={cab._id}>
-                              {cab.name}{cab.seats ? ` (Seats: ${cab.seats})` : ""}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </Col>
-
-                      <Col xs={12} className="mb-2">
-                        <Form.Label className="booking-label">Passengers</Form.Label>
-                        <Form.Control
-                          className="booking-input"
-                          placeholder="Passenger Count"
-                          name="passengerCount"
-                          value={form.passengerCount}
-                          onChange={handleChange}
-                          type="number"
-                          min="1"
-                          max={form.selectedCabType?.seats || 10}
-                          required
-                        />
-                      </Col>
-                      <Col xs={12} className="mb-2">
-                        <Form.Label className="booking-label">Pick Up Time</Form.Label>
-                        <Form.Control
-                          className="booking-input"
-                          type="time"
-                          name="time"
-                          value={form.time}
-                          onChange={handleChange}
-                          required
-                        />
-                      </Col>
-
-                      <Col xs={12}>
-                        <div className="d-grid">
-                          <Button type="submit" className="book-btn">
-                            Book Now
+                            ×
                           </Button>
                         </div>
                       </Col>
-                    </Row>
-                  </Form>
-                </Card.Body>
+                    ))}
+
+                    {/* Add Stop button for mobile */}
+                    <Col xs={12} className="text-center mb-3">
+                      <Button 
+                        className="add-stop-btn" 
+                        onClick={addStop}
+                        title="Add extra stop"
+                      >
+                        + Add Stop
+                      </Button>
+                    </Col>
+
+                    <Col xs={12} className="booking-field">
+                      <Form.Label className="booking-label">Pick Up Date</Form.Label>
+                      <Form.Control
+                        className="booking-input"
+                        type="date"
+                        name="date"
+                        value={form.date}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+
+                    <Col xs={12} className="booking-field">
+                      <Form.Label className="booking-label">Return Date</Form.Label>
+                      <Form.Control
+                        className="booking-input"
+                        type="date"
+                        value={form.returnDate || ""}
+                        min={form.date || new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setForm({ ...form, returnDate: e.target.value })}
+                      />
+                    </Col>
+
+                    <Col xs={12} className="booking-field">
+                      <Form.Label className="booking-label">Cab Type</Form.Label>
+                      <Form.Select
+                        className="booking-input"
+                        name="vehicle"
+                        value={form.vehicle}
+                        onChange={(e) => {
+                          const selected = cabTypes.find((c) => c._id === e.target.value);
+                          setForm((prev) => ({
+                            ...prev,
+                            vehicle: e.target.value,
+                            selectedCabType: selected || null,
+                          }));
+                        }}
+                        required
+                      >
+                        <option value="">Select cab type</option>
+                        {cabTypes.map((cab) => (
+                          <option key={cab._id} value={cab._id}>
+                            {cab.name}{cab.seats ? ` (${cab.seats} seats)` : ""}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Col>
+
+                    <Col xs={6} className="booking-field">
+                      <Form.Label className="booking-label">Passengers</Form.Label>
+                      <Form.Control
+                        className="booking-input"
+                        placeholder="Count"
+                        name="passengerCount"
+                        value={form.passengerCount}
+                        onChange={handleChange}
+                        type="number"
+                        min="1"
+                        max={form.selectedCabType?.seats || 10}
+                        required
+                      />
+                    </Col>
+                    
+                    <Col xs={6} className="booking-field">
+                      <Form.Label className="booking-label">Pick Up Time</Form.Label>
+                      <Form.Control
+                        className="booking-input"
+                        type="time"
+                        name="time"
+                        value={form.time}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+
+                    <Col xs={12} className="text-center">
+                      <Button type="submit" className="book-btn">
+                        Book Now
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form>
               </Card>
             </Col>
           </Row>
@@ -633,7 +611,7 @@ export const Home = () => {
 
         {/* Error and Loading States */}
         {loading && (
-          <Row className="" style={{ marginTop: "250px" }}>
+          <Row className="" style={{ marginTop: "320px" }}>
             <Col>
               <Alert variant="info">Loading cab types...</Alert>
             </Col>
@@ -649,7 +627,7 @@ export const Home = () => {
         )}
 
         {message && (
-          <Row className="" style={{ marginTop: "250px" }}>
+          <Row className="" style={{ marginTop: "320px" }}>
             <Col>
               <Alert variant={message.includes("✅") ? "success" : "danger"}>
                 {message}
@@ -658,11 +636,8 @@ export const Home = () => {
           </Row>
         )}
 
-
-
         {/* Recent Bookings */}
-
-        <Container className="px-3 px-md-4" style={{ marginTop: "220px" }}>
+        <Container className="px-3 px-md-4" style={{ marginTop: "300px" }}>
           <h4 className="fw-bold  text-center">Recent Bookings</h4>
 
           {loading && (
