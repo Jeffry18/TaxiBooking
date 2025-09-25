@@ -28,7 +28,12 @@ export default function DriverOnboardingAndList() {
   // 🔹 Fetch approved drivers list only
   const fetchDrivers = async () => {
     try {
-      const res = await axios.get(`${SERVER_URL}/drivers`);
+      const token = sessionStorage.getItem("token");
+        if (!token) return;
+
+      const res = await axios.get(`${SERVER_URL}/drivers`,{
+        headers: { Authorization: `Bearer ${token}` },
+      });
       console.log("All drivers data:", res.data); // Debug: log the response
       
       // Filter only approved drivers
@@ -100,7 +105,10 @@ export default function DriverOnboardingAndList() {
       });
 
       const response = await axios.post(`${SERVER_URL}/drivers`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.data) {

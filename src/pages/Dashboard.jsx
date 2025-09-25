@@ -3,6 +3,8 @@ import axios from "axios";
 import { Container, Table, Button, Form, Row, Col, Card, Nav, Alert, Badge, Modal } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo 2.png";
+
 
 
 export default function AdminPage() {
@@ -25,7 +27,7 @@ export default function AdminPage() {
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("token"); // Clear auth token
-    navigate("/login"); // Redirect to login page
+    navigate("/"); // Redirect to login page
   };
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState({
@@ -127,7 +129,10 @@ export default function AdminPage() {
   const fetchDrivers = async () => {
     try {
       setLoading((prev) => ({ ...prev, drivers: true }));
-      const res = await axios.get(`${SERVER_URL}/drivers`);
+      const token = sessionStorage.getItem("token");
+      const res = await axios.get(`${SERVER_URL}/drivers`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setDrivers(Array.isArray(res.data) ? res.data : []);
       setError((prev) => ({ ...prev, drivers: null }));
     } catch (err) {
@@ -289,9 +294,12 @@ export default function AdminPage() {
 
   const approveDriver = async (id) => {
     try {
-      await axios.patch(`${SERVER_URL}/drivers/${id}`, {
-        status: "approved",
-      });
+      const token = sessionStorage.getItem("token");
+      await axios.patch(
+        `${SERVER_URL}/drivers/${id}`,
+        { status: "approved" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       await fetchDrivers();
     } catch (err) {
       console.error("Failed to approve driver:", err);
@@ -304,7 +312,12 @@ export default function AdminPage() {
 
   const unapproveDriver = async (id) => {
     try {
-      await axios.patch(`${SERVER_URL}/drivers/${id}`, { status: "pending" });
+      const token = sessionStorage.getItem("token");
+      await axios.patch(
+        `${SERVER_URL}/drivers/${id}`,
+        { status: "pending" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       await fetchDrivers();
     } catch (err) {
       console.error("Failed to unapprove driver:", err);
@@ -476,6 +489,7 @@ export default function AdminPage() {
 
 
   // Submit form
+
   const addCabType = async (e) => {
     e.preventDefault();
     try {
@@ -665,7 +679,7 @@ export default function AdminPage() {
         <h1 className="page-title">Dashboard Overview</h1>
         <p className="page-subtitle">Welcome back! Here's what's happening with your taxi booking service.</p>
       </div>
-      
+
       <div className="overview-stats">
         <div className="stat-card stat-success">
           <div className="stat-icon">
@@ -680,7 +694,7 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="stat-card stat-info">
           <div className="stat-icon">
             <i className="fas fa-id-card"></i>
@@ -694,7 +708,7 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="stat-card stat-warning">
           <div className="stat-icon">
             <i className="fas fa-rupee-sign"></i>
@@ -709,7 +723,7 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
-      
+
       <div className="overview-charts">
         <div className="chart-card">
           <div className="chart-header">
@@ -721,7 +735,7 @@ export default function AdminPage() {
               <div key={vehicle._id} className="pending-item">
                 <i className="fas fa-car"></i>
                 <span>Vehicle {vehicle.model} - {vehicle.number}</span>
-                <button 
+                <button
                   className="approve-btn"
                   onClick={() => approveVehicle(vehicle._id)}
                 >
@@ -733,7 +747,7 @@ export default function AdminPage() {
               <div key={driver._id} className="pending-item">
                 <i className="fas fa-id-card"></i>
                 <span>Driver {driver.name}</span>
-                <button 
+                <button
                   className="approve-btn"
                   onClick={() => approveDriver(driver._id)}
                 >
@@ -753,7 +767,7 @@ export default function AdminPage() {
         <h1 className="page-title">Package Management</h1>
         <p className="page-subtitle">Manage your travel packages and offerings</p>
       </div>
-      
+
       <div className="content-card">
         <div className="card-header">
           <h3>Add New Package</h3>
@@ -772,7 +786,7 @@ export default function AdminPage() {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label className="form-label">Price (₹)</label>
                 <input
@@ -786,7 +800,7 @@ export default function AdminPage() {
                 />
               </div>
             </div>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Duration</label>
@@ -798,7 +812,7 @@ export default function AdminPage() {
                   placeholder="e.g., 3 Days 2 Nights"
                 />
               </div>
-              
+
               <div className="form-group">
                 <label className="form-label">Package Image</label>
                 <input
@@ -811,7 +825,7 @@ export default function AdminPage() {
                 />
               </div>
             </div>
-            
+
             <div className="form-group full-width">
               <label className="form-label">Description</label>
               <textarea
@@ -823,7 +837,7 @@ export default function AdminPage() {
                 rows={4}
               />
             </div>
-            
+
             <button type="submit" className="btn-primary">
               <i className="fas fa-plus"></i>
               Add Package
@@ -831,7 +845,7 @@ export default function AdminPage() {
           </Form>
         </div>
       </div>
-      
+
       <div className="content-card">
         <div className="card-header">
           <h3>Existing Packages</h3>
@@ -890,7 +904,7 @@ export default function AdminPage() {
           <h1 className="page-title">Vehicle Management</h1>
           <p className="page-subtitle">Manage onboarded vehicles and approvals</p>
         </div>
-        
+
         <div className="content-card">
           {loading.vehicles ? (
             <div className="loading-state">
@@ -916,7 +930,7 @@ export default function AdminPage() {
                   </span>
                 </div>
               </div>
-              
+
               <div className="table-container">
                 <table className="data-table">
                   <thead>
@@ -1021,7 +1035,7 @@ export default function AdminPage() {
         <h1 className="page-title">Driver Management</h1>
         <p className="page-subtitle">Manage onboarded drivers and approvals</p>
       </div>
-      
+
       <div className="content-card">
         {loading.drivers ? (
           <div className="loading-state">
@@ -1047,7 +1061,7 @@ export default function AdminPage() {
                 </span>
               </div>
             </div>
-            
+
             <div className="table-container">
               <table className="data-table">
                 <thead>
@@ -2064,27 +2078,32 @@ export default function AdminPage() {
       <div className="dashboard-header">
         <div className="header-content">
           <div className="header-left">
-            <button 
+            <button
               className="sidebar-toggle"
               onClick={() => setActiveTab(activeTab)} // Placeholder for sidebar toggle
             >
               <i className="fas fa-bars"></i>
             </button>
             <div className="header-brand">
-              <div className="brand-logo">
+              {/* <div className="brand-logo">
                 <i className="fas fa-taxi"></i>
-              </div>
-              <h2 className="brand-title">TaxiBooking Admin</h2>
+              </div> */}
+              <img
+                src={logo}
+                alt="Logo"
+                className="navbar-logo img-fluid d-inline-block align-top"
+              />
+              <h2 className="brand-title"> Admin</h2>
             </div>
           </div>
-          
+
           <div className="header-right">
             <div className="header-actions">
               <div className="notification-bell">
                 <i className="fas fa-bell"></i>
                 <span className="notification-badge">3</span>
               </div>
-              
+
               <div className="admin-profile">
                 <div className="profile-avatar">
                   <i className="fas fa-user-shield"></i>
@@ -2094,7 +2113,7 @@ export default function AdminPage() {
                   <span className="profile-role">Administrator</span>
                 </div>
               </div>
-              
+
               <button className="sign-out-btn" onClick={handleLogout}>
                 <i className="fas fa-sign-out-alt"></i>
                 <span>Sign Out</span>
@@ -2140,7 +2159,7 @@ export default function AdminPage() {
                     <span className="nav-badge">{vehicles.filter(v => v.status === "pending").length}</span>
                   )}
                 </button>
-                
+
                 <button
                   onClick={() => setActiveTab("cabtypes")}
                   className={`nav-item ${activeTab === "cabtypes" ? "active" : ""}`}
@@ -2202,7 +2221,7 @@ export default function AdminPage() {
                   <i className="fas fa-gift"></i>
                   <span>Package Entry</span>
                 </button>
-                
+
                 <button
                   onClick={() => setActiveTab("state")}
                   className={`nav-item ${activeTab === "state" ? "active" : ""}`}
@@ -2210,7 +2229,7 @@ export default function AdminPage() {
                   <i className="fas fa-map-marked-alt"></i>
                   <span>States & Places</span>
                 </button>
-                
+
                 <button
                   onClick={() => setActiveTab("tariff")}
                   className={`nav-item ${activeTab === "tariff" ? "active" : ""}`}

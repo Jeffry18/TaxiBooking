@@ -81,7 +81,7 @@ export const AboutUs = () => {
             </Col>
           </Row>
         </Container>
-        <div className="hero-scroll-indicator">
+        <div className="">
           <div className="scroll-mouse">
             <div className="scroll-wheel"></div>
           </div>
@@ -94,7 +94,7 @@ export const AboutUs = () => {
         <Container>
           <Row className="justify-content-center">
             <Col lg={8} className="text-center mb-5">
-              <h2 className="section-title">Our Story</h2>
+              <h2 className="section-title-1">Our Story</h2>
               <p className="section-subtitle">
                 Founded in 2009 by passionate tourism professionals with a vision to showcase incredible India
               </p>
@@ -142,7 +142,7 @@ export const AboutUs = () => {
         <Container>
           <Row className="justify-content-center mb-5">
             <Col lg={8} className="text-center">
-              <h2 className="section-title text-white">Our Core Values</h2>
+              <h2 className="section-title-1 text-white">Our Core Values</h2>
               <p className="section-subtitle text-white-50">
                 The principles that guide everything we do
               </p>
@@ -197,7 +197,7 @@ export const AboutUs = () => {
         <Container>
           <Row className="justify-content-center mb-5">
             <Col lg={8} className="text-center">
-              <h2 className="section-title">What We Offer</h2>
+              <h2 className="section-title-1">What We Offer</h2>
               <p className="section-subtitle">
                 Comprehensive travel solutions for every type of traveler
               </p>
@@ -249,7 +249,7 @@ export const AboutUs = () => {
         <Container>
           <Row className="justify-content-center mb-5">
             <Col lg={8} className="text-center">
-              <h2 className="section-title">Recognized & Trusted</h2>
+              <h2 className="section-title-1">Recognized & Trusted</h2>
               <p className="section-subtitle">
                 Proudly associated with leading tourism organizations
               </p>

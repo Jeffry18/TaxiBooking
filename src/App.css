@@ -528,6 +528,25 @@ html, body {
   animation-duration: 7s;
 }
 
+.section-title-1 {
+  padding: 6px 8px !important;
+  font-size: 1.75rem !important;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin: 8px 0 4px 0 !important;
+  align-items: center;
+  gap: 4px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.2;
+  height: auto !important;
+  min-height: unset !important;
+}
+
 @keyframes floatUpDown {
   0%, 100% {
     transform: translateY(0) rotate(0deg);
@@ -3296,14 +3315,15 @@ END OLD HERO STYLES */
   border: none !important;
 }
 
+
 .navbar-collapse {
   border: none !important;
 }
 
 /* Fix dropdown borders */
 .navbar-nav .dropdown-menu {
-  border: 1px solid #e1e5e9 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.336) !important;
 }
 
 /* ========== END NAVBAR FIXES ========== */
