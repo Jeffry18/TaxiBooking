@@ -189,7 +189,11 @@ export default function AdminPage() {
   const fetchTrips = async () => {
     try {
       setLoading((prev) => ({ ...prev, trips: true }));
-      const res = await axios.get(`${SERVER_URL}/trips`);
+      const token = sessionStorage.getItem("token");
+      const res = await axios.get(`${SERVER_URL}/trips`,{
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
       if (res.data.success) {
         setTrips(Array.isArray(res.data.data) ? res.data.data : []);
         setError((prev) => ({ ...prev, trips: null }));

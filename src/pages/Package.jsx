@@ -55,7 +55,6 @@ const Packages = () => {
     fetchPackages();
   }, []);
 
-  // ✅ Fetch user trips
 // ✅ Fetch trips of logged-in user
 const fetchTrips = async () => {
   const token = sessionStorage.getItem("token");
@@ -65,6 +64,7 @@ const fetchTrips = async () => {
     setBookingsLoading(false);
     return;
   }
+  
 
   try {
     setBookingsLoading(true);
@@ -72,10 +72,14 @@ const fetchTrips = async () => {
     const res = await axios.get(`${SERVER_URL}/trips`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
+      console.log("Trips data response:", res.data); // Debug: log the response
     if (res.data.success && Array.isArray(res.data.data)) {
       setTrips(res.data.data);
+            console.log("Trips data received:", res.data.data); // Debug: log the response
+
       setBookingsError(null);
+      
+
     } else {
       setTrips([]);
       setBookingsError("Failed to load bookings. Please try again.");
