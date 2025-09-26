@@ -88,6 +88,17 @@ export default function AdminPage() {
     extraKmRate: "",
     details: "",
   });
+  const [cityTariff, setCityTariff] = useState([])
+  const [newCityTariff, setNewCityTariff] = useState({
+    city: "",
+    cabType: "",
+    seats: "",
+    rate: "",
+    allowedKm: "",
+    extraKmRate: "",
+    details: "",
+  });
+
 
 
 
@@ -106,6 +117,7 @@ export default function AdminPage() {
     fetchCtiy();
     fetchPlace();
     fetchTariff();
+    fetchCityTariff();
   }, []);
 
   const fetchVehicles = async () => {
@@ -278,6 +290,17 @@ export default function AdminPage() {
     }
   }
 
+  const fetchCityTariff = async () => {
+    try {
+      const res = await axios.get(`${SERVER_URL}/citytariff`);
+      setTariff(Array.isArray(res.data) ? res.data : []);
+    } catch { 
+      console.error("Failed to fetch city tariff:", err);
+      setTariff([]);
+    }
+  }
+
+
   const approveVehicle = async (id) => {
     try {
       await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "approved" });
@@ -417,6 +440,16 @@ export default function AdminPage() {
       setNewTariff({ ...newTariff, [name]: value });
     }
   }
+
+  const handleCityTariffChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setNewTariff({ ...newTariff, image: files[0] });
+    } else {
+      setNewTariff({ ...newTariff, [name]: value });
+    }
+  }
+
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this tariff?")) {
@@ -652,6 +685,34 @@ export default function AdminPage() {
       alert("Error adding tariff. Please try again.");
     }
   }
+
+  const AddCityTariff = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("city", newTariff.city);
+      formData.append("cabType", newTariff.cabType);
+      formData.append("seats", newTariff.seats);  
+      formData.append("rate", newTariff.rate);
+      formData.append("allowedKm", newTariff.allowedKm);
+      formData.append("extraKmRate", newTariff.extraKmRate);
+      formData.append("details", newTariff.details);
+
+      await axios.post(`${SERVER_URL}/citytariff`, formData, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      alert("Tariff added!");
+      setNewTariff({ city: "", cabType: "", seats: "", rate: "", allowedKm: "", extraKmRate: "", details: "" });
+      e.target.reset();
+
+      // Auto-refresh the tariff table
+      fetchTariff();
+    }
+    catch (err) {
+      console.error("Failed to add tariff:", err.response?.data || err.message);
+      alert("Error adding tariff. Please try again.");
+    } }
 
 
 
@@ -2059,8 +2120,89 @@ export default function AdminPage() {
         </tbody>
       </Table>
 
+      <h4 className="mt-5">Add New City Tariff</h4>
+      <Form onSubmit={AddCityTariff} >
+        <Form.Group className="mb-3">
+          <Form.Label>City</Form.Label>
+          <Form.Select
+            name="city"     
+            value={newCityTariff.city}  
+            onChange={handleCityTariffChange}
+            required
+          >
+            <option value="">Select City</option>
+            {city.map((c) => (
+              <option key={c._id} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </Form.Select>
+          <Form.Label>Cab Type</Form.Label>
+          <Form.Select
+            name="cabType"
+            value={newCityTariff.cabType}
+            onChange={handleCityTariffChange}
+            required
+          >
+            <option value="">Select Cab Type</option>
+            {cabTypes.map((type) => (
+              <option key={type._id || type} value={type.name || type}>
+                {type.name || type}
+              </option>
+            ))}
+          </Form.Select>
+          <Form.Label>Seats</Form.Label>
+          <Form.Control type="number" name="seats" value={newCityTariff.seats} onChange={handleCityTariffChange} required />
+          <Form.Label>Rate</Form.Label>
+          <Form.Control type="number" name="rate" value={newCityTariff.rate} onChange={handleCityTariffChange} required />
+          <Form.Label>Details</Form.Label>
+          <Form.Control type="text" name="details" value={newCityTariff.details} onChange={handleCityTariffChange} required />
+          <Form.Label>Allowed Km</Form.Label>
+          <Form.Control type="number" name="allowedKm" value={newCityTariff.allowedKm} onChange={handleCityTariffChange} required />
+          <Form.Label>Extra Km Rate</Form.Label>
+          <Form.Control type="number" name="extraKmRate" value={newCityTariff.extraKmRate} onChange={handleCityTariffChange} required />
+          <Button type="submit" variant="primary">Add City Tariff</Button>
+        </Form.Group>
+      </Form>
+      <h4>City Tariffs</h4>
+      <Table striped bordered hover responsive>
+        <thead>
+          <tr>
+            <th>City</th>
+            <th>Cab Type</th>
+            <th>Seat</th>
+            <th>Rate</th>
+            <th>Details</th>
+            <th>Allowed Km</th>
+            <th>Extra Km Rate</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cityTariff.map((t) => (
+            <tr key={t._id}>
+              <td>{t.city}</td>
+              <td>{t.cabType}</td>
+              <td>{t.seats}</td>
+              <td>{t.rate}</td>
+              <td>{t.allowedKm}</td>
+              <td>{t.extraKmRate}</td>
+              <td>{t.details}</td>              
+              <td>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => handleDelete(t._id)}
+                >
+                  Delete
+                </button>
+              </td> 
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </>
   )
+
 
 
 
