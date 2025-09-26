@@ -80,7 +80,7 @@ const Auth = ({ insideRegister }) => {
   }
 
   return (
-    <div className="auth-container">
+    <div className="auth-container" style={{marginTop:"30px"}}>
       <div className="auth-background">
         <div className="auth-particles">
           <div className="particle particle-1"></div>

@@ -3320,14 +3320,104 @@ END OLD HERO STYLES */
   border: none !important;
 }
 
-/* Fix dropdown borders */
-.navbar-nav .dropdown-menu {
-  position:static !important;
-  border: 1px solid #ffffff !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.336) !important;
+/* ========== CUSTOM DROPDOWN STYLING ========== */
+
+/* Custom dropdown container styling */
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
 }
 
-/* ========== END NAVBAR FIXES ========== */
+@media (max-width: 991px) {
+  .custom-dropdown {
+    display: block;
+    width: 100%;
+  }
+}
+
+/* Custom dropdown menu styling */
+.custom-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  min-width: 10rem;
+  padding: 0.5rem 0;
+  margin: 0.125rem 0 0;
+  font-size: 1rem;
+  color: #212529;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+}
+
+/* Custom dropdown items styling */
+.custom-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1.5rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  text-decoration: none;
+}
+
+.custom-dropdown-item:hover, 
+.custom-dropdown-item:focus {
+  color: #16181b;
+  text-decoration: none;
+  background-color: #f8f9fa;
+}
+
+/* Mobile styling for custom dropdown */
+@media (max-width: 991px) {
+  .custom-dropdown {
+    width: 100%;
+  }
+  
+  .custom-dropdown-menu {
+    position: static;
+    float: none;
+    width: auto;
+    margin-top: 0;
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    padding-left: 1.5rem;
+  }
+  
+  .custom-dropdown-item {
+    padding: 0.5rem 0;
+  }
+  
+  .custom-dropdown-item:hover, 
+  .custom-dropdown-item:focus {
+    background-color: transparent;
+  }
+}
+
+/* Add dropdown arrow */
+.dropdown-toggle::after {
+  display: inline-block;
+  margin-left: 0.255em;
+  vertical-align: 0.255em;
+  content: "";
+  border-top: 0.3em solid;
+  border-right: 0.3em solid transparent;
+  border-bottom: 0;
+  border-left: 0.3em solid transparent;
+}
+
+/* ========== END CUSTOM DROPDOWN STYLING ========== */
 
 /* ✅ Logo styling */
 .navbar-logo {

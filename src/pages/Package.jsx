@@ -1,30 +1,34 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Card, Button, Row, Col, Alert, Modal, Form, Table, Spinner } from "react-bootstrap";
+import { Modal, Button, Form, Table, Spinner, Row, Col, Card } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
 
-export default function Packages() {
+
+const Packages = () => {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [bookingsLoading, setBookingsLoading] = useState(false);
+
+  const [trips, setTrips] = useState([]);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
   const [bookingsError, setBookingsError] = useState(null);
-  const [myTrips, setMyTrips] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+
   const [bookingForm, setBookingForm] = useState({
     name: "",
     email: "",
     phone: "",
     date: "",
     time: "",
-    passengers: 1,
+    passengers: "",
     pickupLocation: "",
     dropLocation: "",
-    specialRequests: ""
+    specialRequests: "",
   });
 
+  // ✅ Fetch packages
   useEffect(() => {
     const fetchPackages = async () => {
       try {
@@ -51,42 +55,46 @@ export default function Packages() {
     fetchPackages();
   }, []);
 
+  // ✅ Fetch user trips
+// ✅ Fetch trips of logged-in user
+const fetchTrips = async () => {
+  const token = sessionStorage.getItem("token");
+  if (!token) {
+    setTrips([]);
+    setBookingsError("Please login to view your bookings.");
+    setBookingsLoading(false);
+    return;
+  }
+
+  try {
+    setBookingsLoading(true);
+
+    const res = await axios.get(`${SERVER_URL}/trips`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.data.success && Array.isArray(res.data.data)) {
+      setTrips(res.data.data);
+      setBookingsError(null);
+    } else {
+      setTrips([]);
+      setBookingsError("Failed to load bookings. Please try again.");
+    }
+  } catch (err) {
+    console.error("Error fetching trips:", err);
+    setTrips([]);
+    setBookingsError("Failed to load bookings. Please try again.");
+  } finally {
+    setBookingsLoading(false);
+  }
+};
+
+
   useEffect(() => {
-    const fetchMyTrips = async () => {
-      try {
-        setBookingsLoading(true);
-        setBookingsError(null);
-        const res = await axios.get(`${SERVER_URL}/trips`);
-        const list = Array.isArray(res.data?.data)
-          ? res.data.data
-          : Array.isArray(res.data)
-            ? res.data
-            : [];
-
-        const email = sessionStorage.getItem('email');
-        const phone = sessionStorage.getItem('phone');
-
-        const filtered = email
-          ? list.filter(t => (t.email || '').toLowerCase() === email.toLowerCase())
-          : phone
-            ? list.filter(t => (t.phone || '') === phone)
-            : list;
-
-        // newest first
-        filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-        setMyTrips(filtered);
-      } catch (err) {
-        console.error('Error fetching user trips:', err);
-        setBookingsError('Failed to load your package bookings.');
-        setMyTrips([]);
-      } finally {
-        setBookingsLoading(false);
-      }
-    };
-
-    fetchMyTrips();
+    fetchTrips();
   }, []);
 
+  // ✅ Open booking modal
   const handleBookNow = (pkg) => {
     setSelectedPackage(pkg);
     setShowModal(true);
@@ -101,10 +109,10 @@ export default function Packages() {
       phone: "",
       date: "",
       time: "",
-      passengers: 1,
+      passengers: "",
       pickupLocation: "",
       dropLocation: "",
-      specialRequests: ""
+      specialRequests: "",
     });
   };
 
@@ -116,144 +124,100 @@ export default function Packages() {
     }));
   };
 
+
+  // ✅ Handle booking form submit
   const handleSubmitBooking = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
-      // Convert date string to Date object for backend
+      const token = sessionStorage.getItem("token");
+      console.log("Token for booking submission:", token); // Debug: log the token
+      
+
       const bookingData = {
         ...bookingForm,
-        date: new Date(bookingForm.date),
         packageId: selectedPackage._id,
         packageName: selectedPackage.name,
-        packagePrice: selectedPackage.price
+        packagePrice: selectedPackage.price,
       };
 
-      // Send booking data to the server
-      const response = await axios.post(`${SERVER_URL}/trips`, bookingData);
+      const response = await axios.post(`${SERVER_URL}/trips`, bookingData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      console.log("Booking response:", response.data);
 
       if (response.data.success) {
         alert("Booking submitted successfully! We'll contact you soon.");
-        console.log("Trip booking created:", response.data.data);
         handleCloseModal();
+        fetchTrips(); // ✅ refresh only user's trips
       } else {
-        alert("Failed to submit booking. Please try again.");
+        alert("Booking failed. Please try again.");
       }
     } catch (err) {
       console.error("Error submitting booking:", err);
-      const errorMessage = err.response?.data?.message || "Failed to submit booking. Please try again.";
-      alert(errorMessage);
+      alert("Error submitting booking. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
+
   return (
-    <Container className="" style={{ marginTop: "90px" }}>
-      <h3 className="mb-3">Trip Packages</h3>
+    <div className="container py-4" style={{ marginTop: "100px" }}>
+      <h2 className="mb-4">Trip Packages</h2>
 
-      {loading && (
-        <Alert variant="info">Loading packages...</Alert>
-      )}
-
-      {error && (
-        <Alert variant="danger">{error}</Alert>
-      )}
-
-      {!loading && !error && packages.length === 0 && (
-        <Alert variant="warning">No packages available.</Alert>
-      )}
-
-      <Row>
-        {packages.map((pkg) => (
-          <Col md={12} key={pkg._id} className="mb-3">
-            <Card
-              className="shadow text-white w-100"
-              style={{
-                height: "450px", // adjust height as needed
-                backgroundImage: `url(${SERVER_URL}/uploads/${pkg.image})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                borderRadius: "12px",
-                position: "relative",
-                overflow: "hidden"
-              }}
-            >
-              {/* Dark overlay for readability */}
-              <div
+      {/* ✅ Show Packages */}
+      {loading ? (
+        <Spinner animation="border" />
+      ) : error ? (
+        <p className="text-danger">{error}</p>
+      ) : (
+        <Row>
+          {packages.map((pkg) => (
+            <Col md={12} key={pkg._id} className="mb-3">
+              <Card
+                className="shadow text-white w-100"
                 style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: "rgba(0, 0, 0, 0.4)"
+                  height: "450px", // adjust height as needed
+                  backgroundImage: `url(${SERVER_URL}/uploads/${pkg.image})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  borderRadius: "12px",
+                  position: "relative",
+                  overflow: "hidden"
                 }}
-              />
+              >
+                {/* Dark overlay for readability */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(0, 0, 0, 0.4)"
+                  }}
+                />
 
-              {/* Card Content */}
-              <Card.Body className="position-relative">
-                <Card.Title className="fw-bold fs-3">{pkg.name}</Card.Title>
-                <Card.Text>{pkg.description}</Card.Text>
-                <p><strong>Duration:</strong> {pkg.duration}</p>
-                <p><strong>Price Per Person:</strong> ₹{pkg.price}</p>
-                <Button variant="light" onClick={() => handleBookNow(pkg)}>
-                  Book Package
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+                {/* Card Content */}
+                <Card.Body className="position-relative">
+                  <Card.Title className="fw-bold fs-3">{pkg.name}</Card.Title>
+                  <Card.Text>{pkg.description}</Card.Text>
+                  <p><strong>Duration:</strong> {pkg.duration}</p>
+                  <p><strong>Price Per Person:</strong> ₹{pkg.price}</p>
+                  <Button variant="light" onClick={() => handleBookNow(pkg)}>
+                    Book Package
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
 
+      )}
 
-
-      {/* My Booked Packages */}
-      <div className="mt-4">
-        <h4 className="mb-3">My Package Bookings</h4>
-        {bookingsLoading && <Spinner animation="border" variant="primary" />}
-        {bookingsError && <Alert variant="danger">{bookingsError}</Alert>}
-        {!bookingsLoading && !bookingsError && myTrips.length === 0 && (
-          <Alert variant="info">You have not booked any packages yet.</Alert>
-        )}
-        {!bookingsLoading && !bookingsError && myTrips.length > 0 && (
-          <Table striped bordered hover responsive>
-            <thead className="table-dark">
-              <tr>
-                <th>Package</th>
-                <th>Travel Date</th>
-                <th>Time</th>
-                <th>Passengers</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Status</th>
-                <th>Price Per Person</th>
-              </tr>
-            </thead>
-            <tbody>
-              {myTrips.map(t => (
-                <tr key={t._id}>
-                  <td>{t.packageName || t.packageId?.name}</td>
-                  <td>{t.date ? new Date(t.date).toLocaleDateString() : '-'}</td>
-                  <td>{t.time}</td>
-                  <td>{t.passengers}</td>
-                  <td>{t.pickupLocation}</td>
-                  <td>{t.dropLocation}</td>
-                  <td>
-                    <span className={`badge ${t.status === 'confirmed' ? 'bg-success' : t.status === 'pending' ? 'bg-warning text-dark' : t.status === 'cancelled' ? 'bg-danger' : 'bg-secondary'}`}>
-                      {t.status}
-                    </span>
-                  </td>
-                  <td>₹{t.packagePrice || t.packageId?.price}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        )}
-      </div>
-
-      {/* Booking Modal */}
       <Modal show={showModal} onHide={handleCloseModal} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Book Package: {selectedPackage?.name}</Modal.Title>
@@ -411,6 +375,64 @@ export default function Packages() {
           </Form>
         </Modal.Body>
       </Modal>
-    </Container>
+
+      {/* ✅ User Trips Table */}
+      <div className="mt-5">
+        <h3>Your Bookings</h3>
+        {sessionStorage.getItem("token") ? (
+          bookingsLoading ? (
+            <Spinner animation="border" />
+          ) : bookingsError ? (
+            <p className="text-danger">{bookingsError}</p>
+          ) : trips.length === 0 ? (
+            <p>No bookings found.</p>
+          ) : (
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Passengers</th>
+                  <th>Pickup</th>
+                  <th>Drop</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {trips.map((trip) => (
+                  <tr key={trip._id}>
+                    <td>{trip.packageName}</td>
+                    <td>{new Date(trip.date).toLocaleDateString()}</td>
+                    <td>{trip.time}</td>
+                    <td>{trip.passengers}</td>
+                    <td>{trip.pickupLocation}</td>
+                    <td>{trip.dropLocation}</td>
+                    <td>₹{trip.packagePrice}</td>
+                    <td>
+                      <span
+                        className={`badge ${trip.status === "confirmed"
+                          ? "bg-success"
+                          : trip.status === "pending"
+                            ? "bg-warning"
+                            : "bg-danger"
+                          }`}
+                      >
+                        {trip.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )
+        ) : (
+          <p className="text-muted">Please login to view your bookings.</p>
+        )}
+      </div>
+    </div>
   );
-}
+};
+
+export default Packages;

@@ -25,7 +25,7 @@ export const AboutUs = () => {
                   <span className="badge-text">Since 2009</span>
                 </div>
                 <h1 className="about-hero-title">
-                  Welcome to <span className="text-gradient">Santos King</span>
+                  Welcome to <span className="text-gradient">FlyMallu</span>
                 </h1>
                 <p className="about-hero-subtitle">
                   Your trusted partner in creating unforgettable travel experiences across incredible India. 
