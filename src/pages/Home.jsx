@@ -32,6 +32,7 @@ export const Home = () => {
     time: "",
     vehicleType: "",
     passengerCount: "",
+    phoneNumber: "", // Add this line
     //tripType: "",
     selectedCabType: null,
   });
@@ -164,7 +165,7 @@ export const Home = () => {
 
       const token = sessionStorage.getItem("token");
       if (!token) {
-        setMessage("❌ You must be logged in to book a taxi");
+        setMessage("❌ You must be logged in to Enquire a trip");
         return;
       }
 
@@ -182,6 +183,7 @@ export const Home = () => {
         returnDate: form.returnDate,
         time: form.time,
         passengerCount: parseInt(form.passengerCount) || 1,
+        phoneNumber: form.phoneNumber,
         // tripType,
         // airportTripType: tripType === "airport" ? airportTripType : null,
         status: "pending",
@@ -212,6 +214,7 @@ export const Home = () => {
           time: "",
           vehicleType: "",
           passengerCount: "",
+          phoneNumber: "",
           // tripType: "",
         });
         // refresh bookings after new booking
@@ -322,6 +325,22 @@ export const Home = () => {
                       </Form.Select>
                     </Col>
 
+                    {/* Desktop view - after cab type field */}
+                    <Col lg={3} md={6} className="booking-field">
+                      <Form.Label className="booking-label">Phone Number</Form.Label>
+                      <Form.Control
+                        className="booking-input"
+                        type="tel"
+                        name="phoneNumber"
+                        value={form.phoneNumber}
+                        onChange={handleChange}
+                        placeholder="Enter phone number"
+                        pattern="[0-9]{10}"
+                        required
+                      />
+                    </Col>
+                    
+
                     <Col lg={3} md={6} className="d-flex align-items-end justify-content-center">
                       <Button 
                         className="add-stop-btn" 
@@ -421,7 +440,7 @@ export const Home = () => {
                   <Row className="mt-3">
                     <Col xs={12} className="text-center">
                       <Button type="submit" className="book-btn">
-                        Book Now
+                        Enquire
                       </Button>
                     </Col>
                   </Row>
@@ -550,6 +569,21 @@ export const Home = () => {
                           </option>
                         ))}
                       </Form.Select>
+                    </Col>
+
+                    {/* Mobile view - after cab type field */}
+                    <Col xs={12} className="booking-field">
+                      <Form.Label className="booking-label">Phone Number</Form.Label>
+                      <Form.Control
+                        className="booking-input"
+                        type="tel"
+                        name="phoneNumber"
+                        value={form.phoneNumber}
+                        onChange={handleChange}
+                        placeholder="Enter phone number"
+                        pattern="[0-9]{10}"
+                        required
+                      />
                     </Col>
 
                     <Col xs={6} className="booking-field">

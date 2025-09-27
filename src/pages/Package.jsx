@@ -114,8 +114,6 @@ const fetchTrips = async () => {
       date: "",
       time: "",
       passengers: "",
-      pickupLocation: "",
-      dropLocation: "",
       specialRequests: "",
     });
   };
@@ -207,10 +205,16 @@ const fetchTrips = async () => {
 
                 {/* Card Content */}
                 <Card.Body className="position-relative">
-                  <Card.Title className="fw-bold fs-3">{pkg.name}</Card.Title>
+                  <Card.Title className="fw-bold fs-3">{pkg.name} 
+                    <span>
+                      <p style={{marginTop:"5px", fontSize:"25px"}}>({pkg.city} to {pkg.destination})</p>
+                    </span>
+                  </Card.Title>
                   <Card.Text>{pkg.description}</Card.Text>
-                  <p><strong>Duration:</strong> {pkg.duration}</p>
-                  <p><strong>Price Per Person:</strong> ₹{pkg.price}</p>
+                  <p><strong><i className="fas fa-clock"></i> Duration:</strong> {pkg.duration}</p>
+                  <p><strong><i className="fas fa-calendar-alt"></i> Month:</strong> {pkg.month}</p>
+                  <p><strong><i className="fas fa-car"></i> Cab Type:</strong> {pkg.cabtype}</p>
+                  <p><strong><i className="fas fa-rupee-sign"></i> :</strong> ₹{pkg.price} Per Person</p>
                   <Button variant="light" onClick={() => handleBookNow(pkg)}>
                     Book Package
                   </Button>
@@ -317,34 +321,7 @@ const fetchTrips = async () => {
               </Col>
             </Row>
 
-            <Row>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Pickup Location *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="pickupLocation"
-                    value={bookingForm.pickupLocation}
-                    onChange={handleFormChange}
-                    required
-                    placeholder="Enter pickup location"
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Drop Location *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="dropLocation"
-                    value={bookingForm.dropLocation}
-                    onChange={handleFormChange}
-                    required
-                    placeholder="Enter drop location"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
+            
 
             <Form.Group className="mb-3">
               <Form.Label>Special Requests</Form.Label>
@@ -373,7 +350,7 @@ const fetchTrips = async () => {
                 Cancel
               </Button>
               <Button variant="primary" type="submit" disabled={submitting}>
-                {submitting ? "Submitting..." : "Submit Booking"}
+                {submitting ? "Submitting..." : "Submit Enquiry"}
               </Button>
             </div>
           </Form>
@@ -398,8 +375,7 @@ const fetchTrips = async () => {
                   <th>Date</th>
                   <th>Time</th>
                   <th>Passengers</th>
-                  <th>Pickup</th>
-                  <th>Drop</th>
+                
                   <th>Price</th>
                   <th>Status</th>
                 </tr>
@@ -411,8 +387,7 @@ const fetchTrips = async () => {
                     <td>{new Date(trip.date).toLocaleDateString()}</td>
                     <td>{trip.time}</td>
                     <td>{trip.passengers}</td>
-                    <td>{trip.pickupLocation}</td>
-                    <td>{trip.dropLocation}</td>
+                    
                     <td>₹{trip.packagePrice}</td>
                     <td>
                       <span

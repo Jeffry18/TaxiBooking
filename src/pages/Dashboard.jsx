@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Table, Button, Form, Row, Col, Card, Nav, Alert, Badge, Modal } from "react-bootstrap";
+import { Container, Table, Button, Form, Row, Col, Card, Nav, Alert, Badge, Modal, Dropdown } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo 2.png";
@@ -21,6 +21,10 @@ export default function AdminPage() {
     description: "",
     duration: "",
     price: "",
+    cabtype: "",
+    city: "",
+    destination: "",
+    month: "",
     image: null,
   });
 
@@ -206,10 +210,10 @@ export default function AdminPage() {
     try {
       setLoading((prev) => ({ ...prev, trips: true }));
       const token = sessionStorage.getItem("token");
-      const res = await axios.get(`${SERVER_URL}/trips`,{
+      const res = await axios.get(`${SERVER_URL}/trips`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       if (res.data.success) {
         setTrips(Array.isArray(res.data.data) ? res.data.data : []);
         setError((prev) => ({ ...prev, trips: null }));
@@ -298,7 +302,7 @@ export default function AdminPage() {
     try {
       const res = await axios.get(`${SERVER_URL}/citytariff`);
       setTariff(Array.isArray(res.data) ? res.data : []);
-    } catch { 
+    } catch {
       console.error("Failed to fetch city tariff:", err);
       setTariff([]);
     }
@@ -308,7 +312,7 @@ export default function AdminPage() {
   const approveVehicle = async (id) => {
     try {
       const token = sessionStorage.getItem("token");
-      await axios.patch(`${SERVER_URL}/vehicles/${id}`,{ status: "approved" },{ headers: { Authorization: `Bearer ${token}` }});
+      await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "approved" }, { headers: { Authorization: `Bearer ${token}` } });
       fetchVehicles();
     } catch (err) {
       console.error("Failed to approve vehicle:", err);
@@ -485,6 +489,10 @@ export default function AdminPage() {
       formData.append("description", newPackage.description);
       formData.append("duration", newPackage.duration);
       formData.append("price", newPackage.price);
+      formData.append("cabtype", newPackage.cabtype);
+      formData.append("city", newPackage.city);
+      formData.append("destination", newPackage.destination);
+      formData.append("month", newPackage.month);
       formData.append("image", newPackage.image);
 
       await axios.post(`${SERVER_URL}/packages`, formData, {
@@ -496,6 +504,10 @@ export default function AdminPage() {
         description: "",
         duration: "",
         price: "",
+        cabtype: "",
+        city: "",
+        destination: "",
+        month: "",
         image: null,
       });
 
@@ -698,7 +710,7 @@ export default function AdminPage() {
       const formData = new FormData();
       formData.append("city", newTariff.city);
       formData.append("cabType", newTariff.cabType);
-      formData.append("seats", newTariff.seats);  
+      formData.append("seats", newTariff.seats);
       formData.append("rate", newTariff.rate);
       formData.append("allowedKm", newTariff.allowedKm);
       formData.append("extraKmRate", newTariff.extraKmRate);
@@ -718,7 +730,8 @@ export default function AdminPage() {
     catch (err) {
       console.error("Failed to add tariff:", err.response?.data || err.message);
       alert("Error adding tariff. Please try again.");
-    } }
+    }
+  }
 
 
 
@@ -870,7 +883,33 @@ export default function AdminPage() {
                   required
                 />
               </div>
+
+              <div className="form-group">
+                <label className="form-label">City</label>
+                <input
+                  name="city"
+                  value={newPackage.city}
+                  onChange={handlePackageChange}
+                  className="form-input"
+                  placeholder="Enter City"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Destination</label>
+                <input
+                  name="destination"
+                  value={newPackage.destination}
+                  onChange={handlePackageChange}
+                  className="form-input"
+                  placeholder="Enter Destination"
+                  required
+                />
+              </div>
             </div>
+
+
 
             <div className="form-row">
               <div className="form-group">
@@ -883,6 +922,38 @@ export default function AdminPage() {
                   placeholder="e.g., 3 Days 2 Nights"
                 />
               </div>
+
+
+              <div className="form-group">
+                <label className="form-label">Month</label>
+                <input
+                  name="month"
+                  value={newPackage.month}
+                  onChange={handlePackageChange}
+                  className="form-input"
+                  placeholder="e.g., November-January"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Cab Type</label>
+                <select
+                  className="form-input"
+                  name="cabtype"
+                  value={newPackage.cabtype}
+                  onChange={handlePackageChange}
+                  required
+                >
+                  <option value="">-- Select Cab Type --</option>
+                  {cabTypes.map((cab) => (
+                    <option key={cab._id} value={cab.name}>
+                      {cab.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+
 
               <div className="form-group">
                 <label className="form-label">Package Image</label>
@@ -936,11 +1007,21 @@ export default function AdminPage() {
                 )}
                 <div className="package-content">
                   <h4 className="package-title">{pkg.name}</h4>
+                  <p className="package-title">{pkg.city} - {pkg.destination}</p>
+
                   <p className="package-description">{pkg.description}</p>
                   <div className="package-details">
                     <div className="detail-item">
+                      <i className="fas fa-calendar-alt"></i>
+                      <span>{pkg.month}</span>
+                    </div>
+                    <div className="detail-item">
                       <i className="fas fa-clock"></i>
                       <span>{pkg.duration}</span>
+                    </div>
+                    <div className="detail-item">
+                      <i className="fas fa-car"></i>
+                      <span>{pkg.cabtype}</span>
                     </div>
                     <div className="detail-item">
                       <i className="fas fa-rupee-sign"></i>
@@ -1215,9 +1296,10 @@ export default function AdminPage() {
                   <tr>
                     <th>#</th>
                     <th>User</th>
+                    <th>Phone Number</th>
                     <th>Cab Type</th>
                     <th>Pickup</th>
-                    <th>Drop</th>
+                    <th>Drop & Stops</th>
                     <th>Time</th>
                     <th>Passengers</th>
                     <th>Status</th>
@@ -1229,9 +1311,30 @@ export default function AdminPage() {
                     <tr key={b._id}>
                       <td>{idx + 1}</td>
                       <td>{b.username}</td>
+                      <td>{b.phoneNumber || "N/A"}</td>
                       <td>{b.cabType?.name || "N/A"}</td>
                       <td>{b.pickup}</td>
-                      <td>{b.drop}</td>
+                      <td style={dropdownStyle}>
+                        <Dropdown>
+                          <Dropdown.Toggle variant="link" className="p-0 text-dark text-decoration-none">
+                            {b.drop} {b.extraStops?.length > 0 && <i className="fas fa-caret-down ms-1"/>}
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu style={dropdownMenuStyle}>
+                            <Dropdown.Header>Extra Stops</Dropdown.Header>
+                            {b.extraStops && b.extraStops.length > 0 && (
+                              <>
+                                <Dropdown.Divider />
+                                
+                                {b.extraStops.map((stop, index) => (
+                                  <Dropdown.Item key={index} disabled>
+                                    {index + 1}. {stop}
+                                  </Dropdown.Item>
+                                ))}
+                              </>
+                            )}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </td>
                       <td>{b.time}</td>
                       <td>{b.passengerCount || "N/A"}</td>
                       <td>
@@ -1289,8 +1392,7 @@ export default function AdminPage() {
               <th>Travel Date</th>
               <th>Time</th>
               <th>Passengers</th>
-              <th>Pickup</th>
-              <th>Drop</th>
+
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -1315,8 +1417,7 @@ export default function AdminPage() {
                 <td>{new Date(trip.date).toLocaleDateString()}</td>
                 <td>{trip.time}</td>
                 <td>{trip.passengers}</td>
-                <td>{trip.pickupLocation}</td>
-                <td>{trip.dropLocation}</td>
+
                 <td>
                   <Badge
                     bg={
@@ -2131,8 +2232,8 @@ export default function AdminPage() {
         <Form.Group className="mb-3">
           <Form.Label>City</Form.Label>
           <Form.Select
-            name="city"     
-            value={newCityTariff.city}  
+            name="city"
+            value={newCityTariff.city}
             onChange={handleCityTariffChange}
             required
           >
@@ -2193,7 +2294,7 @@ export default function AdminPage() {
               <td>{t.rate}</td>
               <td>{t.allowedKm}</td>
               <td>{t.extraKmRate}</td>
-              <td>{t.details}</td>              
+              <td>{t.details}</td>
               <td>
                 <button
                   className="btn btn-danger btn-sm"
@@ -2201,7 +2302,7 @@ export default function AdminPage() {
                 >
                   Delete
                 </button>
-              </td> 
+              </td>
             </tr>
           ))}
         </tbody>
@@ -2209,8 +2310,17 @@ export default function AdminPage() {
     </>
   )
 
+  const dropdownStyle = {
+    position: 'relative'
+  };
 
-
+  const dropdownMenuStyle = {
+    position: 'absolute',
+    transform: 'none',
+    top: '100%',
+    left: 0,
+    willChange: 'transform'
+  };
 
   const handleViewImage = (imageUrl) => {
     setSelectedImage(`${SERVER_URL}/uploads/${imageUrl}`);
@@ -2338,6 +2448,16 @@ export default function AdminPage() {
                     <span className="nav-badge">{drivers.filter(d => d.status === "pending").length}</span>
                   )}
                 </button>
+                <button
+                  onClick={() => setActiveTab("enquiries")}
+                  className={`nav-item ${activeTab === "enquiries" ? "active" : ""}`}
+                >
+                  <i className="fas fa-user"></i>
+                  <span>Enquiries</span>
+                  {bookings.filter(c => c.status === "pending").length > 0 && (
+                    <span className="nav-badge">{bookings.filter(c => c.status === "pending").length}</span>
+                  )}
+                </button>
               </nav>
             </div>
 
@@ -2400,6 +2520,7 @@ export default function AdminPage() {
             {activeTab === "overview" && renderOverview()}
             {activeTab === "vehicles" && renderVehiclesTable()}
             {activeTab === "drivers" && renderDriversTable()}
+            {activeTab === "enquiries" && renderBookingsTable()}
             {activeTab === "trips" && renderTripsTable()}
             {activeTab === "cabtypes" && renderCabTypes()}
             {activeTab === "packages" && renderPackages()}
