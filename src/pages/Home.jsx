@@ -54,24 +54,7 @@ export const Home = () => {
   ];
 
   useEffect(() => {
-    const fetchVehicles = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${SERVER_URL}/vehicles`);
-        setVehicles(response.data);
-        setError(null);
-      } catch (err) {
-        const errorMessage =
-          err.response?.status === 500
-            ? "Server error occurred. Please try again later."
-            : "Failed to load vehicles. Please check your connection.";
-        setError(errorMessage);
-        setVehicles([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVehicles();
+    
 
     const fetchPlaces = async () => {
       try {

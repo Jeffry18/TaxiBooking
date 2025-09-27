@@ -123,7 +123,11 @@ export default function AdminPage() {
   const fetchVehicles = async () => {
     try {
       setLoading((prev) => ({ ...prev, vehicles: true }));
-      const res = await axios.get(`${SERVER_URL}/vehicles`);
+      const token = sessionStorage.getItem("token");
+      const res = await axios.get(`${SERVER_URL}/vehicles`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       setVehicles(Array.isArray(res.data) ? res.data : []);
       setError((prev) => ({ ...prev, vehicles: null }));
     } catch (err) {
@@ -303,7 +307,8 @@ export default function AdminPage() {
 
   const approveVehicle = async (id) => {
     try {
-      await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "approved" });
+      const token = sessionStorage.getItem("token");
+      await axios.patch(`${SERVER_URL}/vehicles/${id}`,{ status: "approved" },{ headers: { Authorization: `Bearer ${token}` }});
       fetchVehicles();
     } catch (err) {
       console.error("Failed to approve vehicle:", err);
@@ -312,7 +317,8 @@ export default function AdminPage() {
 
   const unapproveVehicle = async (id) => {
     try {
-      await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "pending" });
+      const token = sessionStorage.getItem("token");
+      await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "pending" }, { headers: { Authorization: `Bearer ${token}` } });
       fetchVehicles();
     } catch (err) {
       console.error("Failed to unapprove vehicle:", err);
