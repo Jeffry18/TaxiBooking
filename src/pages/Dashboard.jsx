@@ -1303,7 +1303,7 @@ export default function AdminPage() {
                     <th>Time</th>
                     <th>Passengers</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1353,14 +1353,28 @@ export default function AdminPage() {
                         </Badge>
                       </td>
                       <td>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => updateBookingStatus(b._id, "cancelled")}
-                          disabled={b.status === "cancelled"}
-                        >
-                          {b.status === "cancelled" ? "Cancelled" : "Cancel"}
-                        </Button>
+                        <div className="d-flex gap-2">
+                          {b.status === "pending" && (
+                            <Button
+                              variant="success"
+                              size="sm"
+                              onClick={() => updateBookingStatus(b._id, "confirmed")}
+                            >
+                              
+                              Assigned
+                            </Button>
+                          )}
+                          {b.status !== "cancelled" && (
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => updateBookingStatus(b._id, "cancelled")}
+                            >
+                              
+                              Cancel
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

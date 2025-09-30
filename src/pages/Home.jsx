@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Form, Button, Container, Row, Col, Card, Alert, Nav, Table, Spinner, Carousel, CardTitle, } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Card, Alert, Nav, Table, Spinner, Carousel, CardTitle } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
 import '../App.css'
 import Select from 'react-select';
@@ -12,9 +12,6 @@ import airport from '../assets/airport.jpg';
 import oneway from '../assets/oneway.jpg';
 import innova from '../assets/innova-crysta.jpg'
 import { Link, useNavigate } from "react-router-dom";
-
-
-
 
 export const Home = () => {
   const [vehicles, setVehicles] = useState([]); // kept for backward compatibility (no longer used)
@@ -55,8 +52,6 @@ export const Home = () => {
   ];
 
   useEffect(() => {
-    
-
     const fetchPlaces = async () => {
       try {
         const res = await axios.get(`${SERVER_URL}/places/kerala-places`);
@@ -137,8 +132,6 @@ export const Home = () => {
     setExtraStops(updatedStops);
   };
 
-
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -159,18 +152,28 @@ export const Home = () => {
     navigate(`/view-vehicles/${cabTypeName}`);
   };
 
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertVariant, setAlertVariant] = useState('success');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
 
       const token = sessionStorage.getItem("token");
       if (!token) {
-        setMessage("❌ You must be logged in to Enquire a trip");
+        setAlertVariant('danger');
+        setMessage("You must be logged in to Enquire a trip");
+        setShowAlert(true);
+        // Auto hide alert after 3 seconds
+        setTimeout(() => setShowAlert(false), 3000);
         return;
       }
 
       if (!form.vehicle) {
-        setMessage("❌ Please select a cab type");
+        setAlertVariant('danger');
+        setMessage("Please select a cab type");
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
         return;
       }
 
@@ -203,7 +206,12 @@ export const Home = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (response.data) {
+        setAlertVariant('success');
         setMessage("✅ Booking successful!");
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
+
+        // Reset form and update bookings
         setForm({
           vehicle: "",
           pickup: "",
@@ -215,8 +223,8 @@ export const Home = () => {
           vehicleType: "",
           passengerCount: "",
           phoneNumber: "",
-          // tripType: "",
         });
+
         // refresh bookings after new booking
         const res = await axios.get(`${SERVER_URL}/bookings`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -230,13 +238,12 @@ export const Home = () => {
       }
     } catch (err) {
       console.error("Booking failed:", err);
+      setAlertVariant('danger');
       setMessage(`❌ ${err.response?.data?.message || "Booking failed. Please try again"}`);
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
     }
   };
-
-
-
-
 
   // const isAirport = tripType === "airport";
   // const isRound = tripType === "round";
@@ -300,7 +307,7 @@ export const Home = () => {
                       />
                     </Col>
 
-                    <Col lg={3} md={6} className="booking-field">
+                    <Col lg={2} md={6} className="booking-field">
                       <Form.Label className="booking-label">Cab Type</Form.Label>
                       <Form.Select
                         className="booking-input"
@@ -326,7 +333,7 @@ export const Home = () => {
                     </Col>
 
                     {/* Desktop view - after cab type field */}
-                    <Col lg={3} md={6} className="booking-field">
+                    <Col lg={2} md={6} className="booking-field">
                       <Form.Label className="booking-label">Phone Number</Form.Label>
                       <Form.Control
                         className="booking-input"
@@ -339,11 +346,11 @@ export const Home = () => {
                         required
                       />
                     </Col>
-                    
+
 
                     <Col lg={3} md={6} className="d-flex align-items-end justify-content-center">
-                      <Button 
-                        className="add-stop-btn" 
+                      <Button
+                        className="add-stop-btn"
                         onClick={addStop}
                         title="Add extra stop"
                       >
@@ -456,7 +463,7 @@ export const Home = () => {
                 <div>
                   <h2 className="booking-heading">BOOK YOUR TRIP</h2>
                 </div>
-                
+
                 <Form onSubmit={handleSubmit}>
                   <Row>
                     <Col xs={12} className="booking-field">
@@ -471,7 +478,7 @@ export const Home = () => {
                         isSearchable
                       />
                     </Col>
-                    
+
                     <Col xs={12} className="booking-field">
                       <Form.Label className="booking-label">To</Form.Label>
                       <Select
@@ -484,7 +491,7 @@ export const Home = () => {
                         isSearchable
                       />
                     </Col>
-                    
+
                     {/* Extra Stops for mobile */}
                     {extraStops.map((stop, index) => (
                       <Col key={index} xs={12} className="booking-field">
@@ -514,8 +521,8 @@ export const Home = () => {
 
                     {/* Add Stop button for mobile */}
                     <Col xs={12} className="text-center mb-3">
-                      <Button 
-                        className="add-stop-btn" 
+                      <Button
+                        className="add-stop-btn"
                         onClick={addStop}
                         title="Add extra stop"
                       >
@@ -600,7 +607,7 @@ export const Home = () => {
                         required
                       />
                     </Col>
-                    
+
                     <Col xs={6} className="booking-field">
                       <Form.Label className="booking-label">Pick Up Time</Form.Label>
                       <Form.Control
@@ -643,14 +650,22 @@ export const Home = () => {
           </Row>
         )}
 
-        {message && (
-          <Row className="" style={{ marginTop: "320px" }}>
-            <Col>
-              <Alert variant={message.includes("✅") ? "success" : "danger"}>
-                {message}
-              </Alert>
-            </Col>
-          </Row>
+        {showAlert && (
+          <div style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 9999,
+            minWidth: '300px'
+          }}>
+            <Alert
+              variant={alertVariant}
+              onClose={() => setShowAlert(false)}
+              dismissible
+            >
+              {message}
+            </Alert>
+          </div>
         )}
 
         {/* Recent Bookings */}
