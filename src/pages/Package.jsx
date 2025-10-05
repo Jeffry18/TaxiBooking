@@ -144,11 +144,15 @@ const fetchTrips = async () => {
         packagePrice: selectedPackage.price,
       };
 
+      
+
       const response = await axios.post(`${SERVER_URL}/trips`, bookingData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
       console.log("Booking response:", response.data);
+
+
 
       if (response.data.success) {
         alert("Booking submitted successfully! We'll contact you soon.");
@@ -159,7 +163,7 @@ const fetchTrips = async () => {
       }
     } catch (err) {
       console.error("Error submitting booking:", err);
-      alert("Error submitting booking. Please try again.");
+      alert("Error submitting booking.Login and Please try again.");
     } finally {
       setSubmitting(false);
     }

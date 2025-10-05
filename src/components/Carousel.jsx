@@ -68,7 +68,7 @@ function HomeCarousel() {
                   <p className={`hero-description ${activeIndex === index ? 'animate-in delay-2' : ''}`}>
                     {banner.description}
                   </p>
-                  <div className={`hero-buttons ${activeIndex === index ? 'animate-in delay-3' : ''}`}>
+                  {/* <div className={`hero-buttons ${activeIndex === index ? 'animate-in delay-3' : ''}`}>
                     <button className="hero-btn primary-btn">
                       <span>Book Now</span>
                       <i className="fas fa-arrow-right"></i>
@@ -76,7 +76,7 @@ function HomeCarousel() {
                     <button className="hero-btn secondary-btn">
                       <span>Learn More</span>
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

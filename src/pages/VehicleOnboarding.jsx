@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Form, Row, Col, Button, Card, Table, Alert, Spinner } from "react-bootstrap";
+import {
+  Container,
+  Form,
+  Row,
+  Col,
+  Button,
+  Card,
+  Table,
+  Alert,
+  Spinner,
+} from "react-bootstrap";
 
 export default function VehicleOnboarding() {
   const [form, setForm] = useState({
@@ -9,11 +19,13 @@ export default function VehicleOnboarding() {
     type: "",
     capacity: "",
     contactNumber: "",
-    image: null
+    image: null,
   });
   const [vehicles, setVehicles] = useState([]);
+  const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -24,68 +36,107 @@ export default function VehicleOnboarding() {
     }
   };
 
+  // ✅ Validation Logic
+  const validateForm = () => {
+    if (!form.model || form.model.length < 2)
+      return "❌ Please enter a valid vehicle model (min 2 characters).";
+
+    if (!form.number || !/^[A-Za-z0-9-]{6,}$/.test(form.number))
+      return "❌ Enter a valid registration number (min 6 characters, letters/numbers only).";
+
+    if (!form.type.trim()) return "❌ Please specify vehicle type (SUV, Sedan, etc.).";
+
+    if (!form.capacity || isNaN(form.capacity) || Number(form.capacity) <= 0)
+      return "❌ Please enter a valid capacity (numeric and positive).";
+
+    if (!/^[0-9]{10}$/.test(form.contactNumber))
+      return "❌ Please enter a valid 10-digit contact number.";
+
+    if (!form.image) return "❌ Please upload a vehicle image.";
+
+    if (form.image && !["image/jpeg", "image/png"].includes(form.image.type))
+      return "❌ Only JPG or PNG images are allowed.";
+
+    return null; // All good ✅
+  };
+
+  // ✅ Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const token = sessionStorage.getItem("token");
-  if (!token) {
-    setMessage({
-      text: "❌ Please login to onboard vehicles",
-      type: "danger",
-    });
-    return;
-  }
+    if (!token) {
+      setMessage({
+        text: "❌ Please login to onboard vehicles.",
+        type: "danger",
+      });
+      return;
+    }
+
+    // Validate before submitting
+    const validationError = validateForm();
+    if (validationError) {
+      setMessage({ text: validationError, type: "danger" });
+      return;
+    }
 
     try {
+      setSubmitting(true);
       const formData = new FormData();
-      formData.append("model", form.model);
-      formData.append("number", form.number);
-      formData.append("type", form.type);
-      formData.append("capacity", form.capacity);
-      formData.append("contactNumber", form.contactNumber);
-      if (form.image) formData.append("image", form.image);
-
-      await axios.post("http://localhost:5000/vehicles", formData, {
-        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}`, },
+      Object.keys(form).forEach((key) => {
+        if (form[key]) formData.append(key, form[key]);
       });
 
-      alert("✅ Vehicle onboarded successfully!");
+      await axios.post("http://localhost:5000/vehicles", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setMessage({
+        text: "✅ Vehicle onboarded successfully!",
+        type: "success",
+      });
       setForm({
         model: "",
         number: "",
         type: "",
         capacity: "",
         contactNumber: "",
-        image: null
+        image: null,
       });
+      fetchVehicles();
     } catch (err) {
       console.error("Error:", err.response?.data);
-      alert("❌ Error onboarding vehicle.");
+      setMessage({
+        text: err.response?.data?.message || "❌ Error onboarding vehicle.",
+        type: "danger",
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  // Fetch approved vehicles for user
+  // ✅ Fetch approved vehicles
   const fetchVehicles = async () => {
     try {
       const token = sessionStorage.getItem("token");
       if (!token) return;
 
       const response = await axios.get("http://localhost:5000/vehicles", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      
-
-      // Filter only approved vehicles
-      const approvedVehicles = response.data.filter(vehicle => 
-        vehicle.status === 'approved' 
+      const approvedVehicles = response.data.filter(
+        (v) => v.status === "approved"
       );
-     
+
       setVehicles(approvedVehicles);
       setError(null);
     } catch (err) {
       console.error("Error fetching vehicles:", err);
-      setError("Failed to load vehicles");
+      setError("Failed to load vehicles.");
     } finally {
       setLoading(false);
     }
@@ -96,10 +147,24 @@ export default function VehicleOnboarding() {
   }, []);
 
   return (
-    <Container className="" style={{marginTop:"130px"}}>
-      {/* Existing onboarding form */}
+    <Container style={{ marginTop: "130px" }}>
+      {/* Onboard Vehicle Form */}
       <Card className="p-4 shadow mb-4">
-        <h3 className="text-center" style={{fontSize:"40px"}}>Onboard Vehicle</h3>
+        <h3 className="text-center mb-3" style={{ fontSize: "40px" }}>
+          Onboard Vehicle
+        </h3>
+
+        {message && (
+          <Alert
+            variant={message.type}
+            onClose={() => setMessage(null)}
+            dismissible
+            className="mb-3"
+          >
+            {message.text}
+          </Alert>
+        )}
+
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col>
@@ -108,7 +173,6 @@ export default function VehicleOnboarding() {
                 value={form.model}
                 onChange={handleChange}
                 placeholder="Vehicle Model"
-                required
               />
             </Col>
             <Col>
@@ -117,10 +181,10 @@ export default function VehicleOnboarding() {
                 value={form.number}
                 onChange={handleChange}
                 placeholder="Registration No"
-                required
               />
             </Col>
           </Row>
+
           <Row className="mt-2">
             <Col>
               <Form.Control
@@ -139,6 +203,7 @@ export default function VehicleOnboarding() {
               />
             </Col>
           </Row>
+
           <Row className="mt-2">
             <Col>
               <Form.Control
@@ -146,23 +211,26 @@ export default function VehicleOnboarding() {
                 value={form.contactNumber}
                 onChange={handleChange}
                 placeholder="Contact Number"
-                required
               />
             </Col>
             <Col>
-              <Form.Control type="file" name="image" onChange={handleChange} required />
+              <Form.Control
+                type="file"
+                name="image"
+                onChange={handleChange}
+              />
             </Col>
           </Row>
 
-          <div className="text-center">
-            <Button type="submit" className="mt-3" variant="success">
-              Onboard Vehicle
+          <div className="text-center mt-3">
+            <Button type="submit" variant="success" disabled={submitting}>
+              {submitting ? <Spinner size="sm" animation="border" /> : "Onboard Vehicle"}
             </Button>
           </div>
         </Form>
       </Card>
 
-      {/* Approved Vehicles List */}
+      {/* Approved Vehicles */}
       <Card className="p-4 shadow">
         <h3 className="text-center mb-4">Your Approved Vehicles</h3>
         {loading ? (
@@ -186,13 +254,13 @@ export default function VehicleOnboarding() {
               </tr>
             </thead>
             <tbody>
-              {vehicles.map((vehicle) => (
-                <tr key={vehicle._id}>
-                  <td>{vehicle.model}</td>
-                  <td>{vehicle.number}</td>
-                  <td>{vehicle.type}</td>
-                  <td>{vehicle.capacity}</td>
-                  <td>{vehicle.contactNumber}</td>
+              {vehicles.map((v) => (
+                <tr key={v._id}>
+                  <td>{v.model}</td>
+                  <td>{v.number}</td>
+                  <td>{v.type}</td>
+                  <td>{v.capacity}</td>
+                  <td>{v.contactNumber}</td>
                   <td>
                     <span className="badge bg-success">Approved</span>
                   </td>

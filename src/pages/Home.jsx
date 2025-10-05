@@ -62,24 +62,24 @@ export const Home = () => {
     };
     fetchPlaces();
 
-    const fetchRecentBookings = async () => {
-      try {
-        const token = sessionStorage.getItem("token");
-        if (!token) return;
+    // const fetchRecentBookings = async () => {
+    //   try {
+    //     const token = sessionStorage.getItem("token");
+    //     if (!token) return;
 
-        const res = await axios.get(`${SERVER_URL}/bookings`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const list = Array.isArray(res.data) ? res.data : [];
-        const top5 = list
-          .sort((a, b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0))
-          .slice(0, 5);
-        setRecent(top5);
-      } catch (err) {
-        console.error("Error fetching recent bookings:", err);
-      }
-    };
-    fetchRecentBookings();
+    //     const res = await axios.get(`${SERVER_URL}/bookings`, {
+    //       headers: { Authorization: `Bearer ${token}` },
+    //     });
+    //     const list = Array.isArray(res.data) ? res.data : [];
+    //     const top5 = list
+    //       .sort((a, b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0))
+    //       .slice(0, 5);
+    //     setRecent(top5);
+    //   } catch (err) {
+    //     console.error("Error fetching recent bookings:", err);
+    //   }
+    // };
+    // fetchRecentBookings();
 
     const fetchCabTypes = async () => {
       try {
@@ -159,15 +159,10 @@ export const Home = () => {
     e.preventDefault();
     try {
 
-      const token = sessionStorage.getItem("token");
-      if (!token) {
-        setAlertVariant('danger');
-        setMessage("You must be logged in to Enquire a trip");
-        setShowAlert(true);
-        // Auto hide alert after 3 seconds
-        setTimeout(() => setShowAlert(false), 3000);
-        return;
-      }
+      
+      
+        
+      
 
       if (!form.vehicle) {
         setAlertVariant('danger');
@@ -202,9 +197,7 @@ export const Home = () => {
         return;
       }
 
-      const response = await axios.post(`${SERVER_URL}/bookings`, bookingData, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await axios.post(`${SERVER_URL}/bookings`, bookingData)
       if (response.data) {
         setAlertVariant('success');
         setMessage("✅ Booking successful!");
@@ -226,16 +219,14 @@ export const Home = () => {
         });
 
         // refresh bookings after new booking
-        const res = await axios.get(`${SERVER_URL}/bookings`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const list = Array.isArray(res.data) ? res.data : [];
-        const top5 = list
-          .sort((a, b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0))
-          .slice(0, 5);
-        setRecent(top5);
+      //   const res = await axios.get(`${SERVER_URL}/bookings`);
+      //   const list = Array.isArray(res.data) ? res.data : [];
+      //   const top5 = list
+      //     .sort((a, b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0))
+      //     .slice(0, 5);
+      //   setRecent(top5);
 
-      }
+       }
     } catch (err) {
       console.error("Booking failed:", err);
       setAlertVariant('danger');
@@ -251,6 +242,9 @@ export const Home = () => {
   const row1Lg = 12 / row1Cols;
   const row2Cols = 4;
   const row2Lg = 12 / row2Cols;
+
+  const token = sessionStorage.getItem("token");
+
 
   return (
     <div>
@@ -622,7 +616,7 @@ export const Home = () => {
 
                     <Col xs={12} className="text-center">
                       <Button type="submit" className="book-btn">
-                        Book Now
+                        Enquire
                       </Button>
                     </Col>
                   </Row>
@@ -669,73 +663,70 @@ export const Home = () => {
         )}
 
         {/* Recent Bookings */}
-        <Container className="px-3 px-md-4" style={{ marginTop: "300px" }}>
-          <h4 className="fw-bold  text-center">Recent Bookings</h4>
 
-          {loading && (
-            <div className="text-center">
-              <Spinner animation="border" variant="primary" />
-            </div>
-          )}
+         {/* {token ? (  // Only render if token exists
+      <Container className="px-3 px-md-4" style={{ marginTop: "300px" }}>
+        <h4 className="fw-bold text-center">Your Recent Enquires</h4>
 
-          {error && <Alert variant="danger">{error}</Alert>}
+        {loading && (
+          <div className="text-center">
+            <Spinner animation="border" variant="primary" />
+          </div>
+        )}
 
-          {!loading && !error && recent.length === 0 && (
-            <p className="text-center text-muted">No recent bookings found.</p>
-          )}
+        {error && <Alert variant="danger">{error}</Alert>}
 
-          {!loading && recent.length > 0 && (
-            <Table striped bordered hover responsive className="text-center mt-2">
-              <thead className="table-dark">
-                <tr>
-                  <th>Pickup</th>
-                  <th>Drop</th>
-                  <th>Date</th>
-                  <th>Return Date</th>
-                  <th>Time</th>
-                  <th>Passengers</th>
-                  {/* <th>Trip Type</th> */}
-                  <th>Cab Type</th>
+        {!loading && !error && recent.length === 0 && (
+          <p className="text-center text-muted">No recent Enquires found.</p>
+        )}
+
+        {!loading && recent.length > 0 && (
+          <Table striped bordered hover responsive className="text-center mt-2">
+            <thead className="table-dark">
+              <tr>
+                <th>Pickup</th>
+                <th>Drop</th>
+                <th>Date</th>
+                <th>Return Date</th>
+                <th>Time</th>
+                <th>Passengers</th>
+                <th>Cab Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recent.map((b) => (
+                <tr key={b._id}>
+                  <td>{b.pickup}</td>
+                  <td>{b.drop}</td>
+                  <td>{b.date ? new Date(b.date).toLocaleDateString() : "-"}</td>
+                  <td>{b.returnDate ? new Date(b.returnDate).toLocaleDateString() : "-"}</td>
+                  <td>{b.time}</td>
+                  <td>{b.passengerCount}</td>
+                  <td>
+                    {b.cabType
+                      ? `${b.cabType.name || ''}`
+                      : b.vehicle
+                        ? `${b.vehicle.model || b.vehicle.name || ''} (${b.vehicle.type || ''})`
+                        : '-'}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {recent.map((b) => (
-                  <tr key={b._id}>
-                    <td>{b.pickup}</td>
-                    <td>{b.drop}</td>
-                    <td>{b.date ? new Date(b.date).toLocaleDateString() : "-"}</td>
-                    <td>
-                      {b.returnDate
-                        ? new Date(b.returnDate).toLocaleDateString()
-                        : "-"}
-                    </td>
-                    <td>{b.time}</td>
-                    <td>{b.passengerCount}</td>
-                    {/* <td>
-                      {b.tripType === "airport"
-                        ? `Airport (${b.airportTripType})`
-                        : b.tripType}
-                    </td> */}
-                    <td>
-                      {b.cabType
-                        ? `${b.cabType.name || ''}`
-                        : b.vehicle
-                          ? `${b.vehicle.model || b.vehicle.name || ''} (${b.vehicle.type || ''})`
-                          : '-'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          )}
-        </Container>
+              ))}
+            </tbody>
+          </Table>
+        )}
+      </Container>
+    ) : (
+
+      <p className="text-center" style={{ marginTop: "300px" }}>Please log in to see your recent Enquires.</p>
+    )} */}
+  
 
 
 
 
 
         {/* Cab Type Preview List */}
-        <h5 className=" fw-bold text-center" style={{ fontSize: "2rem", marginTop: "150px" }}>Available Cab Types</h5>
+        <h5 className=" fw-bold text-center" style={{ fontSize: "2rem", marginTop: "350px" }}>Available Cab Types</h5>
 
         <Container className="px-3 px-md-4 mt-3 ">
           <Row className="g-3 justify-content-center cabtype-grid">
