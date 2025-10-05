@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Modal, Button, Form, Table, Spinner, Row, Col, Card } from "react-bootstrap";
+import {
+  Modal,
+  Button,
+  Form,
+  Table,
+  Spinner,
+  Row,
+  Col,
+  Card,
+  Alert,
+} from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
-
 
 const Packages = () => {
   const [packages, setPackages] = useState([]);
@@ -23,10 +32,10 @@ const Packages = () => {
     date: "",
     time: "",
     passengers: "",
-    pickupLocation: "",
-    dropLocation: "",
     specialRequests: "",
   });
+
+  const [message, setMessage] = useState(null); // ✅ For validation alerts
 
   // ✅ Fetch packages
   useEffect(() => {
@@ -34,14 +43,12 @@ const Packages = () => {
       try {
         setLoading(true);
         const res = await axios.get(`${SERVER_URL}/packages`);
-        console.log("Packages data received:", res.data); // Debug: log the response
-
         if (Array.isArray(res.data)) {
           setPackages(res.data);
           setError(null);
         } else {
-          setPackages([]);
           setError("Invalid data received from server");
+          setPackages([]);
         }
       } catch (err) {
         console.error("Error fetching packages:", err);
@@ -55,44 +62,37 @@ const Packages = () => {
     fetchPackages();
   }, []);
 
-// ✅ Fetch trips of logged-in user
-const fetchTrips = async () => {
-  const token = sessionStorage.getItem("token");
-  if (!token) {
-    setTrips([]);
-    setBookingsError("Please login to view your bookings.");
-    setBookingsLoading(false);
-    return;
-  }
-  
+  // ✅ Fetch trips of logged-in user
+  const fetchTrips = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      setTrips([]);
+      setBookingsError("Please login to view your bookings.");
+      setBookingsLoading(false);
+      return;
+    }
 
-  try {
-    setBookingsLoading(true);
+    try {
+      setBookingsLoading(true);
+      const res = await axios.get(`${SERVER_URL}/trips`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const res = await axios.get(`${SERVER_URL}/trips`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-      console.log("Trips data response:", res.data); // Debug: log the response
-    if (res.data.success && Array.isArray(res.data.data)) {
-      setTrips(res.data.data);
-            console.log("Trips data received:", res.data.data); // Debug: log the response
-
-      setBookingsError(null);
-      
-
-    } else {
+      if (res.data.success && Array.isArray(res.data.data)) {
+        setTrips(res.data.data);
+        setBookingsError(null);
+      } else {
+        setTrips([]);
+        setBookingsError("Failed to load bookings. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error fetching trips:", err);
       setTrips([]);
       setBookingsError("Failed to load bookings. Please try again.");
+    } finally {
+      setBookingsLoading(false);
     }
-  } catch (err) {
-    console.error("Error fetching trips:", err);
-    setTrips([]);
-    setBookingsError("Failed to load bookings. Please try again.");
-  } finally {
-    setBookingsLoading(false);
-  }
-};
-
+  };
 
   useEffect(() => {
     fetchTrips();
@@ -116,27 +116,65 @@ const fetchTrips = async () => {
       passengers: "",
       specialRequests: "",
     });
+    setMessage(null);
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setBookingForm(prev => ({
+    setBookingForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
+  // ✅ Validation logic
+  const validateBookingForm = () => {
+    const { name, email, phone, date, time, passengers } = bookingForm;
+
+    if (!name.trim() || name.trim().length < 5)
+      return "❌ Full name must be at least 5 characters long.";
+
+    if (!/^[a-zA-Z\s]+$/.test(name))
+      return "❌ Name should contain only letters and spaces.";
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return "❌ Please enter a valid email address.";
+
+    if (!/^[0-9]{10}$/.test(phone))
+      return "❌ Please enter a valid 10-digit phone number.";
+
+    const today = new Date();
+    const selectedDate = new Date(date);
+    if (!date || selectedDate < today.setHours(0, 0, 0, 0))
+      return "❌ Please select a valid travel date (today or later).";
+
+    if (!time) return "❌ Please select a travel time.";
+
+    if (!passengers || Number(passengers) <= 0)
+      return "❌ Please select the number of passengers.";
+
+    return null;
+  };
 
   // ✅ Handle booking form submit
   const handleSubmitBooking = async (e) => {
     e.preventDefault();
+
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      setMessage({ type: "danger", text: "❌ Please login to book a package." });
+      return;
+    }
+
+    const validationError = validateBookingForm();
+    if (validationError) {
+      setMessage({ type: "danger", text: validationError });
+      return;
+    }
+
     setSubmitting(true);
 
     try {
-      const token = sessionStorage.getItem("token");
-      console.log("Token for booking submission:", token); // Debug: log the token
-      
-
       const bookingData = {
         ...bookingForm,
         packageId: selectedPackage._id,
@@ -144,31 +182,32 @@ const fetchTrips = async () => {
         packagePrice: selectedPackage.price,
       };
 
-      
-
       const response = await axios.post(`${SERVER_URL}/trips`, bookingData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
-      console.log("Booking response:", response.data);
-
-
 
       if (response.data.success) {
-        alert("Booking submitted successfully! We'll contact you soon.");
-        handleCloseModal();
-        fetchTrips(); // ✅ refresh only user's trips
+        setMessage({ type: "success", text: "✅ Booking submitted successfully!" });
+        setTimeout(() => {
+          handleCloseModal();
+          fetchTrips();
+        }, 2000);
       } else {
-        alert("Booking failed. Please try again.");
+        setMessage({
+          type: "danger",
+          text: response.data.message || "❌ Booking failed. Please try again.",
+        });
       }
     } catch (err) {
       console.error("Error submitting booking:", err);
-      alert("Error submitting booking.Login and Please try again.");
+      setMessage({
+        type: "danger",
+        text: "❌ Error submitting booking. Please try again after logging in.",
+      });
     } finally {
       setSubmitting(false);
     }
   };
-
 
   return (
     <div className="container py-4" style={{ marginTop: "100px" }}>
@@ -186,16 +225,15 @@ const fetchTrips = async () => {
               <Card
                 className="shadow text-white w-100"
                 style={{
-                  height: "450px", // adjust height as needed
+                  height: "450px",
                   backgroundImage: `url(${SERVER_URL}/uploads/${pkg.image})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   borderRadius: "12px",
                   position: "relative",
-                  overflow: "hidden"
+                  overflow: "hidden",
                 }}
               >
-                {/* Dark overlay for readability */}
                 <div
                   style={{
                     position: "absolute",
@@ -203,22 +241,29 @@ const fetchTrips = async () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: "rgba(0, 0, 0, 0.4)"
+                    background: "rgba(0, 0, 0, 0.4)",
                   }}
                 />
-
-                {/* Card Content */}
                 <Card.Body className="position-relative">
-                  <Card.Title className="fw-bold fs-3">{pkg.name} 
-                    <span>
-                      <p style={{marginTop:"5px", fontSize:"25px"}}>({pkg.city} to {pkg.destination})</p>
-                    </span>
+                  <Card.Title className="fw-bold fs-3">
+                    {pkg.name}
+                    <p style={{ marginTop: "5px", fontSize: "25px" }}>
+                      ({pkg.city} to {pkg.destination})
+                    </p>
                   </Card.Title>
                   <Card.Text>{pkg.description}</Card.Text>
-                  <p><strong><i className="fas fa-clock"></i> Duration:</strong> {pkg.duration}</p>
-                  <p><strong><i className="fas fa-calendar-alt"></i> Month:</strong> {pkg.month}</p>
-                  <p><strong><i className="fas fa-car"></i> Cab Type:</strong> {pkg.cabtype}</p>
-                  <p><strong><i className="fas fa-rupee-sign"></i> :</strong> ₹{pkg.price} Per Person</p>
+                  <p>
+                    <strong>Duration:</strong> {pkg.duration}
+                  </p>
+                  <p>
+                    <strong>Month:</strong> {pkg.month}
+                  </p>
+                  <p>
+                    <strong>Cab Type:</strong> {pkg.cabtype}
+                  </p>
+                  <p>
+                    <strong>Price:</strong> ₹{pkg.price} Per Person
+                  </p>
                   <Button variant="light" onClick={() => handleBookNow(pkg)}>
                     Book Package
                   </Button>
@@ -227,14 +272,25 @@ const fetchTrips = async () => {
             </Col>
           ))}
         </Row>
-
       )}
 
+      {/* ✅ Booking Modal */}
       <Modal show={showModal} onHide={handleCloseModal} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Book Package: {selectedPackage?.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {/* ✅ Validation Message */}
+          {message && (
+            <Alert
+              variant={message.type}
+              onClose={() => setMessage(null)}
+              dismissible
+            >
+              {message.text}
+            </Alert>
+          )}
+
           <Form onSubmit={handleSubmitBooking}>
             <Row>
               <Col md={6}>
@@ -245,7 +301,6 @@ const fetchTrips = async () => {
                     name="name"
                     value={bookingForm.name}
                     onChange={handleFormChange}
-                    required
                     placeholder="Enter your full name"
                   />
                 </Form.Group>
@@ -258,7 +313,6 @@ const fetchTrips = async () => {
                     name="email"
                     value={bookingForm.email}
                     onChange={handleFormChange}
-                    required
                     placeholder="Enter your email"
                   />
                 </Form.Group>
@@ -274,7 +328,6 @@ const fetchTrips = async () => {
                     name="phone"
                     value={bookingForm.phone}
                     onChange={handleFormChange}
-                    required
                     placeholder="Enter your phone number"
                   />
                 </Form.Group>
@@ -287,8 +340,7 @@ const fetchTrips = async () => {
                     name="date"
                     value={bookingForm.date}
                     onChange={handleFormChange}
-                    required
-                    min={new Date().toISOString().split('T')[0]}
+                    min={new Date().toISOString().split("T")[0]}
                   />
                 </Form.Group>
               </Col>
@@ -303,29 +355,27 @@ const fetchTrips = async () => {
                     name="time"
                     value={bookingForm.time}
                     onChange={handleFormChange}
-                    required
                   />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Number of Passengers *</Form.Label>
-                  <Form.Control
-                    as="select"
+                  <Form.Select
                     name="passengers"
                     value={bookingForm.passengers}
                     onChange={handleFormChange}
-                    required
                   >
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                      <option key={num} value={num}>{num} {num === 1 ? 'Passenger' : 'Passengers'}</option>
+                    <option value="">Select</option>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                      <option key={num} value={num}>
+                        {num} {num === 1 ? "Passenger" : "Passengers"}
+                      </option>
                     ))}
-                  </Form.Control>
+                  </Form.Select>
                 </Form.Group>
               </Col>
             </Row>
-
-            
 
             <Form.Group className="mb-3">
               <Form.Label>Special Requests</Form.Label>
@@ -335,33 +385,23 @@ const fetchTrips = async () => {
                 value={bookingForm.specialRequests}
                 onChange={handleFormChange}
                 rows={3}
-                placeholder="Any special requests or additional information..."
+                placeholder="Any special requests or notes..."
               />
             </Form.Group>
-
-            {selectedPackage && (
-              <div className="bg-light p-3 rounded mb-3">
-                <h6>Package Details:</h6>
-                <p className="mb-1"><strong>Name:</strong> {selectedPackage.name}</p>
-                <p className="mb-1"><strong>Duration:</strong> {selectedPackage.duration}</p>
-                <p className="mb-1"><strong>Price:</strong> ₹{selectedPackage.price}</p>
-                <p className="mb-0"><strong>Description:</strong> {selectedPackage.description}</p>
-              </div>
-            )}
 
             <div className="d-flex justify-content-end gap-2">
               <Button variant="secondary" onClick={handleCloseModal}>
                 Cancel
               </Button>
               <Button variant="primary" type="submit" disabled={submitting}>
-                {submitting ? "Submitting..." : "Submit Enquiry"}
+                {submitting ? "Submitting..." : "Submit Booking"}
               </Button>
             </div>
           </Form>
         </Modal.Body>
       </Modal>
 
-      {/* ✅ User Trips Table */}
+      {/* ✅ User Trips */}
       <div className="mt-5">
         <h3>Your Bookings</h3>
         {sessionStorage.getItem("token") ? (
@@ -379,7 +419,6 @@ const fetchTrips = async () => {
                   <th>Date</th>
                   <th>Time</th>
                   <th>Passengers</th>
-                
                   <th>Price</th>
                   <th>Status</th>
                 </tr>
@@ -391,16 +430,16 @@ const fetchTrips = async () => {
                     <td>{new Date(trip.date).toLocaleDateString()}</td>
                     <td>{trip.time}</td>
                     <td>{trip.passengers}</td>
-                    
                     <td>₹{trip.packagePrice}</td>
                     <td>
                       <span
-                        className={`badge ${trip.status === "confirmed"
-                          ? "bg-success"
-                          : trip.status === "pending"
+                        className={`badge ${
+                          trip.status === "confirmed"
+                            ? "bg-success"
+                            : trip.status === "pending"
                             ? "bg-warning"
                             : "bg-danger"
-                          }`}
+                        }`}
                       >
                         {trip.status}
                       </span>
