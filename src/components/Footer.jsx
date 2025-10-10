@@ -64,7 +64,7 @@ export const Footer = () => {
             <h5 className="mt-3 mb-4">OUR SERVICES</h5>
             <a
               href="/packages"
-              target="_blank"
+              
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
             >
@@ -72,7 +72,7 @@ export const Footer = () => {
             </a>
             <a
               href="/packages"
-              target="_blank"
+              
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
             >
@@ -80,7 +80,7 @@ export const Footer = () => {
             </a>
             <a
               href="/packages"
-              target="_blank"
+              
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
             >
@@ -88,7 +88,7 @@ export const Footer = () => {
             </a>
             <a
               href="/packages"
-              target="_blank"
+              
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
             >
@@ -96,7 +96,7 @@ export const Footer = () => {
             </a>
             <a
               href="/packages"
-              target="_blank"
+              
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
             >
@@ -104,7 +104,7 @@ export const Footer = () => {
             </a>
             <a
               href="/packages"
-              target="_blank"
+              
               rel="noreferrer"
               className="text-decoration-none text-dark d-block mb-2"
             >
