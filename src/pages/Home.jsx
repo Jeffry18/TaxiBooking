@@ -628,22 +628,7 @@ export const Home = () => {
         </div>
 
 
-        {/* Error and Loading States */}
-        {loading && (
-          <Row className="" style={{ marginTop: "320px" }}>
-            <Col>
-              <Alert variant="info">Loading cab types...</Alert>
-            </Col>
-          </Row>
-        )}
-
-        {error && (
-          <Row className="">
-            <Col>
-              <Alert variant="danger">{error}</Alert>
-            </Col>
-          </Row>
-        )}
+        
 
         {showAlert && (
           <div style={{
@@ -727,7 +712,24 @@ export const Home = () => {
 
 
         {/* Cab Type Preview List */}
-        <h5 className=" fw-bold text-center" style={{ fontSize: "2rem", marginTop: "350px" }}>Available Cab Types</h5>
+        <h5 className=" fw-bold text-center cab-heading" >Available Cab Types</h5>
+        
+        {/* Error and Loading States */}
+        {loading && (
+          <Row className="" style={{ marginTop: "320px" }}>
+            <Col>
+              <Alert variant="info">Loading cab types...</Alert>
+            </Col>
+          </Row>
+        )}
+
+        {error && (
+          <Row className="">
+            <Col>
+              <Alert variant="danger">{error}</Alert>
+            </Col>
+          </Row>
+        )}
 
         <Container className="px-3 px-md-4 mt-3 ">
           <Row className="g-3 justify-content-center cabtype-grid">

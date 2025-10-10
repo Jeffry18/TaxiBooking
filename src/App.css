@@ -427,6 +427,18 @@ html, body {
 
 /* ========== END ENHANCED BOOKING FORM STYLES ========== */
 
+.cab-heading {
+  font-size: 2rem;
+  margin-top: 350px; /* default for large screens */
+}
+
+@media (max-width: 768px) {
+  .cab-heading {
+    margin-top: 50px; /* smaller gap on small screens */
+  }
+}
+
+
 /* ========== ABOUT US PAGE STYLES ========== */
 
 .about-us-page {
@@ -3506,23 +3518,23 @@ END OLD HERO STYLES */
 
 .hero-slider-container {
   position: relative;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
 .hero-carousel {
-  height: 100vh;
+  height: 100%;
 }
 
 .hero-slide {
   position: relative;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
 .hero-image-container {
   position: relative;
-  height: 100vh;
+  height: 100%;
   width: 100%;
 }
 
@@ -3746,6 +3758,9 @@ END OLD HERO STYLES */
 }
 
 /* Scroll Indicator */
+
+
+
 .hero-scroll-indicator {
   position: absolute;
   bottom: 30px;

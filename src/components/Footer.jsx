@@ -16,7 +16,7 @@ export const Footer = () => {
               className="navbar-logo img-fluid d-inline-block align-top"
             />
             <p>
-            Your trusted taxi partner for 25 years. Kerala Tourism accredited tour operator providing reliable and safe transportation services across God's Own Country.
+            Your trusted taxi partner for 17 years. Ministry of Tourism accredited tour operator providing reliable and safe transportation services across God's Own Country.
             </p>
             
           </div>
