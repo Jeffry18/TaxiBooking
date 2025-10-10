@@ -427,6 +427,8 @@ html, body {
 
 /* ========== END ENHANCED BOOKING FORM STYLES ========== */
 
+/* ========== CABTYPE HEADING STYLES ========== */
+
 .cab-heading {
   font-size: 2rem;
   margin-top: 350px; /* default for large screens */
@@ -813,7 +815,46 @@ html, body {
   }
 }
 
-/* Authentication Pages Styling */
+/* Hero Features Responsive Styling */
+
+
+@media (max-width: 768px) {
+  .hero-features {
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.5rem 0;
+  }
+
+  .feature-item {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  .feature-icon {
+    font-size: 1.35rem;
+  }
+
+  .feature-item span {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-features {
+    margin: 1rem 0;
+  }
+
+  .feature-item {
+    max-width: 250px;
+    padding: 0.5rem;
+  }
+}
+
+/* ======== Authentication Pages Styling ========= */
+
 .auth-container {
   position: relative;
   min-height: 100vh;
