@@ -159,10 +159,10 @@ export const Home = () => {
     e.preventDefault();
     try {
 
-      
-      
-        
-      
+
+
+
+
 
       if (!form.vehicle) {
         setAlertVariant('danger');
@@ -219,14 +219,14 @@ export const Home = () => {
         });
 
         // refresh bookings after new booking
-      //   const res = await axios.get(`${SERVER_URL}/bookings`);
-      //   const list = Array.isArray(res.data) ? res.data : [];
-      //   const top5 = list
-      //     .sort((a, b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0))
-      //     .slice(0, 5);
-      //   setRecent(top5);
+        //   const res = await axios.get(`${SERVER_URL}/bookings`);
+        //   const list = Array.isArray(res.data) ? res.data : [];
+        //   const top5 = list
+        //     .sort((a, b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0))
+        //     .slice(0, 5);
+        //   setRecent(top5);
 
-       }
+      }
     } catch (err) {
       console.error("Booking failed:", err);
       setAlertVariant('danger');
@@ -394,7 +394,8 @@ export const Home = () => {
                         name="date"
                         value={form.date}
                         onChange={handleChange}
-                        required
+                        min={new Date().toISOString().split("T")[0]}
+                      required
                       />
                     </Col>
 
@@ -664,7 +665,7 @@ export const Home = () => {
 
         {/* Recent Bookings */}
 
-         {/* {token ? (  // Only render if token exists
+        {/* {token ? (  // Only render if token exists
       <Container className="px-3 px-md-4" style={{ marginTop: "300px" }}>
         <h4 className="fw-bold text-center">Your Recent Enquires</h4>
 
@@ -719,7 +720,7 @@ export const Home = () => {
 
       <p className="text-center" style={{ marginTop: "300px" }}>Please log in to see your recent Enquires.</p>
     )} */}
-  
+
 
 
 

@@ -28,6 +28,26 @@ export default function AdminPage() {
     image: null,
   });
 
+  // Add these state variables near your other state declarations
+const [editingId, setEditingId] = useState(null);
+const [editedPackage, setEditedPackage] = useState(null);
+
+// Add near your other state declarations
+const [editingState, setEditingState] = useState(null);
+const [editedState, setEditedState] = useState(null);
+
+// Add near your other state declarations
+const [editingCity, setEditingCity] = useState(null);
+const [editedCity, setEditedCity] = useState(null);
+
+// Add near your other state declarations
+const [editingPlace, setEditingPlace] = useState(null);
+const [editedPlace, setEditedPlace] = useState(null);
+
+// Add near your other state declarations
+const [editingCabType, setEditingCabType] = useState(null);
+const [editedCabType, setEditedCabType] = useState(null);
+
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("token"); // Clear auth token
@@ -62,6 +82,12 @@ export default function AdminPage() {
     capacity: "",
     pricePerKm: ""
   });
+  // Editing state for cab vehicles
+  const [editingCabVehicleId, setEditingCabVehicleId] = useState(null);
+  const [editedCabVehicle, setEditedCabVehicle] = useState(null);
+ 
+
+
   const [states, setStates] = useState([])
   const [newStates, setNewStates] = useState({
     name: "",
@@ -97,11 +123,18 @@ export default function AdminPage() {
     city: "",
     cabType: "",
     seats: "",
-    rate: "",
+    ratePerDay: "",
     allowedKm: "",
     extraKmRate: "",
     details: "",
   });
+  // Editing state for tariffs
+  const [editingTariffId, setEditingTariffId] = useState(null);
+  const [editedTariff, setEditedTariff] = useState(null);
+
+  // Editing state for city tariffs
+  const [editingCityTariffId, setEditingCityTariffId] = useState(null);
+  const [editedCityTariff, setEditedCityTariff] = useState(null);
 
 
 
@@ -118,7 +151,7 @@ export default function AdminPage() {
     fetchCabs();
     fetchCabVehicles();
     fetchStates();
-    fetchCtiy();
+    fetchCity();
     fetchPlace();
     fetchTariff();
     fetchCityTariff();
@@ -267,7 +300,7 @@ export default function AdminPage() {
     }
   }
 
-  const fetchCtiy = async () => {
+  const fetchCity = async () => {
     try {
       const res = await axios.get(`${SERVER_URL}/city`);
       setCity(Array.isArray(res.data) ? res.data : []);
@@ -301,10 +334,10 @@ export default function AdminPage() {
   const fetchCityTariff = async () => {
     try {
       const res = await axios.get(`${SERVER_URL}/citytariff`);
-      setTariff(Array.isArray(res.data) ? res.data : []);
+      setCityTariff(Array.isArray(res.data) ? res.data : []);
     } catch {
       console.error("Failed to fetch city tariff:", err);
-      setTariff([]);
+      setCityTariff([]);
     }
   }
 
@@ -432,6 +465,7 @@ export default function AdminPage() {
     }
   }
 
+  
   const handlePlaceChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
@@ -454,14 +488,14 @@ export default function AdminPage() {
   const handleCityTariffChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
-      setNewTariff({ ...newTariff, image: files[0] });
+      setNewCityTariff({ ...newCityTariff, image: files[0] });
     } else {
-      setNewTariff({ ...newTariff, [name]: value });
+      setNewCityTariff({ ...newCityTariff, [name]: value });
     }
   }
 
 
-  const handleDelete = async (id) => {
+  const handleTariffDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this tariff?")) {
       try {
         await axios.delete(`${SERVER_URL}/tariff/${id}`); // Connects to your existing controller
@@ -473,6 +507,271 @@ export default function AdminPage() {
     }
   };
 
+  const handleCityTariffDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this tariff?")) {
+      try {
+        await axios.delete(`${SERVER_URL}/citytariff/${id}`); // Connects to your existing controller
+        setCityTariff(cityTariff.filter((t) => t._id !== id)); // Remove from frontend state
+      } catch (err) {
+        console.error("Failed to delete tariff:", err);
+        alert("Error deleting tariff.");
+      }
+    }
+  };
+
+  const handleUpdateTariff = async (id) => {
+    try {
+      if (!editedTariff) return;
+      const payload = {
+        cabType: editedTariff.cabType,
+        seats: editedTariff.seats,
+        rate: editedTariff.rate,
+        allowedKm: editedTariff.allowedKm,
+        extraKmRate: editedTariff.extraKmRate,
+        details: editedTariff.details,
+      };
+      const res = await axios.put(`${SERVER_URL}/tariff/${id}`, payload);
+      setTariff((prev) => prev.map((t) => (t._id === id ? res.data : t)));
+      setEditingTariffId(null);
+      setEditedTariff(null);
+    } catch (err) {
+      console.error('Failed to update tariff:', err);
+      alert('Error updating tariff');
+    }
+  };
+
+  const handleUpdateCityTariff = async (id) => {
+    try {
+      if (!editedCityTariff) return;
+      const payload = {
+        city: editedCityTariff.city,
+        cabType: editedCityTariff.cabType,
+        seats: editedCityTariff.seats,
+        ratePerDay: editedCityTariff.ratePerDay,
+        allowedKm: editedCityTariff.allowedKm,
+        extraKmRate: editedCityTariff.extraKmRate,
+        details: editedCityTariff.details,
+      };
+      const res = await axios.put(`${SERVER_URL}/citytariff/${id}`, payload);
+      setCityTariff((prev) => prev.map((t) => (t._id === id ? res.data : t)));
+      setEditingCityTariffId(null);
+      setEditedCityTariff(null);
+    } catch (err) {
+      console.error('Failed to update city tariff:', err);
+      alert('Error updating city tariff');
+    }
+  };
+
+  const handleUpdatePackage = async (packageId) => {
+    try {
+      const formData = new FormData();
+      
+      // Add all fields to formData
+      Object.keys(editedPackage).forEach(key => {
+        if (key !== '_id' && key !== '__v' && editedPackage[key] !== undefined) {
+          // skip the temporary newImage field here, it's handled below
+          if (key === 'newImage') return;
+          formData.append(key, editedPackage[key]);
+        }
+      });
+
+      // If there's a new image file, append it
+      if (editedPackage.newImage instanceof File) {
+        formData.append('image', editedPackage.newImage);
+      }
+
+      // IMPORTANT: do NOT set Content-Type here. Let the browser/axios set the multipart boundary.
+      const response = await axios.put(
+        `${SERVER_URL}/packages/${packageId}`,
+        formData
+      );
+
+      if (response.data) {
+        setEditingId(null);
+        setEditedPackage(null);
+        fetchPackages();
+        alert('Package updated successfully!');
+      }
+    } catch (error) {
+      console.error('Error updating package:', error);
+      alert('Failed to update package. Please try again.');
+    }
+  };
+
+  const handleUpdateState = async (stateId) => {
+  try {
+    const formData = new FormData();
+    formData.append('name', editedState.name);
+    formData.append('description', editedState.description);
+    if (editedState.newImage instanceof File) {
+      formData.append('image', editedState.newImage);
+    }
+
+    const response = await axios.put(`${SERVER_URL}/states/${stateId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    if (response.data) {
+      setEditingState(null);
+      setEditedState(null);
+      fetchStates();
+      alert('State updated successfully!');
+    }
+  } catch (error) {
+    console.error('Error updating state:', error);
+    alert('Failed to update state. Please try again.');
+  }
+};
+
+const handleUpdateCity = async (cityId) => {
+  try {
+    const formData = new FormData();
+    formData.append('name', editedCity.name);
+    formData.append('state', editedCity.state);
+    formData.append('description', editedCity.description);
+    if (editedCity.newImage instanceof File) {
+      formData.append('image', editedCity.newImage);
+    }
+
+    const response = await axios.put(`${SERVER_URL}/city/${cityId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    if (response.data) {
+      setEditingCity(null);
+      setEditedCity(null);
+      fetchCity(); // Refresh the city list
+      alert('City updated successfully!');
+    }
+  } catch (error) {
+    console.error('Error updating city:', error);
+    alert('Failed to update city. Please try again.');
+  }
+};
+
+const handleUpdatePlace = async (placeId) => {
+  try {
+    const formData = new FormData();
+    formData.append('name', editedPlace.name);
+    formData.append('city', editedPlace.city);
+    formData.append('description', editedPlace.description);
+    formData.append('rate', editedPlace.rate);
+    if (editedPlace.newImage instanceof File) {
+      formData.append('image', editedPlace.newImage);
+    }
+
+    const response = await axios.put(`${SERVER_URL}/place/${placeId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    if (response.data) {
+      setEditingPlace(null);
+      setEditedPlace(null);
+      fetchPlace(); // Refresh the places list
+      alert('Place updated successfully!');
+    }
+  } catch (error) {
+    console.error('Error updating place:', error);
+    alert('Failed to update place. Please try again.');
+  }
+};
+
+const handleUpdateCabType = async (cabTypeId) => {
+  try {
+    const formData = new FormData();
+    formData.append('name', editedCabType.name);
+    formData.append('description', editedCabType.description);
+    formData.append('seats', editedCabType.seats);
+    if (editedCabType.newImage instanceof File) {
+      formData.append('image', editedCabType.newImage);
+    }
+
+    const response = await axios.patch(`${SERVER_URL}/cabtypes/${cabTypeId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    if (response.data) {
+      setEditingCabType(null);
+      setEditedCabType(null);
+      fetchCabs(); // Refresh the cab types list
+      alert('Cab type updated successfully!');
+    }
+  } catch (error) {
+    console.error('Error updating cab type:', error);
+    alert('Failed to update cab type. Please try again.');
+  }
+};
+
+const handleUpdateCabVehicle = async (vehicleId) => {
+    try {
+      if (!editedCabVehicle) return;
+      const formData = new FormData();
+      formData.append('cabTypeName', editedCabVehicle.cabTypeName || '');
+      formData.append('modelName', editedCabVehicle.modelName || '');
+      formData.append('capacity', editedCabVehicle.capacity || '');
+      formData.append('pricePerKm', editedCabVehicle.pricePerKm || '');
+      if (editedCabVehicle.newImage) {
+        formData.append('image', editedCabVehicle.newImage);
+      }
+
+      const res = await fetch(`${SERVER_URL}/cabVehicles/${vehicleId}`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || 'Failed to update cab vehicle');
+      }
+
+      const updated = await res.json();
+
+      // Update local state
+      setCabVehicles((prev) => prev.map((v) => (v._id === vehicleId ? updated : v)));
+
+      // Clear editing state
+      setEditingCabVehicleId(null);
+      setEditedCabVehicle(null);
+    } catch (error) {
+      console.error('update cab vehicle error', error);
+      // Optionally set an error state or show toast
+    }
+};
+
+const handleCabTypeDelete = async (id) => {
+  try {
+    if (!window.confirm("Are you sure you want to delete this cab type?")) return;
+    const response = await axios.delete(`${SERVER_URL}/cabtypes/${id}`);
+    if (response.status === 200) {
+      alert(response.data.message); // "Cab type deleted successfully"
+      fetchCabs(); // Refresh the list after deletion
+    } else {
+      alert("Failed to delete cab type. Please try again.");
+    }
+  } catch (err) {
+    console.error("Failed to delete cab type:", err);
+    // If backend sends a specific error message
+    const errorMessage = err.response?.data?.message || "Failed to delete cab type. Please try again.";
+    alert(errorMessage);
+  }
+};
+
+const handleCabVehicleDelete = async (id) => {
+  try {
+    if (!window.confirm("Are you sure you want to delete this cab vehicle?")) return;
+    const response = await axios.delete(`${SERVER_URL}/cabvehicles/${id}`);
+    if (response.status === 200) {
+      alert(response.data.message);
+      fetchCabVehicles(); // Refresh the list after deletion
+    } else {
+      alert("Failed to delete cab vehicle. Please try again.");
+    }
+  } catch (err) {
+    console.error("Failed to delete cab vehicle:", err);
+    const errorMessage = err.response?.data?.message || "Failed to delete cab vehicle. Please try again.";
+    alert(errorMessage);
+  }
+};
 
   const addPackage = async (e) => {
     e.preventDefault();
@@ -540,10 +839,6 @@ export default function AdminPage() {
       alert(errorMessage);
     }
   };
-
-
-
-  // Submit form
 
   const addCabType = async (e) => {
     e.preventDefault();
@@ -642,7 +937,7 @@ export default function AdminPage() {
       alert("City added!");
       setNewCity({ name: "", states: "", description: "", image: null });
       e.target.reset();
-      fetchCtiy();
+      fetchCity();
     } catch (err) {
       console.error("Failed to add city:", err.response?.data || err.message);
       alert("Error adding city. Please try again.");
@@ -708,24 +1003,24 @@ export default function AdminPage() {
     e.preventDefault();
     try {
       const formData = new FormData();
-      formData.append("city", newTariff.city);
-      formData.append("cabType", newTariff.cabType);
-      formData.append("seats", newTariff.seats);
-      formData.append("rate", newTariff.rate);
-      formData.append("allowedKm", newTariff.allowedKm);
-      formData.append("extraKmRate", newTariff.extraKmRate);
-      formData.append("details", newTariff.details);
+      formData.append("city", newCityTariff.city);
+      formData.append("cabType", newCityTariff.cabType);
+      formData.append("seats", newCityTariff.seats);
+      formData.append("ratePerDay", newCityTariff.ratePerDay);
+      formData.append("allowedKm", newCityTariff.allowedKm);
+      formData.append("extraKmRate", newCityTariff.extraKmRate);
+      formData.append("details", newCityTariff.details);
 
       await axios.post(`${SERVER_URL}/citytariff`, formData, {
         headers: { "Content-Type": "application/json" },
       });
 
       alert("Tariff added!");
-      setNewTariff({ city: "", cabType: "", seats: "", rate: "", allowedKm: "", extraKmRate: "", details: "" });
+      setNewCityTariff({ city: "", cabType: "", seats: "", ratePerDay: "", allowedKm: "", extraKmRate: "", details: "" });
       e.target.reset();
 
       // Auto-refresh the tariff table
-      fetchTariff();
+      fetchCityTariff();
     }
     catch (err) {
       console.error("Failed to add tariff:", err.response?.data || err.message);
@@ -1006,35 +1301,167 @@ export default function AdminPage() {
                   </div>
                 )}
                 <div className="package-content">
-                  <h4 className="package-title">{pkg.name}</h4>
-                  <p className="package-title">{pkg.city} - {pkg.destination}</p>
+                  {editingId === pkg._id ? (
+                    // Editing mode
+                    <div className="package-edit-form">
+                      <input
+                        className="edit-input"
+                        value={editedPackage.name}
+                        onChange={(e) => setEditedPackage({
+                          ...editedPackage,
+                          name: e.target.value
+                        })}
+                        placeholder="Package Name"
+                      />
+                      <input
+                        className="edit-input"
+                        value={editedPackage.city}
+                        onChange={(e) => setEditedPackage({
+                          ...editedPackage,
+                          city: e.target.value
+                        })}
+                        placeholder="City"
+                      />
+                      <input
+                        className="edit-input"
+                        value={editedPackage.destination}
+                        onChange={(e) => setEditedPackage({
+                          ...editedPackage,
+                          destination: e.target.value
+                        })}
+                        placeholder="Destination"
+                      />
+                      <textarea
+                        className="edit-input"
+                        value={editedPackage.description}
+                        onChange={(e) => setEditedPackage({
+                          ...editedPackage,
+                          description: e.target.value
+                        })}
+                        placeholder="Description"
+                      />
+                      <div className="edit-row">
+                        <input
+                          className="edit-input"
+                          value={editedPackage.duration}
+                          onChange={(e) => setEditedPackage({
+                            ...editedPackage,
+                            duration: e.target.value
+                          })}
+                          placeholder="Duration"
+                        />
+                        <input
+                          className="edit-input"
+                          type="number"
+                          value={editedPackage.price}
+                          onChange={(e) => setEditedPackage({
+                            ...editedPackage,
+                            price: e.target.value
+                          })}
+                          placeholder="Price"
+                        />
+                      </div>
+                      <div className="edit-row">
+                        <select
+                          className="edit-input"
+                          value={editedPackage.cabtype}
+                          onChange={(e) => setEditedPackage({
+                            ...editedPackage,
+                            cabtype: e.target.value
+                          })}
+                        >
+                          <option value="">Select Cab Type</option>
+                          {cabTypes.map((cab) => (
+                            <option key={cab._id} value={cab.name}>
+                              {cab.name}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          className="edit-input"
+                          value={editedPackage.month}
+                          onChange={(e) => setEditedPackage({
+                            ...editedPackage,
+                            month: e.target.value
+                          })}
+                          placeholder="Month"
+                        />
+                      </div>
+                      <div className="form-group full-width">
+                        <label className="form-label">Package Image</label>
+                        <input 
+                          type="file"
+                          className="edit-input file-input"
+                          onChange={(e) => setEditedPackage({
+                            ...editedPackage,
+                            newImage: e.target.files[0]
+                          })}
+                        />
+                      </div>
+                      
+                      <div className="edit-actions">
+                        <button
+                          className="save-btn"
+                          onClick={() => handleUpdatePackage(pkg._id)}
+                        >
+                          <i className="fas fa-save"></i> Save
+                        </button>
+                        <button
+                          className="cancel-btn"
+                          onClick={() => {
+                            setEditingId(null);
+                            setEditedPackage(null);
+                          }}
+                        >
+                          <i className="fas fa-times"></i> Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // Display mode
+                    <>
+                      <h4 className="package-title">{pkg.name}</h4>
+                      <p className="package-title">{pkg.city} - {pkg.destination}</p>
+                      <p className="package-description">{pkg.description}</p>
+                      <div className="package-details">
+                        <div className="detail-item">
+                          <i className="fas fa-calendar-alt"></i>
+                          <span>{pkg.month}</span>
+                        </div>
+                        <div className="detail-item">
+                          <i className="fas fa-clock"></i>
+                          <span>{pkg.duration}</span>
+                        </div>
+                        <div className="detail-item">
+                          <i className="fas fa-car"></i>
+                          <span>{pkg.cabtype}</span>
+                        </div>
+                        <div className="detail-item">
+                          <i className="fas fa-rupee-sign"></i>
+                          <span>₹{pkg.price} per person</span>
+                        </div>
+                        
 
-                  <p className="package-description">{pkg.description}</p>
-                  <div className="package-details">
-                    <div className="detail-item">
-                      <i className="fas fa-calendar-alt"></i>
-                      <span>{pkg.month}</span>
-                    </div>
-                    <div className="detail-item">
-                      <i className="fas fa-clock"></i>
-                      <span>{pkg.duration}</span>
-                    </div>
-                    <div className="detail-item">
-                      <i className="fas fa-car"></i>
-                      <span>{pkg.cabtype}</span>
-                    </div>
-                    <div className="detail-item">
-                      <i className="fas fa-rupee-sign"></i>
-                      <span>₹{pkg.price} per person</span>
-                    </div>
-                  </div>
-                  <button
-                    className="delete-btn"
-                    onClick={() => deletePackageById(pkg._id)}
-                  >
-                    <i className="fas fa-trash"></i>
-                    Delete
-                  </button>
+                      </div>
+                      <div className="package-actions">
+                        <button
+                          className="edit-btn"
+                          onClick={() => {
+                            setEditingId(pkg._id);
+                            setEditedPackage({ ...pkg });
+                          }}
+                        >
+                          <i className="fas fa-edit"></i> Edit
+                        </button>
+                        <button
+                          className="delete-btn"
+                          onClick={() => deletePackageById(pkg._id)}
+                        >
+                          <i className="fas fa-trash"></i> Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ))
@@ -1653,55 +2080,123 @@ export default function AdminPage() {
         {cabTypes.length > 0 ? (
           <Table striped bordered hover responsive>
             <thead>
-              <tr>
-                <th>#</th>
-                <th>Cab Name</th>
-                <th>Description</th>
-                <th>Seats</th>
-                <th>Image</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cabTypes.map((cab, index) => (
-                <tr key={cab._id}>
-                  <td>{index + 1}</td>
-                  <td>{cab.name}</td>
-                  <td>{cab.description}</td>
-                  <td>{cab.seats}</td>
-                  <td>
-                    {cab.image ? (
-                      <img
-                        src={`${SERVER_URL}/uploads/${cab.image}`}
-                        alt={cab.name}
-                        style={{ width: "80px", height: "50px", objectFit: "cover" }}
-                      />
-                    ) : (
-                      "No Image"
-                    )}
-                  </td>
-                  <td>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={async () => {
-                        if (window.confirm("Are you sure you want to delete this cab type?")) {
-                          try {
-                            await axios.delete(`${SERVER_URL}/cabtypes/${cab._id}`);
-                            fetchCabs();
-                          } catch (err) {
-                            console.error("Failed to delete cab type:", err);
-                            alert("Error deleting cab type.");
-                          }
-                        }
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Seats</th>
+          <th>Image</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {cabTypes.map((cabType) => (
+          <tr key={cabType._id}>
+            <td>
+              {editingCabType === cabType._id ? (
+                <input
+                  className="edit-input"
+                  value={editedCabType.name}
+                  onChange={(e) => setEditedCabType({
+                    ...editedCabType,
+                    name: e.target.value
+                  })}
+                />
+              ) : (
+                cabType.name
+              )}
+            </td>
+            <td>
+              {editingCabType === cabType._id ? (
+                <input
+                  className="edit-input"
+                  value={editedCabType.description}
+                  onChange={(e) => setEditedCabType({
+                    ...editedCabType,
+                    description: e.target.value
+                  })}
+                />
+              ) : (
+                cabType.description
+              )}
+            </td>
+            <td>
+              {editingCabType === cabType._id ? (
+                <input
+                  className="edit-input"
+                  type="number"
+                  value={editedCabType.seats}
+                  onChange={(e) => setEditedCabType({
+                    ...editedCabType,
+                    seats: e.target.value
+                  })}
+                />
+              ) : (
+                cabType.seats
+              )}
+            </td>
+            <td>
+              {editingCabType === cabType._id ? (
+                <input
+                  type="file"
+                  className="edit-input"
+                  onChange={(e) => setEditedCabType({
+                    ...editedCabType,
+                    newImage: e.target.files[0]
+                  })}
+                  accept="image/*"
+                />
+              ) : (
+                cabType.image && (
+                  <img
+                    src={`${SERVER_URL}/uploads/${cabType.image}`}
+                    alt={cabType.name}
+                    style={{ height: '50px', width: '50px', objectFit: 'cover' }}
+                  />
+                )
+              )}
+            </td>
+            <td>
+              {editingCabType === cabType._id ? (
+                <div className="d-flex gap-2">
+                  <button
+                    className="btn btn-success btn-sm"
+                    onClick={() => handleUpdateCabType(cabType._id)}
+                  >
+                    <i className="fas fa-save"></i> Save
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => {
+                      setEditingCabType(null);
+                      setEditedCabType(null);
+                    }}
+                  >
+                    <i className="fas fa-times"></i> Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="d-flex gap-2">
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => {
+                      setEditingCabType(cabType._id);
+                      setEditedCabType({ ...cabType });
+                    }}
+                  >
+                    <i className="fas fa-edit"></i> Edit
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleCabTypeDelete(cabType._id)}
+                  >
+                    <i className="fas fa-trash"></i> Delete
+                  </button>
+                </div>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
           </Table>
         ) : (
           <Alert variant="warning">No cab types available.</Alert>
@@ -1728,39 +2223,108 @@ export default function AdminPage() {
               {cabVehicles.map((vehicle, index) => (
                 <tr key={vehicle._id}>
                   <td>{index + 1}</td>
-                  <td>{vehicle.cabTypeName}</td>
-                  <td>{vehicle.modelName}</td>
-                  <td>{vehicle.capacity}</td>
-                  <td>₹{vehicle.pricePerKm}</td>
                   <td>
-                    {vehicle.image ? (
-                      <img
-                        src={`${SERVER_URL}/uploads/${vehicle.image}`}
-                        alt={vehicle.modelName}
-                        style={{ width: "80px", height: "50px", objectFit: "cover" }}
+                    {editingCabVehicleId === vehicle._id ? (
+                      <Form.Control
+                        type="text"
+                        value={editedCabVehicle.cabTypeName}
+                        onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, cabTypeName: e.target.value })}
                       />
                     ) : (
-                      "No Image"
+                      vehicle.cabTypeName
                     )}
                   </td>
                   <td>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={async () => {
-                        if (window.confirm("Are you sure you want to delete this cab vehicle?")) {
-                          try {
-                            await axios.delete(`${SERVER_URL}/cabvehicles/${vehicle._id}`);
-                            fetchCabVehicles(); // refresh after delete
-                          } catch (err) {
-                            console.error("Failed to delete cab vehicle:", err);
-                            alert("Error deleting cab vehicle.");
-                          }
-                        }
-                      }}
-                    >
-                      Delete
-                    </Button>
+                    {editingCabVehicleId === vehicle._id ? (
+                      <Form.Control
+                        type="text"
+                        value={editedCabVehicle.modelName}
+                        onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, modelName: e.target.value })}
+                      />
+                    ) : (
+                      vehicle.modelName
+                    )}
+                  </td>
+                  <td>
+                    {editingCabVehicleId === vehicle._id ? (
+                      <Form.Control
+                        type="number"
+                        value={editedCabVehicle.capacity}
+                        onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, capacity: e.target.value })}
+                      />
+                    ) : (
+                      vehicle.capacity
+                    )}
+                  </td>
+                  <td>
+                    {editingCabVehicleId === vehicle._id ? (
+                      <Form.Control
+                        type="number"
+                        value={editedCabVehicle.pricePerKm}
+                        onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, pricePerKm: e.target.value })}
+                      />
+                    ) : (
+                      `₹${vehicle.pricePerKm}`
+                    )}
+                  </td>
+                  <td>
+                    {editingCabVehicleId === vehicle._id ? (
+                      <div>
+                        <small className="text-muted">Leave empty to keep existing</small>
+                        <Form.Control
+                          type="file"
+                          onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, newImage: e.target.files[0] })}
+                          accept="image/*"
+                        />
+                      </div>
+                    ) : (
+                      vehicle.image ? (
+                        <img
+                          src={`${SERVER_URL}/uploads/${vehicle.image}`}
+                          alt={vehicle.modelName}
+                          style={{ width: "80px", height: "50px", objectFit: "cover" }}
+                        />
+                      ) : (
+                        "No Image"
+                      )
+                    )}
+                  </td>
+                  <td>
+                    {editingCabVehicleId === vehicle._id ? (
+                      <div className="d-flex gap-2">
+                        <Button
+                          variant="success"
+                          size="sm"
+                          onClick={() => handleUpdateCabVehicle(vehicle._id)}
+                        >
+                          <i className="fas fa-save"></i> Save
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => { setEditingCabVehicleId(null); setEditedCabVehicle(null); }}
+                        >
+                          <i className="fas fa-times"></i> Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="d-flex gap-2">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => { setEditingCabVehicleId(vehicle._id); setEditedCabVehicle({ cabTypeName: vehicle.cabTypeName, modelName: vehicle.modelName, capacity: vehicle.capacity, pricePerKm: vehicle.pricePerKm }); }}
+                        >
+                          <i className="fas fa-edit"></i> Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleCabVehicleDelete(vehicle._id)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -1832,25 +2396,52 @@ export default function AdminPage() {
 
 
       {/* States List */}
-      <Card className="p-4 shadow mt-4">
+      
+
+<Card className="p-4 shadow mt-4">
         <h4 className="mb-3 fw-bold">Available States</h4>
         {states.length > 0 ? (
           <Table striped bordered hover responsive>
             <thead>
-              <tr>
-                <th>#</th>
-                <th>State Name</th>
-                <th>Description</th>
-                <th>image</th>
-              </tr>
-            </thead>
-            <tbody>
-              {states.map((state, index) => (
-                <tr key={state._id}>
-                  <td>{index + 1}</td>
-                  <td>{state.name}</td>
-                  <td>{state.description}</td>
-                  <td>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Image</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {states.map((state) => (
+              <tr key={state._id}>
+                <td>
+                  {editingState === state._id ? (
+                    <input
+                      className="edit-inputState"
+                      value={editedState.name}
+                      onChange={(e) => setEditedState({
+                        ...editedState,
+                        name: e.target.value
+                      })}
+                    />
+                  ) : (
+                    state.name
+                  )}
+                </td>
+                <td>
+                  {editingState === state._id ? (
+                    <input
+                      className="edit-inputState"
+                      value={editedState.description}
+                      onChange={(e) => setEditedState({
+                        ...editedState,
+                        description: e.target.value
+                      })}
+                    />
+                  ) : (
+                    state.description
+                  )}
+                </td>
+                 <td>
                     {state.image ? (
                       <img
                         src={`${SERVER_URL}/uploads/${state.image}`}
@@ -1861,33 +2452,54 @@ export default function AdminPage() {
                       "No Image"
                     )}
                   </td>
-                  <td>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={async () => {
-                        if (window.confirm("Are you sure you want to delete this state")) {
-                          try {
-                            await axios.delete(`${SERVER_URL}/states/${state._id}`);
-                            fetchStates(); // refresh after delete
-                          } catch (err) {
-                            console.error("Failed to delete state:", err);
-                            alert("Error deleting cab vehicle.");
-                          }
-                        }
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+                <td>
+                  {editingState === state._id ? (
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => handleUpdateState(state._id)}
+                      >
+                        <i className="fas fa-save"></i> Save
+                      </button>
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => {
+                          setEditingState(null);
+                          setEditedState(null);
+                        }}
+                      >
+                        <i className="fas fa-times"></i> Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => {
+                          setEditingState(state._id);
+                          setEditedState({ ...state });
+                        }}
+                      >
+                        <i className="fas fa-edit"></i> Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(state._id)}
+                      >
+                        <i className="fas fa-trash"></i> Delete
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
           </Table>
         ) : (
           <Alert variant="warning">No states available.</Alert>
         )}
       </Card>
+
 
       {/* Add City Form */}
       <Card className="p-4 shadow mt-3">
@@ -1961,59 +2573,129 @@ export default function AdminPage() {
         {city.length > 0 ? (
           <Table striped bordered hover responsive>
             <thead>
-              <tr>
-                <th>#</th>
-                <th>City Name</th>
-                <th>State</th>
-                <th>Description</th>
-                <th>Image</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {city.map((city, index) => (
-                <tr key={city._id}>
-                  <td>{index + 1}</td>
-                  <td>{city.name}</td>
-                  <td>{city.state}</td>
-                  <td>{city.description}</td>
-                  <td>
-                    {city.image ? (
-                      <img
-                        src={`${SERVER_URL}/uploads/${city.image}`}
-                        alt={city.name}
-                        style={{
-                          width: "80px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      "No Image"
-                    )}
-                  </td>
-                  <td>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={async () => {
-                        if (window.confirm("Are you sure you want to delete this city?")) {
-                          try {
-                            await axios.delete(`${SERVER_URL}/city/${city._id}`);
-                            fetchCities(); // refresh list after delete
-                          } catch (err) {
-                            console.error("Failed to delete city:", err);
-                            alert("Error deleting city.");
-                          }
-                        }
-                      }}
+            <tr>
+              <th>Name</th>
+              <th>State</th>
+              <th>Description</th>
+              <th>Image</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {city.map((cityItem) => (
+              <tr key={cityItem._id}>
+                <td>
+                  {editingCity === cityItem._id ? (
+                    <input
+                      className="edit-input"
+                      value={editedCity.name}
+                      onChange={(e) => setEditedCity({
+                        ...editedCity,
+                        name: e.target.value
+                      })}
+                    />
+                  ) : (
+                    cityItem.name
+                  )}
+                </td>
+                <td>
+                  {editingCity === cityItem._id ? (
+                    <select
+                      className="edit-input"
+                      value={editedCity.state}
+                      onChange={(e) => setEditedCity({
+                        ...editedCity,
+                        state: e.target.value
+                      })}
                     >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+                      <option value="">Select State</option>
+                      {states.map((state) => (
+                        <option key={state._id} value={state.name}>
+                          {state.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    cityItem.state
+                  )}
+                </td>
+                <td>
+                  {editingCity === cityItem._id ? (
+                    <input
+                      className="edit-input"
+                      value={editedCity.description}
+                      onChange={(e) => setEditedCity({
+                        ...editedCity,
+                        description: e.target.value
+                      })}
+                    />
+                  ) : (
+                    cityItem.description
+                  )}
+                </td>
+                <td>
+                  {editingCity === cityItem._id ? (
+                    <input
+                      type="file"
+                      className="edit-input"
+                      onChange={(e) => setEditedCity({
+                        ...editedCity,
+                        newImage: e.target.files[0]
+                      })}
+                      accept="image/*"
+                    />
+                  ) : (
+                    cityItem.image && (
+                      <img
+                        src={`${SERVER_URL}/uploads/${cityItem.image}`}
+                        alt={cityItem.name}
+                        style={{ height: '50px', width: '50px', objectFit: 'cover' }}
+                      />
+                    )
+                  )}
+                </td>
+                <td>
+                  {editingCity === cityItem._id ? (
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => handleUpdateCity(cityItem._id)}
+                      >
+                        <i className="fas fa-save"></i> Save
+                      </button>
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => {
+                          setEditingCity(null);
+                          setEditedCity(null);
+                        }}
+                      >
+                        <i className="fas fa-times"></i> Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => {
+                          setEditingCity(cityItem._id);
+                          setEditedCity({ ...cityItem });
+                        }}
+                      >
+                        <i className="fas fa-edit"></i> Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleCityDelete(cityItem._id)}
+                      >
+                        <i className="fas fa-trash"></i> Delete
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
           </Table>
         ) : (
           <Alert variant="warning">No cities available.</Alert>
@@ -2108,61 +2790,145 @@ export default function AdminPage() {
         {place.length > 0 ? (
           <Table striped bordered hover responsive>
             <thead>
-              <tr>
-                <th>#</th>
-                <th>Place Name</th>
-                <th>City</th>
-                <th>Description</th>
-                <th>Rate</th>
-                <th>Image</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {place.map((place, index) => (
-                <tr key={place._id}>
-                  <td>{index + 1}</td>
-                  <td>{place.name}</td>
-                  <td>{place.city}</td>
-                  <td>{place.description}</td>
-                  <td>{place.rate}</td>
-                  <td>
-                    {place.image ? (
-                      <img
-                        src={`${SERVER_URL}/uploads/${place.image}`}
-                        alt={place.name}
-                        style={{
-                          width: "80px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      "No Image"
-                    )}
-                  </td>
-                  <td>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={async () => {
-                        if (window.confirm("Are you sure you want to delete this place?")) {
-                          try {
-                            await axios.delete(`${SERVER_URL}/place/${place._id}`);
-                            fetchPlace(); // refresh list after delete
-                          } catch (err) {
-                            console.error("Failed to delete place:", err);
-                            alert("Error deleting place.");
-                          }
-                        }
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+        <tr>
+          <th>Name</th>
+          <th>City</th>
+          <th>Description</th>
+          <th>Rate</th>
+          <th>Image</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {place.map((placeItem) => (
+          <tr key={placeItem._id}>
+            <td>
+              {editingPlace === placeItem._id ? (
+                <input
+                  className="edit-input"
+                  value={editedPlace.name}
+                  onChange={(e) => setEditedPlace({
+                    ...editedPlace,
+                    name: e.target.value
+                  })}
+                />
+              ) : (
+                placeItem.name
+              )}
+            </td>
+            <td>
+              {editingPlace === placeItem._id ? (
+                <select
+                  className="edit-inputplace"
+                  value={editedPlace.city}
+                  onChange={(e) => setEditedPlace({
+                    ...editedPlace,
+                    city: e.target.value
+                  })}
+                >
+                  <option value="">Select City</option>
+                  {city.map((c) => (
+                    <option key={c._id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                placeItem.city
+              )}
+            </td>
+            <td>
+              {editingPlace === placeItem._id ? (
+                <input
+                  className="edit-inputplace"
+                  value={editedPlace.description}
+                  onChange={(e) => setEditedPlace({
+                    ...editedPlace,
+                    description: e.target.value
+                  })}
+                />
+              ) : (
+                placeItem.description
+              )}
+            </td>
+            <td>
+              {editingPlace === placeItem._id ? (
+                <input
+                  className="edit-inputplace"
+                  type="number"
+                  value={editedPlace.rate}
+                  onChange={(e) => setEditedPlace({
+                    ...editedPlace,
+                    rate: e.target.value
+                  })}
+                />
+              ) : (
+                placeItem.rate
+              )}
+            </td>
+            <td>
+              {editingPlace === placeItem._id ? (
+                <input
+                  type="file"
+                  className="edit-inputplace"
+                  onChange={(e) => setEditedPlace({
+                    ...editedPlace,
+                    newImage: e.target.files[0]
+                  })}
+                  accept="image/*"
+                />
+              ) : (
+                placeItem.image && (
+                  <img
+                    src={`${SERVER_URL}/uploads/${placeItem.image}`}
+                    alt={placeItem.name}
+                    style={{ height: '50px', width: '50px', objectFit: 'cover' }}
+                  />
+                )
+              )}
+            </td>
+            <td>
+              {editingPlace === placeItem._id ? (
+                <div className="d-flex gap-2">
+                  <button
+                    className="btn btn-success btn-sm"
+                    onClick={() => handleUpdatePlace(placeItem._id)}
+                  >
+                    <i className="fas fa-save"></i> Save
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => {
+                      setEditingPlace(null);
+                      setEditedPlace(null);
+                    }}
+                  >
+                    <i className="fas fa-times"></i> Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="d-flex gap-2">
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => {
+                      setEditingPlace(placeItem._id);
+                      setEditedPlace({ ...placeItem });
+                    }}
+                  >
+                    <i className="fas fa-edit"></i> Edit
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handlePlaceDelete(placeItem._id)}
+                  >
+                    <i className="fas fa-trash"></i> Delete
+                  </button>
+                </div>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
           </Table>
         ) : (
           <Alert variant="warning">No places available.</Alert>
@@ -2222,19 +2988,60 @@ export default function AdminPage() {
         <tbody>
           {tariff.map((t) => (
             <tr key={t._id}>
-              <td>{t.cabType}</td>
-              <td>{t.seats}</td>
-              <td>{t.rate}</td>
-              <td>{t.allowedKm}</td>
-              <td>{t.extraKmRate}</td>
-              <td>{t.details}</td>
               <td>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDelete(t._id)}
-                >
-                  Delete
-                </button>
+                {editingTariffId === t._id ? (
+                  <Form.Control type="text" value={editedTariff.cabType} onChange={(e) => setEditedTariff({ ...editedTariff, cabType: e.target.value })} />
+                ) : (
+                  t.cabType
+                )}
+              </td>
+              <td>
+                {editingTariffId === t._id ? (
+                  <Form.Control type="number" value={editedTariff.seats} onChange={(e) => setEditedTariff({ ...editedTariff, seats: e.target.value })} />
+                ) : (
+                  t.seats
+                )}
+              </td>
+              <td>
+                {editingTariffId === t._id ? (
+                  <Form.Control type="number" value={editedTariff.rate} onChange={(e) => setEditedTariff({ ...editedTariff, rate: e.target.value })} />
+                ) : (
+                  t.rate
+                )}
+              </td>
+              <td>
+                {editingTariffId === t._id ? (
+                  <Form.Control type="number" value={editedTariff.allowedKm} onChange={(e) => setEditedTariff({ ...editedTariff, allowedKm: e.target.value })} />
+                ) : (
+                  t.allowedKm
+                )}
+              </td>
+              <td>
+                {editingTariffId === t._id ? (
+                  <Form.Control type="number" value={editedTariff.extraKmRate} onChange={(e) => setEditedTariff({ ...editedTariff, extraKmRate: e.target.value })} />
+                ) : (
+                  t.extraKmRate
+                )}
+              </td>
+              <td>
+                {editingTariffId === t._id ? (
+                  <Form.Control type="text" value={editedTariff.details} onChange={(e) => setEditedTariff({ ...editedTariff, details: e.target.value })} />
+                ) : (
+                  t.details
+                )}
+              </td>
+              <td>
+                {editingTariffId === t._id ? (
+                  <div className="d-flex gap-2">
+                    <Button size="sm" variant="success" onClick={() => handleUpdateTariff(t._id)}>Save</Button>
+                    <Button size="sm" variant="secondary" onClick={() => { setEditingTariffId(null); setEditedTariff(null); }}>Cancel</Button>
+                  </div>
+                ) : (
+                  <div className="d-flex gap-2">
+                    <Button size="sm" variant="primary" onClick={() => { setEditingTariffId(t._id); setEditedTariff({ ...t }); }}>Edit</Button>
+                    <Button size="sm" variant="danger" onClick={() => handleTariffDelete(t._id)}>Delete</Button>
+                  </div>
+                )}
               </td>
             </tr>
           ))}
@@ -2275,7 +3082,7 @@ export default function AdminPage() {
           <Form.Label>Seats</Form.Label>
           <Form.Control type="number" name="seats" value={newCityTariff.seats} onChange={handleCityTariffChange} required />
           <Form.Label>Rate</Form.Label>
-          <Form.Control type="number" name="rate" value={newCityTariff.rate} onChange={handleCityTariffChange} required />
+          <Form.Control type="number" name="ratePerDay" value={newCityTariff.ratePerDay} onChange={handleCityTariffChange} required />
           <Form.Label>Details</Form.Label>
           <Form.Control type="text" name="details" value={newCityTariff.details} onChange={handleCityTariffChange} required />
           <Form.Label>Allowed Km</Form.Label>
@@ -2302,20 +3109,67 @@ export default function AdminPage() {
         <tbody>
           {cityTariff.map((t) => (
             <tr key={t._id}>
-              <td>{t.city}</td>
-              <td>{t.cabType}</td>
-              <td>{t.seats}</td>
-              <td>{t.rate}</td>
-              <td>{t.allowedKm}</td>
-              <td>{t.extraKmRate}</td>
-              <td>{t.details}</td>
               <td>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDelete(t._id)}
-                >
-                  Delete
-                </button>
+                {editingCityTariffId === t._id ? (
+                  <Form.Control type="text" value={editedCityTariff.city} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, city: e.target.value })} />
+                ) : (
+                  t.city
+                )}
+              </td>
+              <td>
+                {editingCityTariffId === t._id ? (
+                  <Form.Control type="text" value={editedCityTariff.cabType} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, cabType: e.target.value })} />
+                ) : (
+                  t.cabType
+                )}
+              </td>
+              <td>
+                {editingCityTariffId === t._id ? (
+                  <Form.Control type="number" value={editedCityTariff.seats} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, seats: e.target.value })} />
+                ) : (
+                  t.seats
+                )}
+              </td>
+              <td>
+                {editingCityTariffId === t._id ? (
+                  <Form.Control type="number" value={editedCityTariff.ratePerDay} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, ratePerDay: e.target.value })} />
+                ) : (
+                  t.ratePerDay
+                )}
+              </td>
+              <td>
+                {editingCityTariffId === t._id ? (
+                  <Form.Control type="text" value={editedCityTariff.details} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, details: e.target.value })} />
+                ) : (
+                  t.details
+                )}
+              </td>
+              <td>
+                {editingCityTariffId === t._id ? (
+                  <Form.Control type="number" value={editedCityTariff.allowedKm} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, allowedKm: e.target.value })} />
+                ) : (
+                  t.allowedKm
+                )}
+              </td>
+              <td>
+                {editingCityTariffId === t._id ? (
+                  <Form.Control type="number" value={editedCityTariff.extraKmRate} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, extraKmRate: e.target.value })} />
+                ) : (
+                  t.extraKmRate
+                )}
+              </td>
+              <td>
+                {editingCityTariffId === t._id ? (
+                  <div className="d-flex gap-2">
+                    <Button size="sm" variant="success" onClick={() => handleUpdateCityTariff(t._id)}>Save</Button>
+                    <Button size="sm" variant="secondary" onClick={() => { setEditingCityTariffId(null); setEditedCityTariff(null); }}>Cancel</Button>
+                  </div>
+                ) : (
+                  <div className="d-flex gap-2">
+                    <Button size="sm" variant="primary" onClick={() => { setEditingCityTariffId(t._id); setEditedCityTariff({ ...t }); }}>Edit</Button>
+                    <Button size="sm" variant="danger" onClick={() => handleCityTariffDelete(t._id)}>Delete</Button>
+                  </div>
+                )}
               </td>
             </tr>
           ))}
@@ -2345,6 +3199,8 @@ export default function AdminPage() {
     setShowImageModal(false);
     setSelectedImage(null);
   };
+
+  
 
 
 
