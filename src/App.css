@@ -4091,6 +4091,69 @@ END OLD HERO STYLES */
   gap: 8px;
 }
 
+.form-input[multiple] {
+  height: auto;
+  min-height: 100px;
+  padding: 8px;
+}
+
+.form-input[multiple] option {
+  padding: 4px 8px;
+  margin: 2px 0;
+  border-radius: 4px;
+}
+
+.form-input[multiple] option:checked {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Add to your existing CSS */
+.cab-types-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.cab-type-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cab-type-checkbox:hover {
+  background: #e9ecef;
+}
+
+.cab-type-checkbox input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.cab-type-checkbox label {
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+
+.cab-type-checkbox input[type="checkbox"]:checked + label {
+  color: #0d6efd;
+  font-weight: 500;
+}
+
+.cab-type-checkbox:has(input[type="checkbox"]:checked) {
+  background: #e7f1ff;
+  border: 1px solid #0d6efd;
+}
+
 /* ---------- CUSTOM STYLES FOR STATES EDIT FORM ---------- */
 
 .edit-inputState {
@@ -4186,6 +4249,9 @@ END OLD HERO STYLES */
 .data-table td {
   vertical-align: middle;
 }
+
+
+
 
 
 /* ========== END CUSTOM STYLES ========== */
