@@ -1235,7 +1235,7 @@ export default function AdminPage() {
                 />
               </div>
 
-             
+
               <div className="form-group">
                 <label className="form-label">Cab Types</label>
                 <div className="cab-types-checkbox-group">
@@ -1317,6 +1317,7 @@ export default function AdminPage() {
                 )}
                 <div className="package-content">
                   {editingId === pkg._id ? (
+
                     // Editing mode
                     <div className="package-edit-form">
                       <input
@@ -1377,31 +1378,51 @@ export default function AdminPage() {
                         />
                       </div>
                       <div className="edit-row">
-                        <select
-                          className="edit-input"
-                          value={editedPackage.cabtype}
-                          onChange={(e) => setEditedPackage({
-                            ...editedPackage,
-                            cabtype: e.target.value
-                          })}
-                        >
-                          <option value="">Select Cab Type</option>
-                          {cabTypes.map((cab) => (
-                            <option key={cab._id} value={cab.name}>
-                              {cab.name}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          className="edit-input"
-                          value={editedPackage.month}
-                          onChange={(e) => setEditedPackage({
-                            ...editedPackage,
-                            month: e.target.value
-                          })}
-                          placeholder="Month"
-                        />
+                        
+                        <div className="form-group">
+                          <label className="form-label">Cab Types</label>
+                          <div className="cab-types-checkbox-group">
+                            {cabTypes.map((cab) => (
+                              <div key={cab._id} className="cab-type-checkbox">
+                                <input
+                                  type="checkbox"
+                                  id={`edit-cab-${cab._id}`}
+                                  checked={editedPackage.cabtype.includes(cab.name)}
+                                  onChange={(e) => {
+                                    const value = cab.name;
+                                    setEditedPackage(prev => ({
+                                      ...prev,
+                                      cabtype: e.target.checked
+                                        ? [...(Array.isArray(prev.cabtype) ? prev.cabtype : []), value]
+                                        : Array.isArray(prev.cabtype)
+                                          ? prev.cabtype.filter(type => type !== value)
+                                          : []
+                                    }));
+                                  }}
+                                />
+                                <label htmlFor={`edit-cab-${cab._id}`}>{cab.name}</label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
+
+                        
+                        <div className="edit-row">
+                          
+                          
+                            <input
+                              className="edit-input"
+                              value={editedPackage.month}
+                              onChange={(e) => setEditedPackage({
+                                ...editedPackage,
+                                month: e.target.value
+                              })}
+                              placeholder="Month"
+                            />
+                        
+                        </div>
+                      
                       <div className="form-group full-width">
                         <label className="form-label">Package Image</label>
                         <input
