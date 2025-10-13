@@ -1,11 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo 2.png";
+import WhatsAppChat from './WhatsAppChat';
 
 
 export const Footer = () => {
   return (
     <footer className="footer bg-light mt-5 shadow">
+      <WhatsAppChat />
       <div className="container py-5">
         <div className="row gy-4">
           {/* intro */}
@@ -115,18 +117,13 @@ export const Footer = () => {
           {/* contact */}
           <div className="col-12 col-md-6 col-lg-5">
             <h5 className="mt-3 mb-4">Contacts</h5>
-            <div className="d-flex flex-column flex-sm-row">
+            <p>Address : </p>
+            <p>Email : <a href=""></a></p>
+            <p>Phone : </p>
+            
 
-              <input
-                type="text"
-                placeholder="Enter Your Email Here.."
-                className="form-control me-sm-2 mb-2 mb-sm-0"
-              />
-              <button className="btn btn-info">
-                <i className="fa-solid fa-arrow-right"></i>
-              </button>
-            </div>
-            <div className="d-flex justify-content-center justify-content-md-start gap-3 mt-3">
+            {/* Social Media Icons */}
+            <div className="d-flex justify-content-center justify-content-md-start gap-5 mt-5 ms-5">
               <a href="https://x.com/" target="_blank" rel="noreferrer">
                 <i className="fa-brands fa-twitter fs-5"></i>
               </a>
@@ -139,9 +136,9 @@ export const Footer = () => {
               <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">
                 <i className="fa-brands fa-linkedin fs-5"></i>
               </a>
-              <a href="https://github.com/login" target="_blank" rel="noreferrer">
+              {/* <a href="https://github.com/login" target="_blank" rel="noreferrer">
                 <i className="fa-brands fa-github fs-5"></i>
-              </a>
+              </a> */}
               <a
                 href="https://www.freeconferencecallhd.com/dialer"
                 target="_blank"

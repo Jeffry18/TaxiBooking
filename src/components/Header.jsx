@@ -108,7 +108,11 @@ export const Header = () => {
                 </Nav.Link>
                 {showContactDropdown && (
                   <div className="custom-dropdown-menu">
-                    <a href="mailto:email.gmail.com" className="custom-dropdown-item"
+                    <p className="custom-dropdown-item">Address : Santos Tavel</p>
+                    <p className="custom-dropdown-item">Aluva, Kerala</p>
+                    <p className="custom-dropdown-item">India - 682030</p>
+                    
+                    <a href="mailto:email.gmail.com" target="_blank" className="custom-dropdown-item"
                        onClick={() => setShowContactDropdown(false)}>
                       email@gmail.com
                     </a>

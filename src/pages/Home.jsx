@@ -23,6 +23,7 @@ export const Home = () => {
     vehicle: "", // will hold selected cab type id now
     pickup: "",
     drop: "",
+    email: "",
     extraStops: [],
     date: "",
     returnDate: "",
@@ -176,6 +177,7 @@ export const Home = () => {
         cabType: form.vehicle,
         pickup: form.pickup,
         drop: form.drop,
+        email: form.email || "",
         extraStops: extraStops.filter(s => s.trim() !== "") || [], // ✅ include extra stops
         date: form.date,
         returnDate: form.returnDate,
@@ -209,6 +211,7 @@ export const Home = () => {
           vehicle: "",
           pickup: "",
           drop: "",
+          email: "",
           extraStops: [],
           date: "",
           returnDate: "",
