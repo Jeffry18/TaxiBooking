@@ -59,15 +59,7 @@ export const Home = () => {
   ];
 
   useEffect(() => {
-    const fetchPlaces = async () => {
-      try {
-        const res = await axios.get(`${SERVER_URL}/places/kerala-places`);
-        setPlaces(res.data); // store in state
-      } catch (err) {
-        console.error("Error loading places:", err);
-      }
-    };
-    fetchPlaces();
+
 
     // const fetchRecentBookings = async () => {
     //   try {
