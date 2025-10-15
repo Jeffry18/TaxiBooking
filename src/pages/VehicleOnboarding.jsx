@@ -19,7 +19,7 @@ export default function VehicleOnboarding() {
     type: "",
     capacity: "",
     contactNumber: "",
-    image: null,
+    images: [],
   });
   const [vehicles, setVehicles] = useState([]);
   const [message, setMessage] = useState(null);
@@ -29,8 +29,8 @@ export default function VehicleOnboarding() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "image") {
-      setForm({ ...form, image: files[0] });
+    if (name === "images") {
+      setForm({ ...form, images: Array.from(files) });
     } else {
       setForm({ ...form, [name]: value });
     }
@@ -52,10 +52,17 @@ export default function VehicleOnboarding() {
     if (!/^[0-9]{10}$/.test(form.contactNumber))
       return "❌ Please enter a valid 10-digit contact number.";
 
-    if (!form.image) return "❌ Please upload a vehicle image.";
+    if (!form.images || form.images.length < 5)
+      return "❌ Please upload  5 images as requested.";
 
-    if (form.image && !["image/jpeg", "image/png"].includes(form.image.type))
-      return "❌ Only JPG or PNG images are allowed.";
+    if (form.images.length > 10)
+      return "❌ Maximum 10 images allowed.";
+
+    const invalidImage = form.images.find(
+      image => !["image/jpeg", "image/png"].includes(image.type)
+    );
+    if (invalidImage)
+      return "❌ Only JPG , PNG or PDF images are allowed.";
 
     return null; // All good ✅
   };
@@ -83,8 +90,17 @@ export default function VehicleOnboarding() {
     try {
       setSubmitting(true);
       const formData = new FormData();
-      Object.keys(form).forEach((key) => {
-        if (form[key]) formData.append(key, form[key]);
+
+      // Append text fields
+      formData.append('model', form.model);
+      formData.append('number', form.number);
+      formData.append('type', form.type);
+      formData.append('capacity', form.capacity);
+      formData.append('contactNumber', form.contactNumber);
+
+      // Append multiple images
+      form.images.forEach(image => {
+        formData.append('images', image);
       });
 
       await axios.post("http://localhost:5000/vehicles", formData, {
@@ -104,7 +120,7 @@ export default function VehicleOnboarding() {
         type: "",
         capacity: "",
         contactNumber: "",
-        image: null,
+        images: [],
       });
       fetchVehicles();
     } catch (err) {
@@ -214,12 +230,32 @@ export default function VehicleOnboarding() {
               />
             </Col>
             <Col>
-              <Form.Control
-                type="file"
-                name="image"
-                onChange={handleChange}
-              />
+              <div className="mb-2">
+                <Form.Control
+                  type="file"
+                  name="images"
+                  onChange={handleChange}
+                  multiple
+                  accept="image/jpeg,image/png,application/pdf"
+                />
+                <Form.Text className="text-muted">
+                  Upload Vehicle Image , Registration Certificate , Pollution Certificate , Insurance Certificate and Driving License (JPG , PNG , PDF). Max 10MB.
+                </Form.Text>
+              </div>
+              {form.images.length > 0 && (
+                <div className="selected-files-container p-2 border rounded bg-light">
+                  <small className="text-muted d-block mb-1">Selected files ({form.images.length}):</small>
+                  <div style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                    {Array.from(form.images).map((file, index) => (
+                      <div key={index} className="selected-file" style={{ fontSize: '0.875rem' }}>
+                        {index + 1}. {file.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </Col>
+
           </Row>
 
           <div className="text-center mt-3">
@@ -251,6 +287,7 @@ export default function VehicleOnboarding() {
                 <th>Capacity</th>
                 <th>Contact</th>
                 <th>Status</th>
+                <th>Images</th>
               </tr>
             </thead>
             <tbody>
@@ -263,6 +300,23 @@ export default function VehicleOnboarding() {
                   <td>{v.contactNumber}</td>
                   <td>
                     <span className="badge bg-success">Approved</span>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                      {v.images && v.images.map((image, index) => (
+                        <img
+                          key={index}
+                          src={`http://localhost:5000/uploads/${image}`}
+                          alt={`Vehicle ${index + 1}`}
+                          style={{
+                            width: '50px',
+                            height: '50px',
+                            objectFit: 'cover',
+                            borderRadius: '4px'
+                          }}
+                        />
+                      ))}
+                    </div>
                   </td>
                 </tr>
               ))}

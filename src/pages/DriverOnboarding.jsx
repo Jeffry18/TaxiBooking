@@ -215,7 +215,7 @@ export default function DriverOnboardingAndList() {
           </Row>
 
           <Form.Group className="mb-3">
-            <Form.Label>Driver Photo</Form.Label>
+            <Form.Label>License Photo</Form.Label>
             <Form.Control
               type="file"
               name="image"

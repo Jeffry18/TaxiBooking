@@ -211,62 +211,126 @@ const Packages = () => {
 
   return (
     <div className="container py-4" style={{ marginTop: "100px" }}>
-      <h2 className="mb-4">Trip Packages</h2>
+      <div className="text-center mb-5">
+        <h2 className="display-6 fw-bold text-primary mb-2">Travel Packages</h2>
+        <p className="lead text-muted">Discover amazing destinations with our curated travel packages</p>
+      </div>
 
       {/* ✅ Show Packages */}
       {loading ? (
-        <Spinner animation="border" />
+        <Row className="g-4">
+          {[1, 2, 3, 4, 5, 6].map((index) => (
+            <Col lg={4} md={6} sm={12} key={index}>
+              <Card className="h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                <div
+                  style={{ height: "200px", backgroundColor: "#e9ecef" }}
+                  className="d-flex align-items-center justify-content-center"
+                >
+                  <Spinner animation="border" variant="primary" size="sm" />
+                </div>
+                <Card.Body className="p-3">
+                  <div className="placeholder-glow">
+                    <span className="placeholder col-8 mb-2"></span>
+                    <span className="placeholder col-6 mb-2"></span>
+                    <span className="placeholder col-12 mb-3"></span>
+                    <span className="placeholder col-4"></span>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       ) : error ? (
-        <p className="text-danger">{error}</p>
+        <Alert variant="danger" className="text-center">{error}</Alert>
       ) : (
-        <Row>
+        <Row className="g-4">
           {packages.map((pkg) => (
-            <Col md={12} key={pkg._id} className="mb-3">
-              <Card
-                className="shadow text-white w-100"
-                style={{
-                  height: "450px",
-                  backgroundImage: `url(${SERVER_URL}/uploads/${pkg.image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  borderRadius: "12px",
-                  position: "relative",
-                  overflow: "hidden",
-                }}
-              >
+            <Col lg={4} md={6} sm={12} key={pkg._id}>
+              <Card className="h-100 package-card rounded-3 overflow-hidden">
+                {/* Image Section */}
                 <div
                   style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: "rgba(0, 0, 0, 0.4)",
+                    height: "200px",
+                    backgroundImage: pkg.image 
+                      ? `url(${SERVER_URL}/uploads/${pkg.image})` 
+                      : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
-                />
-                <Card.Body className="position-relative">
-                  <Card.Title className="fw-bold fs-3">
+                >
+                  {!pkg.image && (
+                    <i className="bi bi-geo-alt text-white" style={{ fontSize: "3rem", opacity: 0.7 }}></i>
+                  )}
+                  <div className="package-image-overlay"></div>
+                  <div
+                    className="position-absolute top-0 end-0 m-2 price-badge"
+                    style={{
+                      background: "rgba(0, 0, 0, 0.8)",
+                      color: "white",
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                      zIndex: 2
+                    }}
+                  >
+                    ₹{pkg.price}
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <Card.Body className="p-3">
+                  <Card.Title className="h5 mb-2 text-truncate">
                     {pkg.name}
-                    <p style={{ marginTop: "5px", fontSize: "25px" }}>
-                      ({pkg.city} to {pkg.destination})
-                    </p>
                   </Card.Title>
-                  <Card.Text>{pkg.description}</Card.Text>
-                  <p>
-                    <strong>Duration:</strong> {pkg.duration}
-                  </p>
-                  <p>
-                    <strong>Month:</strong> {pkg.month}
-                  </p>
-                  <p>
-                    <strong>Cab Type:</strong> {pkg.cabtype}
-                  </p>
-                  <p>
-                    <strong>Price:</strong> ₹{pkg.price} Per Person
-                  </p>
-                  <Button variant="light" onClick={() => handleBookNow(pkg)}>
-                    Book Package
-                  </Button>
+                  <Card.Subtitle className="mb-2 text-muted small">
+                    {pkg.city} → {pkg.destination}
+                  </Card.Subtitle>
+                  <Card.Text className="small text-muted mb-3 package-description">
+                    {pkg.description}
+                  </Card.Text>
+
+                  {/* Package Details in Compact Format */}
+                  <div className="row g-2 mb-3">
+                    <div className="col-6">
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-clock me-1 text-primary"></i>
+                        <small className="text-muted">{pkg.duration}</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-calendar me-1 text-primary"></i>
+                        <small className="text-muted">{pkg.month}</small>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-car-front me-1 text-primary"></i>
+                        <small className="text-muted">{pkg.cabtype}</small>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Price and Book Button */}
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span className="h6 text-primary mb-0">₹{pkg.price}</span>
+                      <small className="text-muted d-block">per person</small>
+                    </div>
+                    <Button 
+                      variant="primary" 
+                      size="sm"
+                      onClick={() => handleBookNow(pkg)}
+                      className="px-3"
+                    >
+                      Book Now
+                    </Button>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
@@ -361,18 +425,13 @@ const Packages = () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Number of Passengers *</Form.Label>
-                  <Form.Select
+                  <Form.Control
+                    type="number"
                     name="passengers"
                     value={bookingForm.passengers}
                     onChange={handleFormChange}
                   >
-                    <option value="">Select</option>
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                      <option key={num} value={num}>
-                        {num} {num === 1 ? "Passenger" : "Passengers"}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  </Form.Control>
                 </Form.Group>
               </Col>
             </Row>
@@ -403,7 +462,10 @@ const Packages = () => {
 
       {/* ✅ User Trips */}
       <div className="mt-5">
-        <h3>Your Bookings</h3>
+        <div className="d-flex align-items-center mb-4">
+          <i className="bi bi-calendar-check me-2 text-primary"></i>
+          <h4 className="mb-0">Your Bookings</h4>
+        </div>
         {sessionStorage.getItem("token") ? (
           bookingsLoading ? (
             <Spinner animation="border" />
@@ -412,42 +474,93 @@ const Packages = () => {
           ) : trips.length === 0 ? (
             <p>No bookings found.</p>
           ) : (
-            <Table striped bordered hover responsive>
-              <thead>
-                <tr>
-                  <th>Package</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Passengers</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trips.map((trip) => (
-                  <tr key={trip._id}>
-                    <td>{trip.packageName}</td>
-                    <td>{new Date(trip.date).toLocaleDateString()}</td>
-                    <td>{trip.time}</td>
-                    <td>{trip.passengers}</td>
-                    <td>₹{trip.packagePrice}</td>
-                    <td>
-                      <span
-                        className={`badge ${
-                          trip.status === "confirmed"
-                            ? "bg-success"
-                            : trip.status === "pending"
-                            ? "bg-warning"
-                            : "bg-danger"
-                        }`}
-                      >
-                        {trip.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            <>
+              {/* Desktop Table View */}
+              <div className="d-none d-md-block">
+                <Table striped bordered hover responsive className="bg-white rounded shadow-sm">
+                  <thead className="bg-light">
+                    <tr>
+                      <th className="border-0"><i className="bi bi-box me-1"></i>Package</th>
+                      <th className="border-0"><i className="bi bi-calendar me-1"></i>Date</th>
+                      <th className="border-0"><i className="bi bi-clock me-1"></i>Time</th>
+                      <th className="border-0"><i className="bi bi-people me-1"></i>Passengers</th>
+                      <th className="border-0"><i className="bi bi-currency-rupee me-1"></i>Price</th>
+                      <th className="border-0"><i className="bi bi-check-circle me-1"></i>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {trips.map((trip) => (
+                      <tr key={trip._id}>
+                        <td className="fw-medium">{trip.packageName}</td>
+                        <td>{new Date(trip.date).toLocaleDateString()}</td>
+                        <td>{trip.time}</td>
+                        <td>{trip.passengers}</td>
+                        <td className="fw-bold text-primary">₹{trip.packagePrice}</td>
+                        <td>
+                          <span
+                            className={`badge ${
+                              trip.status === "confirmed"
+                                ? "bg-success"
+                                : trip.status === "pending"
+                                ? "bg-warning text-dark"
+                                : "bg-danger"
+                            }`}
+                          >
+                            {trip.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+              
+              {/* Mobile Card View */}
+              <div className="d-md-none">
+                <Row className="g-3">
+                  {trips.map((trip) => (
+                    <Col xs={12} key={trip._id}>
+                      <Card className="shadow-sm border-0">
+                        <Card.Body className="p-3">
+                          <div className="d-flex justify-content-between align-items-start mb-2">
+                            <h6 className="mb-0 text-primary">{trip.packageName}</h6>
+                            <span
+                              className={`badge ${
+                                trip.status === "confirmed"
+                                  ? "bg-success"
+                                  : trip.status === "pending"
+                                  ? "bg-warning text-dark"
+                                  : "bg-danger"
+                              }`}
+                            >
+                              {trip.status}
+                            </span>
+                          </div>
+                          <div className="row g-2 text-sm">
+                            <div className="col-6">
+                              <i className="bi bi-calendar me-1 text-muted"></i>
+                              <small>{new Date(trip.date).toLocaleDateString()}</small>
+                            </div>
+                            <div className="col-6">
+                              <i className="bi bi-clock me-1 text-muted"></i>
+                              <small>{trip.time}</small>
+                            </div>
+                            <div className="col-6">
+                              <i className="bi bi-people me-1 text-muted"></i>
+                              <small>{trip.passengers} passengers</small>
+                            </div>
+                            <div className="col-6">
+                              <i className="bi bi-currency-rupee me-1 text-muted"></i>
+                              <span className="fw-bold text-primary">₹{trip.packagePrice}</span>
+                            </div>
+                          </div>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              </div>
+            </>
           )
         ) : (
           <p className="text-muted">Please login to view your bookings.</p>

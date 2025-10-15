@@ -7,7 +7,44 @@
     <link rel="icon" sizes="180x180" href="favicon.png" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Allow external scripts for Google Maps -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com; connect-src 'self' https://maps.googleapis.com; img-src 'self' data: https://maps.gstatic.com https://maps.googleapis.com;">
     <title>Flymallu</title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Maps API with callback -->
+    <script>
+      console.log('🚀 Setting up Google Maps callbacks...');
+      
+      function initGoogleMaps() {
+        console.log('🎉 Google Maps API loaded successfully!');
+        console.log('window.google:', window.google);
+        console.log('window.google.maps:', window.google?.maps);
+        console.log('window.google.maps.places:', window.google?.maps?.places);
+        
+        window.googleMapsLoaded = true;
+        window.dispatchEvent(new Event('googleMapsLoaded'));
+      }
+      
+      function googleMapsError() {
+        console.error('❌ Google Maps failed to load');
+        window.googleMapsError = true;
+      }
+      
+      // Also check if script loads
+      window.addEventListener('load', function() {
+        console.log('🌍 Page loaded, checking Google Maps status...');
+        if (window.google) {
+          console.log('✅ Google Maps available after page load');
+        } else {
+          console.log('⚠️ Google Maps not available after page load');
+        }
+      });
+    </script>
+    <script async defer 
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1hya_2cUTOJIKAi6m0gDywebNBJd4rEA&libraries=places&loading=async&callback=initGoogleMaps"
+      onerror="googleMapsError()">
+    </script>
     <script type="application/ld+json">
   {
     "@context": "https://schema.org",

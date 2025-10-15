@@ -851,7 +851,7 @@ export default function AdminPage() {
       const formData = new FormData();
       formData.append("name", newCab.name);
       formData.append("description", newCab.description);
-      formData.append("seats", Number(newCab.seats));
+      formData.append("seats", newCab.seats);
       if (newCab.image) {
         formData.append("image", newCab.image); // must be File object
       }
@@ -1032,6 +1032,26 @@ export default function AdminPage() {
       alert("Error adding tariff. Please try again.");
     }
   }
+
+  const [zoomImage, setZoomImage] = useState(null);
+  const [zoomIndex, setZoomIndex] = useState(0);
+
+  const handleNextZoom = () => {
+    if (!Array.isArray(selectedImage)) return;
+    setZoomIndex((prev) => (prev + 1) % selectedImage.length);
+    setZoomImage(`${SERVER_URL}/uploads/${selectedImage[(zoomIndex + 1) % selectedImage.length]}`);
+  };
+
+  const handlePrevZoom = () => {
+    if (!Array.isArray(selectedImage)) return;
+    setZoomIndex((prev) => (prev - 1 + selectedImage.length) % selectedImage.length);
+    setZoomImage(`${SERVER_URL}/uploads/${selectedImage[(zoomIndex - 1 + selectedImage.length) % selectedImage.length]}`);
+  };
+
+  const handleImageClick = (img, index) => {
+    setZoomIndex(index);
+    setZoomImage(`${SERVER_URL}/uploads/${img}`);
+  };
 
 
 
@@ -1474,7 +1494,7 @@ export default function AdminPage() {
                         </div>
                         <div className="detail-item">
                           <i className="fas fa-rupee-sign"></i>
-                          <span>₹{pkg.price} per person</span>
+                          <span>₹{pkg.price} Per Day Onwards</span>
                         </div>
 
 
@@ -1570,13 +1590,13 @@ export default function AdminPage() {
                           <td>{v.capacity}</td>
                           <td>{v.contactNumber || "-"}</td>
                           <td>
-                            {v.imageUrl ? (
+                            {(v.images && v.images.length > 0) || v.imageUrl ? (
                               <button
-                                className="image-btn"
-                                onClick={() => handleViewImage(v.imageUrl)}
+                                className="image-btn btn btn-primary btn-sm"
+                                onClick={() => handleVehicleViewImage(v.images?.length > 0 ? v.images : [v.imageUrl])}
                               >
-                                <i className="fas fa-image"></i>
-                                View
+                                <i className="fas fa-image me-1"></i>
+                                View ({v.images?.length || 1})
                               </button>
                             ) : (
                               <span className="no-image">No Image</span>
@@ -1627,22 +1647,134 @@ export default function AdminPage() {
       {/* Image Modal */}
       <Modal show={showImageModal} onHide={handleCloseModal} centered size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Vehicle Image</Modal.Title>
+          <Modal.Title>Vehicle Images</Modal.Title>
         </Modal.Header>
-        <Modal.Body className="text-center">
+        <Modal.Body>
           {selectedImage ? (
-            <img
-              src={selectedImage}
-              alt="Vehicle"
-              style={{ maxWidth: "100%", height: "auto" }}
-            />
+            <div className="image-gallery">
+              {Array.isArray(selectedImage) ? (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                  gap: '10px',
+                  padding: '10px'
+                }}>
+                  {selectedImage.map((img, index) => (
+                    <div key={index} style={{
+                      position: 'relative',
+                      paddingBottom: '100%',
+                      height: 0,
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => handleImageClick(img, index)}
+                    >
+                      <img
+                        src={`${SERVER_URL}/uploads/${img}`}
+                        alt={`Vehicle ${index + 1}`}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                          border: '1px solid #ddd'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <img
+                  src={`${SERVER_URL}/uploads/${selectedImage}`}
+                  alt="Vehicle"
+                  style={{ maxWidth: "100%", height: "auto", cursor: 'pointer' }}
+                  onClick={() => setZoomImage(`${SERVER_URL}/uploads/${selectedImage}`)}
+                />
+              )}
+            </div>
           ) : (
-            <p>No image available</p>
+            <p>No images available</p>
+          )}
+        </Modal.Body>
+      </Modal>
+
+      {/* Zoom Modal */}
+      <Modal show={!!zoomImage} onHide={() => setZoomImage(null)} centered size="xl">
+        <Modal.Body style={{ textAlign: 'center', position: 'relative' }}>
+          {zoomImage && (
+            <>
+              <img
+                src={zoomImage}
+                alt="Zoomed Vehicle"
+                style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }}
+              />
+              {Array.isArray(selectedImage) && selectedImage.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePrevZoom}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: 10,
+                      transform: 'translateY(-50%)',
+                      background: 'rgba(0,0,0,0.5)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: 40,
+                      height: 40,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    &#8592;
+                  </button>
+                  <button
+                    onClick={handleNextZoom}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      right: 10,
+                      transform: 'translateY(-50%)',
+                      background: 'rgba(0,0,0,0.5)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: 40,
+                      height: 40,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    &#8594;
+                  </button>
+                </>
+              )}
+            </>
           )}
         </Modal.Body>
       </Modal>
     </>
   );
+
+  const [showDriverImageModal, setShowDriverImageModal] = useState(false);
+  const [selectedDriverImage, setSelectedDriverImage] = useState(null);
+  const [driverZoomImage, setDriverZoomImage] = useState(null);
+
+  const handleDriverImageClick = (img) => {
+    setDriverZoomImage(`${SERVER_URL}/uploads/${img}`);
+  };
+
+  const handleViewDriverImage = (image) => {
+    setSelectedDriverImage(image);
+    setShowDriverImageModal(true);
+  };
+
+  const handleCloseDriverModal = () => {
+    setShowDriverImageModal(false);
+    setSelectedDriverImage(null);
+    setDriverZoomImage(null);
+  };
 
   const renderDriversTable = () => (
     <div className="dashboard-section">
@@ -1681,6 +1813,7 @@ export default function AdminPage() {
               <table className="data-table">
                 <thead>
                   <tr>
+                    <th>Image</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Contact</th>
@@ -1693,6 +1826,19 @@ export default function AdminPage() {
                   {drivers.length > 0 ? (
                     drivers.map((d) => (
                       <tr key={d._id}>
+                        <td>
+                          {d.image ? (
+                            <button
+                              className="image-btn btn btn-primary btn-sm"
+                              onClick={() => handleViewDriverImage(d.image)}
+                            >
+                              <i className="fas fa-image me-1"></i>
+                              View
+                            </button>
+                          ) : (
+                            <span className="no-image">No Image</span>
+                          )}
+                        </td>
                         <td>{d.name}</td>
                         <td>{d.email}</td>
                         <td>{d.contact}</td>
@@ -1725,7 +1871,7 @@ export default function AdminPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="empty-state">
+                      <td colSpan={7} className="empty-state">
                         <i className="fas fa-id-card"></i>
                         <span>No drivers available</span>
                       </td>
@@ -1734,6 +1880,57 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Driver Image Modal */}
+            <Modal show={showDriverImageModal} onHide={handleCloseDriverModal} centered size="lg">
+              <Modal.Header closeButton>
+                <Modal.Title>Driver Image</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {selectedDriverImage ? (
+                  <div className="image-gallery">
+                    <div 
+                      style={{
+                        position: 'relative',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <img
+                        src={`${SERVER_URL}/uploads/${selectedDriverImage}`}
+                        alt="Driver"
+                        style={{ 
+                          maxWidth: "100%", 
+                          height: "auto", 
+                          cursor: 'pointer',
+                          borderRadius: '8px',
+                          border: '1px solid #ddd'
+                        }}
+                        onClick={() => handleDriverImageClick(selectedDriverImage)}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <p>No image available</p>
+                )}
+              </Modal.Body>
+            </Modal>
+
+            {/* Driver Image Zoom Modal */}
+            <Modal show={!!driverZoomImage} onHide={() => setDriverZoomImage(null)} centered size="xl">
+              <Modal.Body style={{ textAlign: 'center', position: 'relative' }}>
+                {driverZoomImage && (
+                  <img
+                    src={driverZoomImage}
+                    alt="Zoomed Driver"
+                    style={{ 
+                      maxWidth: '100%', 
+                      maxHeight: '80vh', 
+                      objectFit: 'contain'
+                    }}
+                  />
+                )}
+              </Modal.Body>
+            </Modal>
           </>
         )}
       </div>
@@ -2002,7 +2199,7 @@ export default function AdminPage() {
           <Form.Group className="mb-3">
             <Form.Label>Seats</Form.Label>
             <Form.Control
-              type="number"
+              type="text"
               name="seats"
               value={newCab.seats}
               onChange={handleCabChange}
@@ -2159,7 +2356,7 @@ export default function AdminPage() {
                     {editingCabType === cabType._id ? (
                       <input
                         className="edit-input"
-                        type="number"
+                        type="text"
                         value={editedCabType.seats}
                         onChange={(e) => setEditedCabType({
                           ...editedCabType,
@@ -3236,6 +3433,15 @@ export default function AdminPage() {
     setSelectedImage(null);
   };
 
+    const handleVehicleViewImage = (images) => {
+    setSelectedImage(images);
+    setShowImageModal(true);
+  };
+
+  const handleVehicleCloseModal = () => {
+    setShowImageModal(false);
+    setSelectedImage(null);
+  };
 
 
 

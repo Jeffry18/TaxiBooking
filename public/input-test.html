@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Input Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #test-input { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Simple Input Test (No Google Maps)</h1>
+    <p>This is a basic input field to test if typing works without Google Maps interference:</p>
+    
+    <input type="text" id="test-input" placeholder="Type something here...">
+    <div id="log"></div>
+
+    <script>
+        const input = document.getElementById('test-input');
+        const log = document.getElementById('log');
+        
+        function addLog(message) {
+            log.innerHTML += `<div class="log">${new Date().toLocaleTimeString()}: ${message}</div>`;
+        }
+        
+        input.addEventListener('input', function(e) {
+            addLog(`Input event: "${e.target.value}"`);
+        });
+        
+        input.addEventListener('keydown', function(e) {
+            addLog(`Key down: ${e.key}`);
+        });
+        
+        input.addEventListener('keyup', function(e) {
+            addLog(`Key up: ${e.key}`);
+        });
+        
+        addLog('Basic input test ready. Try typing above.');
+    </script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Working Google Places Form</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .form-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .place-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚗 Taxi Booking - Google Places Test</h1>
+    
+    <div id="status" class="status info">
+        Loading Google Maps API...
+    </div>
+
+    <form id="booking-form">
+        <div class="form-group">
+            <label for="pickup">Pickup Location:</label>
+            <input type="text" id="pickup" placeholder="Enter pickup location..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="destination">Destination:</label>
+            <input type="text" id="destination" placeholder="Enter destination..." required>
+        </div>
+
+        <div class="form-group">
+            <button type="button" class="btn" onclick="clearForm()">Clear Form</button>
+            <button type="submit" class="btn">Book Taxi</button>
+        </div>
+    </form>
+
+    <div id="selected-places"></div>
+
+    <script>
+        let pickupPlace = null;
+        let destinationPlace = null;
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = message;
+            console.log(message);
+        }
+
+        function displayPlaceDetails(place, type) {
+            const container = document.getElementById('selected-places');
+            const placeDiv = document.createElement('div');
+            placeDiv.className = 'place-details';
+            placeDiv.innerHTML = `
+                <h4>${type} Location:</h4>
+                <p><strong>Address:</strong> ${place.formatted_address}</p>
+                <p><strong>Name:</strong> ${place.name || 'N/A'}</p>
+                <p><strong>Coordinates:</strong> ${place.geometry.location.lat()}, ${place.geometry.location.lng()}</p>
+                <p><strong>Place ID:</strong> ${place.place_id}</p>
+            `;
+            
+            // Remove previous selection of this type
+            const existing = container.querySelector(`[data-type="${type}"]`);
+            if (existing) existing.remove();
+            
+            placeDiv.setAttribute('data-type', type);
+            container.appendChild(placeDiv);
+        }
+
+        function initGoogleMaps() {
+            updateStatus('✅ Google Maps API loaded successfully!', 'success');
+
+            if (!window.google || !window.google.maps || !window.google.maps.places) {
+                updateStatus('❌ Google Places API not available', 'error');
+                return;
+            }
+
+            try {
+                // Use the new recommended PlaceAutocompleteElement if available
+                if (window.google.maps.places.PlaceAutocompleteElement) {
+                    initWithNewAutocomplete();
+                } else {
+                    // Fallback to legacy Autocomplete
+                    initWithLegacyAutocomplete();
+                }
+            } catch (error) {
+                console.error('Error initializing Places API:', error);
+                // Try legacy as fallback
+                initWithLegacyAutocomplete();
+            }
+        }
+
+        function initWithNewAutocomplete() {
+            updateStatus('🆕 Using new PlaceAutocompleteElement', 'info');
+            
+            // Replace input fields with new PlaceAutocompleteElement
+            const pickupContainer = document.getElementById('pickup').parentNode;
+            const destinationContainer = document.getElementById('destination').parentNode;
+            
+            // Create new autocomplete elements
+            const pickupAutocomplete = document.createElement('gmp-place-autocomplete');
+            pickupAutocomplete.setAttribute('placeholder', 'Enter pickup location...');
+            pickupAutocomplete.setAttribute('country', 'IN');
+            pickupAutocomplete.style.width = '100%';
+            pickupAutocomplete.style.padding = '12px';
+            pickupAutocomplete.style.fontSize = '16px';
+            pickupAutocomplete.style.border = '2px solid #ddd';
+            pickupAutocomplete.style.borderRadius = '4px';
+            
+            const destinationAutocomplete = document.createElement('gmp-place-autocomplete');
+            destinationAutocomplete.setAttribute('placeholder', 'Enter destination...');
+            destinationAutocomplete.setAttribute('country', 'IN');
+            destinationAutocomplete.style.width = '100%';
+            destinationAutocomplete.style.padding = '12px';
+            destinationAutocomplete.style.fontSize = '16px';
+            destinationAutocomplete.style.border = '2px solid #ddd';
+            destinationAutocomplete.style.borderRadius = '4px';
+            
+            // Replace inputs
+            pickupContainer.replaceChild(pickupAutocomplete, document.getElementById('pickup'));
+            destinationContainer.replaceChild(destinationAutocomplete, document.getElementById('destination'));
+            
+            // Add event listeners
+            pickupAutocomplete.addEventListener('gmp-placeselect', (event) => {
+                pickupPlace = event.detail.place;
+                if (pickupPlace) {
+                    displayPlaceDetails(pickupPlace, 'Pickup');
+                    updateStatus('✅ Pickup location selected', 'success');
+                }
+            });
+            
+            destinationAutocomplete.addEventListener('gmp-placeselect', (event) => {
+                destinationPlace = event.detail.place;
+                if (destinationPlace) {
+                    displayPlaceDetails(destinationPlace, 'Destination');
+                    updateStatus('✅ Destination selected', 'success');
+                }
+            });
+            
+            updateStatus('🎯 New Google Places autocomplete ready! Start typing locations.', 'success');
+        }
+
+        function initWithLegacyAutocomplete() {
+            updateStatus('⚠️ Using legacy Autocomplete (deprecated)', 'info');
+            
+            // Initialize pickup autocomplete
+            const pickupInput = document.getElementById('pickup');
+            const pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput, {
+                types: ['geocode'],
+                componentRestrictions: { country: 'IN' },
+                fields: ['place_id', 'formatted_address', 'name', 'geometry']
+            });
+
+            pickupAutocomplete.addListener('place_changed', function() {
+                pickupPlace = pickupAutocomplete.getPlace();
+                if (pickupPlace && pickupPlace.formatted_address) {
+                    displayPlaceDetails(pickupPlace, 'Pickup');
+                    updateStatus('✅ Pickup location selected', 'success');
+                }
+            });
+
+            // Initialize destination autocomplete
+            const destinationInput = document.getElementById('destination');
+            const destinationAutocomplete = new google.maps.places.Autocomplete(destinationInput, {
+                types: ['geocode'],
+                componentRestrictions: { country: 'IN' },
+                fields: ['place_id', 'formatted_address', 'name', 'geometry']
+            });
+
+            destinationAutocomplete.addListener('place_changed', function() {
+                destinationPlace = destinationAutocomplete.getPlace();
+                if (destinationPlace && destinationPlace.formatted_address) {
+                    displayPlaceDetails(destinationPlace, 'Destination');
+                    updateStatus('✅ Destination selected', 'success');
+                }
+            });
+
+            updateStatus('🎯 Google Places autocomplete ready! Start typing locations.', 'success');
+        }
+
+        function clearForm() {
+            document.getElementById('pickup').value = '';
+            document.getElementById('destination').value = '';
+            document.getElementById('selected-places').innerHTML = '';
+            pickupPlace = null;
+            destinationPlace = null;
+            updateStatus('🧹 Form cleared', 'info');
+        }
+
+        function googleMapsError() {
+            updateStatus('❌ Failed to load Google Maps API', 'error');
+        }
+
+        // Form submission
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!pickupPlace || !destinationPlace) {
+                updateStatus('⚠️ Please select both pickup and destination locations', 'error');
+                return;
+            }
+
+            const bookingData = {
+                pickup: {
+                    address: pickupPlace.formatted_address,
+                    name: pickupPlace.name,
+                    coordinates: {
+                        lat: pickupPlace.geometry.location.lat(),
+                        lng: pickupPlace.geometry.location.lng()
+                    }
+                },
+                destination: {
+                    address: destinationPlace.formatted_address,
+                    name: destinationPlace.name,
+                    coordinates: {
+                        lat: destinationPlace.geometry.location.lat(),
+                        lng: destinationPlace.geometry.location.lng()
+                    }
+                }
+            };
+
+            console.log('Booking Data:', bookingData);
+            updateStatus('🎉 Taxi booking data ready! Check console for details.', 'success');
+        });
+    </script>
+
+    <!-- Google Maps API with optimized loading -->
+    <script async defer 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1hya_2cUTOJIKAi6m0gDywebNBJd4rEA&libraries=places&loading=async&callback=initGoogleMaps"
+        onerror="googleMapsError()">
+    </script>
+</body>
+</html>

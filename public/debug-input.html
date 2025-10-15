@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Input Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #007bff;
+            border-radius: 4px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #0056b3;
+            box-shadow: 0 0 5px rgba(0,123,255,0.5);
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #007bff;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Comprehensive Input Debug Test</h1>
+    
+    <div class="status warning">
+        <strong>Testing all possible input scenarios...</strong>
+    </div>
+
+    <div class="test-container">
+        <h3>Test 1: Basic Text Input</h3>
+        <input type="text" id="test1" placeholder="Type anything here..." autocomplete="off">
+        <div id="log1"></div>
+    </div>
+
+    <div class="test-container">
+        <h3>Test 2: Text Input with Different Attributes</h3>
+        <input type="text" id="test2" placeholder="Another test input..." spellcheck="false" autocomplete="off" autocorrect="off">
+        <div id="log2"></div>
+    </div>
+
+    <div class="test-container">
+        <h3>Test 3: Textarea</h3>
+        <textarea id="test3" placeholder="Try typing in this textarea..." rows="3"></textarea>
+        <div id="log3"></div>
+    </div>
+
+    <div class="test-container">
+        <h3>Test 4: Input with Manual Focus</h3>
+        <input type="text" id="test4" placeholder="This input will be auto-focused...">
+        <button onclick="focusTest4()">Focus Input</button>
+        <div id="log4"></div>
+    </div>
+
+    <div class="test-container">
+        <h3>Test 5: System Information</h3>
+        <div id="system-info"></div>
+    </div>
+
+    <div class="test-container">
+        <h3>Event Logs</h3>
+        <div id="global-log"></div>
+    </div>
+
+    <script>
+        let globalLogCount = 0;
+
+        function addGlobalLog(message) {
+            globalLogCount++;
+            const log = document.getElementById('global-log');
+            log.innerHTML += `<div class="log">${globalLogCount}. ${new Date().toLocaleTimeString()}: ${message}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function addLog(testId, message) {
+            const log = document.getElementById(`log${testId}`);
+            log.innerHTML += `<div class="log">${new Date().toLocaleTimeString()}: ${message}</div>`;
+            addGlobalLog(`Test ${testId}: ${message}`);
+        }
+
+        function setupTest(testNumber) {
+            const input = document.getElementById(`test${testNumber}`);
+            
+            input.addEventListener('focus', function() {
+                addLog(testNumber, '🎯 Input focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                addLog(testNumber, '😴 Input lost focus');
+            });
+            
+            input.addEventListener('input', function(e) {
+                addLog(testNumber, `📝 Input: "${e.target.value}" (length: ${e.target.value.length})`);
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                addLog(testNumber, `⬇️ Key down: "${e.key}" (code: ${e.code})`);
+            });
+            
+            input.addEventListener('keypress', function(e) {
+                addLog(testNumber, `🔤 Key press: "${e.key}" (charCode: ${e.charCode})`);
+            });
+            
+            input.addEventListener('keyup', function(e) {
+                addLog(testNumber, `⬆️ Key up: "${e.key}"`);
+            });
+        }
+
+        function focusTest4() {
+            document.getElementById('test4').focus();
+            addLog(4, '🎯 Manual focus triggered');
+        }
+
+        function displaySystemInfo() {
+            const info = {
+                'User Agent': navigator.userAgent,
+                'Platform': navigator.platform,
+                'Language': navigator.language,
+                'Online': navigator.onLine,
+                'Cookie Enabled': navigator.cookieEnabled,
+                'JavaScript Enabled': true,
+                'Local Storage': typeof(Storage) !== "undefined",
+                'Document Ready State': document.readyState,
+                'Window Width': window.innerWidth,
+                'Window Height': window.innerHeight,
+                'Screen Width': screen.width,
+                'Screen Height': screen.height,
+                'Has Touch': 'ontouchstart' in window,
+                'Device Pixel Ratio': window.devicePixelRatio
+            };
+
+            let html = '<table style="width:100%; font-size:12px;">';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<tr><td style="font-weight:bold; padding:2px;">${key}:</td><td style="padding:2px;">${value}</td></tr>`;
+            }
+            html += '</table>';
+            
+            document.getElementById('system-info').innerHTML = html;
+        }
+
+        // Initialize all tests
+        addGlobalLog('🚀 Starting comprehensive input debug test...');
+        
+        for (let i = 1; i <= 4; i++) {
+            setupTest(i);
+        }
+        
+        displaySystemInfo();
+        
+        // Auto-focus the first input after a short delay
+        setTimeout(function() {
+            document.getElementById('test1').focus();
+            addGlobalLog('🎯 Auto-focused first input');
+        }, 500);
+
+        // Global error handling
+        window.addEventListener('error', function(e) {
+            addGlobalLog(`❌ JavaScript Error: ${e.message} at line ${e.lineno}`);
+        });
+
+        // Test document interaction
+        document.addEventListener('click', function(e) {
+            addGlobalLog(`🖱️ Clicked on: ${e.target.tagName} ${e.target.id ? '#' + e.target.id : ''}`);
+        });
+
+        addGlobalLog('✅ All event listeners attached');
+        addGlobalLog('📋 Try typing in any of the input fields above');
+    </script>
+</body>
+</html>

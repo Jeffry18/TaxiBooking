@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Places API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f1aeb5; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        #autocomplete { width: 100%; padding: 12px; font-size: 16px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+        .place-details { background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Google Places API Quick Test</h1>
+    <div id="status"></div>
+    
+    <h3>🔍 Places Autocomplete Test</h3>
+    <p>Type a location in India (e.g., "Brigade Road Bangalore", "Mumbai Airport", "Delhi Railway Station"):</p>
+    <input type="text" id="autocomplete" placeholder="Start typing a location in India...">
+    <div id="place-result"></div>
+
+    <script>
+        function addStatus(message, type = 'warning') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML += `<div class="test-result ${type}">${message}</div>`;
+            console.log(message);
+        }
+
+        function showPlaceDetails(place) {
+            const resultDiv = document.getElementById('place-result');
+            resultDiv.innerHTML = `
+                <div class="place-details">
+                    <strong>✅ Place Selected Successfully!</strong><br><br>
+                    <strong>Address:</strong> ${place.formatted_address}<br>
+                    <strong>Name:</strong> ${place.name || 'N/A'}<br>
+                    <strong>Place ID:</strong> ${place.place_id}<br>
+                    <strong>Coordinates:</strong> ${place.geometry?.location?.lat()}, ${place.geometry?.location?.lng()}<br>
+                    <strong>Types:</strong> ${place.types?.join(', ') || 'N/A'}<br>
+                    <strong>Plus Code:</strong> ${place.plus_code?.global_code || 'N/A'}<br>
+                    <strong>Components:</strong> ${place.address_components?.length || 0} components
+                </div>
+            `;
+        }
+
+        function initGoogleMaps() {
+            addStatus('🎉 Google Maps JavaScript API loaded successfully!', 'success');
+            
+            if (window.google && window.google.maps && window.google.maps.places) {
+                addStatus('✅ Google Places API is available and ready!', 'success');
+                setupAutocomplete();
+            } else {
+                addStatus('❌ Google Places API not found', 'error');
+            }
+        }
+
+        function setupAutocomplete() {
+            try {
+                const input = document.getElementById('autocomplete');
+                
+                // Test if input is working before Google Places
+                input.addEventListener('input', function(e) {
+                    console.log('Input event:', e.target.value);
+                });
+                
+                // Add some delay to ensure input works first
+                setTimeout(() => {
+                    const autocomplete = new google.maps.places.Autocomplete(input, {
+                        types: ['geocode', 'establishment'],
+                        componentRestrictions: { country: 'IN' },
+                        fields: [
+                            'place_id', 'formatted_address', 'name', 
+                            'geometry.location', 'address_components', 
+                            'types', 'plus_code'
+                        ]
+                    });
+
+                    autocomplete.addListener('place_changed', function() {
+                        const place = autocomplete.getPlace();
+                        console.log('Selected place:', place);
+                        
+                        if (place && place.formatted_address) {
+                            showPlaceDetails(place);
+                            addStatus(`🎯 Successfully selected: ${place.formatted_address}`, 'success');
+                        } else {
+                            addStatus('⚠️ Place selected but no details available', 'warning');
+                        }
+                    });
+
+                    addStatus('🔧 Autocomplete initialized successfully! Try typing above.', 'success');
+                }, 500);
+                
+            } catch (error) {
+                addStatus(`❌ Error setting up autocomplete: ${error.message}`, 'error');
+            }
+        }
+
+        function googleMapsError() {
+            addStatus('❌ Failed to load Google Maps JavaScript API', 'error');
+        }
+
+        // Initial status
+        addStatus('🚀 Loading Google Maps API with your key...', 'warning');
+    </script>
+
+    <!-- Load Google Maps with your Places API (New) key -->
+    <script async defer 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1hya_2cUTOJIKAi6m0gDywebNBJd4rEA&libraries=places&callback=initGoogleMaps"
+        onerror="googleMapsError()">
+    </script>
+</body>
+</html>

@@ -4,6 +4,8 @@ import { Form, Button, Container, Row, Col, Card, Alert, Nav, Table, Spinner, Ca
 import SERVER_URL from "../services/serverURL";
 import '../App.css'
 import Select from 'react-select';
+import GooglePlacesAutocomplete from '../components/GooglePlacesAutocomplete';
+import SimpleGooglePlaces from '../components/SimpleGooglePlaces';
 import defaultVehicleImage from '../assets/default-vehicle.jpg';
 import HomeCarousel from "../components/Carousel";
 import local from '../assets/local.jpg';
@@ -33,6 +35,10 @@ export const Home = () => {
     phoneNumber: "", // Add this line
     //tripType: "",
     selectedCabType: null,
+    // Google Places data
+    pickupPlace: { address: '', name: '', place_id: '', lat: null, lng: null },
+    dropPlace: { address: '', name: '', place_id: '', lat: null, lng: null },
+    extraStopPlaces: [], // Array of place objects for extra stops
   });
 
   const navigate = useNavigate();
@@ -105,7 +111,7 @@ export const Home = () => {
       try {
         const res = await axios.get(`${SERVER_URL}/states`);
         setStates(Array.isArray(res.data) ? res.data : []);
-      } catch {
+      } catch (err) {
         console.error("Failed to fetch states:", err);
         setStates([]);
       }
@@ -149,6 +155,36 @@ export const Home = () => {
     }
   };
 
+  // Google Places handlers
+  const handlePickupPlaceSelect = (place) => {
+    setForm((prev) => ({
+      ...prev,
+      pickup: place.address,
+      pickupPlace: place
+    }));
+  };
+
+  const handleDropPlaceSelect = (place) => {
+    setForm((prev) => ({
+      ...prev,
+      drop: place.address,
+      dropPlace: place
+    }));
+  };
+
+  const handleExtraStopPlaceSelect = (index, place) => {
+    const updatedStops = [...extraStops];
+    updatedStops[index] = place.address;
+    setExtraStops(updatedStops);
+
+    const updatedStopPlaces = [...form.extraStopPlaces];
+    updatedStopPlaces[index] = place;
+    setForm((prev) => ({
+      ...prev,
+      extraStopPlaces: updatedStopPlaces
+    }));
+  };
+
   const handleViewVehicles = (cabTypeName) => {
     navigate(`/view-vehicles/${cabTypeName}`);
   };
@@ -187,6 +223,23 @@ export const Home = () => {
         // tripType,
         // airportTripType: tripType === "airport" ? airportTripType : null,
         status: "pending",
+        // Google Places data for better location accuracy
+        pickupCoordinates: {
+          lat: form.pickupPlace.lat,
+          lng: form.pickupPlace.lng,
+          place_id: form.pickupPlace.place_id
+        },
+        dropCoordinates: {
+          lat: form.dropPlace.lat,
+          lng: form.dropPlace.lng,
+          place_id: form.dropPlace.place_id
+        },
+        extraStopCoordinates: form.extraStopPlaces.map(place => ({
+          lat: place.lat,
+          lng: place.lng,
+          place_id: place.place_id,
+          address: place.address
+        }))
       };
 
 
@@ -279,28 +332,21 @@ export const Home = () => {
                   {/* Row 1: Location Fields + Add Stop Button */}
                   <Row className="booking-row align-items-end mb-3">
                     <Col lg={3} md={6} className="booking-field">
-                      <Form.Label className="booking-label">From</Form.Label>
-                      <Select
-                        classNamePrefix="rs"
-                        className="booking-select"
-                        options={places.map((p) => ({ value: p.name, label: p.name }))}
-                        value={form.pickup ? { value: form.pickup, label: form.pickup } : null}
-                        onChange={(selected) => setForm({ ...form, pickup: selected.value })}
-                        placeholder="Select pickup location"
-                        isSearchable
+                      <SimpleGooglePlaces
+                        label="From"
+                        placeholder="Enter pickup location"
+                        onPlaceSelect={handlePickupPlaceSelect}
+                        className="booking-input"
                       />
                     </Col>
 
                     <Col lg={3} md={6} className="booking-field">
-                      <Form.Label className="booking-label">To</Form.Label>
-                      <Select
-                        classNamePrefix="rs"
-                        className="booking-select"
-                        options={places.map((p) => ({ value: p.name, label: p.name }))}
-                        value={form.drop ? { value: form.drop, label: form.drop } : null}
-                        onChange={(selected) => setForm({ ...form, drop: selected.value })}
-                        placeholder="Select destination"
-                        isSearchable
+                      <SimpleGooglePlaces
+                        label="To"
+                        onPlaceSelect={handleDropPlaceSelect}
+                        placeholder="Enter destination"
+                        className="booking-input"
+                        required
                       />
                     </Col>
 
@@ -363,16 +409,12 @@ export const Home = () => {
                         <Col key={index} lg={3} md={6} className="booking-field">
                           <div className="d-flex align-items-end">
                             <div style={{ flexGrow: 1 }}>
-                              <Form.Label className="booking-label">Stop {index + 1}</Form.Label>
-                              <Select
-                                classNamePrefix="rs"
-                                className="booking-select"
-                                options={places.map((p) => ({ value: p.name, label: p.name }))}
-                                value={stop ? { value: stop, label: stop } : null}
-                                onChange={(selected) => updateStop(index, selected.value)}
-                                placeholder="Select extra stop"
-                                isSearchable
-                              />
+                            <SimpleGooglePlaces
+                              label={`Stop ${index + 1}`}
+                              onPlaceSelect={(place) => handleExtraStopPlaceSelect(index, place)}
+                              placeholder="Enter extra stop location"
+                              className="booking-input"
+                            />
                             </div>
                             <Button
                               className="remove-stop-btn"
@@ -465,28 +507,22 @@ export const Home = () => {
                 <Form onSubmit={handleSubmit}>
                   <Row>
                     <Col xs={12} className="booking-field">
-                      <Form.Label className="booking-label">From</Form.Label>
-                      <Select
-                        classNamePrefix="rs"
-                        className="booking-select"
-                        options={places.map((p) => ({ value: p.name, label: p.name }))}
-                        value={form.pickup ? { value: form.pickup, label: form.pickup } : null}
-                        onChange={(selected) => setForm({ ...form, pickup: selected.value })}
-                        placeholder="Select pickup location"
-                        isSearchable
+                      <SimpleGooglePlaces
+                        label="From"
+                        onPlaceSelect={handlePickupPlaceSelect}
+                        placeholder="Enter pickup location"
+                        className="booking-input"
+                        required
                       />
                     </Col>
 
                     <Col xs={12} className="booking-field">
-                      <Form.Label className="booking-label">To</Form.Label>
-                      <Select
-                        classNamePrefix="rs"
-                        className="booking-select"
-                        options={places.map((p) => ({ value: p.name, label: p.name }))}
-                        value={form.drop ? { value: form.drop, label: form.drop } : null}
-                        onChange={(selected) => setForm({ ...form, drop: selected.value })}
-                        placeholder="Select destination"
-                        isSearchable
+                      <SimpleGooglePlaces
+                        label="To"
+                        onPlaceSelect={handleDropPlaceSelect}
+                        placeholder="Enter destination"
+                        className="booking-input"
+                        required
                       />
                     </Col>
 
@@ -495,15 +531,11 @@ export const Home = () => {
                       <Col key={index} xs={12} className="booking-field">
                         <div className="d-flex align-items-end">
                           <div style={{ flexGrow: 1 }}>
-                            <Form.Label className="booking-label">Stop {index + 1}</Form.Label>
-                            <Select
-                              classNamePrefix="rs"
-                              className="booking-select"
-                              options={places.map((p) => ({ value: p.name, label: p.name }))}
-                              value={stop ? { value: stop, label: stop } : null}
-                              onChange={(selected) => updateStop(index, selected.value)}
-                              placeholder="Select extra stop"
-                              isSearchable
+                            <SimpleGooglePlaces
+                              label={`Stop ${index + 1}`}
+                              onPlaceSelect={(place) => handleExtraStopPlaceSelect(index, place)}
+                              placeholder="Enter extra stop location"
+                              className="booking-input"
                             />
                           </div>
                           <Button
