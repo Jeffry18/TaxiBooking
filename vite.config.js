@@ -6,8 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        //target: 'https://flymallu.com/api',
-        target: 'http://localhost:5000',
+        target: 'https://flymallu.com/api',
+        //target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false, // <-- ignore TLS cert issues locally
         rewrite: (path) => path.replace(/^\/api/, '')
