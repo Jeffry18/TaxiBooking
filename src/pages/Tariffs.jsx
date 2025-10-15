@@ -91,7 +91,7 @@ const Tariff = () => {
               <FaCar size={24} color="#0d6efd" />
             </div>
             <h6 className="fw-bold">Multiple Vehicles</h6>
-            <small className="text-muted">Sedan to Tempo Traveller</small>
+            <small className="text-muted">Sedan to Coach</small>
           </div>
         </Col>
 
@@ -101,7 +101,7 @@ const Tariff = () => {
               <FaUsers size={24} color="#0d6efd" />
             </div>
             <h6 className="fw-bold">All Group Sizes</h6>
-            <small className="text-muted">3 to 26 passengers</small>
+            <small className="text-muted">2 to 50 passengers</small>
           </div>
         </Col>
 
@@ -129,7 +129,7 @@ const Tariff = () => {
       {/* tariff Table */}
       <Card className="shadow-sm mb-5 mt-5">
       <Card.Body>
-        <Card.Title className="mb-5 text-center fw-bold">Daily Rates With Driver <br /><span className="text-muted" style={{ fontSize: '0.9rem' }}>All rates include driver allowance and vehicle maintenance</span></Card.Title>
+        <Card.Title className="mb-5 text-center fw-bold">Daily Rates With Driver </Card.Title>
         <Table borderless hover responsive className="text-center align-middle">
           <thead className="table-light ">
             <tr>
@@ -137,6 +137,7 @@ const Tariff = () => {
               <th>Seats</th>
               <th>Rate/day</th>
               <th>Allowed Km</th>
+              <th>Driver Bata</th>
               <th>Extra Km Rate</th>
               <th>Details</th>
             </tr>
@@ -153,9 +154,10 @@ const Tariff = () => {
                     >
                       {t.seats} persons
                     </Badge></td>
-                  <td className="text-primary">{t.rate}</td>
+                  <td className="text-primary">₹{t.rate}</td>
                   <td>{t.allowedKm}</td>
-                  <td>{t.extraKmRate}</td>
+                  <td>₹{t.driverBata}</td>
+                  <td>₹{t.extraKmRate}</td>
                   <td>{t.details}</td>
                 </tr>
               ))
@@ -204,7 +206,9 @@ const Tariff = () => {
               <th>Rate/day</th>
               <th>Allowed Km</th>
               <th>Extra Km Rate</th>
+              <th>Outstation Rate</th>
               <th>Details</th>
+              
             </tr>
           </thead>
           <tbody>
@@ -215,9 +219,10 @@ const Tariff = () => {
                     <td>{(typeof t.city === 'string') ? (cities.find(c => c._id === t.city)?.name || t.city) : (t.city?.name || selectedCityName)}</td>
                     <td>{t.cabType}</td>
                     <td><Badge bg="light" text="Black" style={{ fontSize: '0.9rem', padding: '5px 10px', borderRadius: '12px' }}>{t.seats} persons</Badge></td>
-                    <td className="text-primary">{t.ratePerDay || t.rate}</td>
+                    <td className="text-primary">₹{t.ratePerDay || t.rate}</td>
                     <td>{t.allowedKm}</td>
-                    <td>{t.extraKmRate}</td>
+                    <td>₹{t.extraKmRate}</td>
+                    <td>₹{t.outstation}</td>
                     <td>{t.details}</td>
                   </tr>
                 ))

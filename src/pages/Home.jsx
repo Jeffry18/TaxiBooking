@@ -322,7 +322,7 @@ export const Home = () => {
 
                 <Form onSubmit={handleSubmit}>
                   {/* Row 1: Location Fields + Add Stop Button */}
-                  <Row className="booking-row align-items-end mb-3">
+                  <Row className="booking-row align-items-end ">
                     <Col lg={3} md={6} className="booking-field">
                       <SimpleGooglePlaces
                         label="From"

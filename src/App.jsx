@@ -14,6 +14,7 @@ import  Corporate  from './pages/Corporate.jsx'
 import ViewVehicle from './pages/ViewVehicle.jsx'
 import ViewStates from './pages/ViewStates.jsx'
 import Tariffs from './pages/Tariffs.jsx'
+import PackagesExtend from './pages/PackageExtend.jsx'
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         }/>
         <Route path='/vehicle-onboarding' element={<VehicleOnboarding/>}/>
         <Route path='/packages' element={<Packages/>}/>
+        <Route path='/package-extend' element={<PackagesExtend/>}/>
         <Route path='/driver-onboarding' element={<Driver/>}/>
         <Route path='/login' element={<Auth/>}/>
         <Route path='/register' element={<Auth insideRegister={true}/>}/>

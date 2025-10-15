@@ -115,6 +115,7 @@ export default function AdminPage() {
     seats: "",
     rate: "",
     allowedKm: "",
+    driverBata: "",
     extraKmRate: "",
     details: "",
   });
@@ -126,6 +127,7 @@ export default function AdminPage() {
     ratePerDay: "",
     allowedKm: "",
     extraKmRate: "",
+    outstation: "",
     details: "",
   });
   // Editing state for tariffs
@@ -531,6 +533,7 @@ export default function AdminPage() {
         seats: editedTariff.seats,
         rate: editedTariff.rate,
         allowedKm: editedTariff.allowedKm,
+        driverBata: editedTariff.driverBata,
         extraKmRate: editedTariff.extraKmRate,
         details: editedTariff.details,
       };
@@ -554,6 +557,7 @@ export default function AdminPage() {
         ratePerDay: editedCityTariff.ratePerDay,
         allowedKm: editedCityTariff.allowedKm,
         extraKmRate: editedCityTariff.extraKmRate,
+        outstation: editedCityTariff.outstation,
         details: editedCityTariff.details,
       };
       const res = await axios.put(`${SERVER_URL}/citytariff/${id}`, payload);
@@ -984,6 +988,7 @@ export default function AdminPage() {
       formData.append("seats", newTariff.seats);
       formData.append("rate", newTariff.rate);
       formData.append("allowedKm", newTariff.allowedKm);
+      formData.append("driverBata", newTariff.driverBata);
       formData.append("extraKmRate", newTariff.extraKmRate);
       formData.append("details", newTariff.details);
 
@@ -992,7 +997,7 @@ export default function AdminPage() {
       });
 
       alert("Tariff added!");
-      setNewTariff({ cabType: "", seats: "", rate: "", allowedKm: "", extraKmRate: "", details: "" });
+      setNewTariff({ cabType: "", seats: "", rate: "", allowedKm: "",driverBata: "",extraKmRate: "", details: "" });
       e.target.reset();
 
       // Auto-refresh the tariff table
@@ -1014,6 +1019,7 @@ export default function AdminPage() {
       formData.append("ratePerDay", newCityTariff.ratePerDay);
       formData.append("allowedKm", newCityTariff.allowedKm);
       formData.append("extraKmRate", newCityTariff.extraKmRate);
+      formData.append("outstation", newCityTariff.outstation);
       formData.append("details", newCityTariff.details);
 
       await axios.post(`${SERVER_URL}/citytariff`, formData, {
@@ -1021,7 +1027,7 @@ export default function AdminPage() {
       });
 
       alert("Tariff added!");
-      setNewCityTariff({ city: "", cabType: "", seats: "", ratePerDay: "", allowedKm: "", extraKmRate: "", details: "" });
+      setNewCityTariff({ city: "", cabType: "", seats: "", ratePerDay: "", allowedKm: "", extraKmRate: "", outstation: "", details: "" });
       e.target.reset();
 
       // Auto-refresh the tariff table
@@ -3198,9 +3204,11 @@ export default function AdminPage() {
           <Form.Control type="number" name="rate" value={newTariff.rate} onChange={handleTariffChange} required />
           <Form.Label>Allowed Km</Form.Label>
           <Form.Control type="number" name="allowedKm" value={newTariff.allowedKm} onChange={handleTariffChange} required />
+          <Form.Label>Driver Bata</Form.Label>
+          <Form.Control type="number" name="driverBata" value={newTariff.driverBata} onChange={handleTariffChange} required />
           <Form.Label>Extra Km Rate</Form.Label>
           <Form.Control type="number" name="extraKmRate" value={newTariff.extraKmRate} onChange={handleTariffChange} required />
-          <Form.Label>Details</Form.Label>
+          <Form.Label>Detials</Form.Label>
           <Form.Control type="text" name="details" value={newTariff.details} onChange={handleTariffChange} required />
           <Button type="submit" variant="primary">Add Tariff</Button>
         </Form.Group>
@@ -3213,6 +3221,7 @@ export default function AdminPage() {
             <th>Seats</th>
             <th>Rate</th>
             <th>Allowed Km</th>
+            <th>Driver Bata</th>
             <th>Extra Km Rate</th>
             <th>Details</th>
             <th>Actions</th>
@@ -3247,6 +3256,13 @@ export default function AdminPage() {
                   <Form.Control type="number" value={editedTariff.allowedKm} onChange={(e) => setEditedTariff({ ...editedTariff, allowedKm: e.target.value })} />
                 ) : (
                   t.allowedKm
+                )}
+              </td>
+              <td> 
+                {editingTariffId === t._id ? (
+                  <Form.Control type="number" value={editedTariff.driverBata} onChange={(e) => setEditedTariff({ ...editedTariff, driverBata: e.target.value })} />
+                ) : (
+                  t.driverBata
                 )}
               </td>
               <td>
@@ -3322,6 +3338,8 @@ export default function AdminPage() {
           <Form.Control type="number" name="allowedKm" value={newCityTariff.allowedKm} onChange={handleCityTariffChange} required />
           <Form.Label>Extra Km Rate</Form.Label>
           <Form.Control type="number" name="extraKmRate" value={newCityTariff.extraKmRate} onChange={handleCityTariffChange} required />
+          <Form.Label>Outstation Rate</Form.Label>
+          <Form.Control type="text" name="outstation" value={newCityTariff.outstation} onChange={handleCityTariffChange} required />
           <Button type="submit" variant="primary">Add City Tariff</Button>
         </Form.Group>
       </Form>
@@ -3336,6 +3354,7 @@ export default function AdminPage() {
             <th>Details</th>
             <th>Allowed Km</th>
             <th>Extra Km Rate</th>
+            <th>Outstation Rate</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -3389,6 +3408,13 @@ export default function AdminPage() {
                   <Form.Control type="number" value={editedCityTariff.extraKmRate} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, extraKmRate: e.target.value })} />
                 ) : (
                   t.extraKmRate
+                )}
+              </td>
+              <td>
+                {editingCityTariffId === t._id ? (
+                  <Form.Control type="text" value={editedCityTariff.outstation} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, outstation: e.target.value })} />
+                ) : (
+                  t.outstation
                 )}
               </td>
               <td>

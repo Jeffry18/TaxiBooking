@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Modal,
@@ -36,6 +37,8 @@ const Packages = () => {
   });
 
   const [message, setMessage] = useState(null); // ✅ For validation alerts
+  const navigate = useNavigate();
+
 
   // ✅ Fetch packages
   useEffect(() => {
@@ -246,13 +249,16 @@ const Packages = () => {
         <Row className="g-4">
           {packages.map((pkg) => (
             <Col lg={4} md={6} sm={12} key={pkg._id}>
-              <Card className="h-100 package-card rounded-3 overflow-hidden">
+              <Card className="h-100 package-card rounded-3 overflow-hidden"
+                onClick={() => navigate("/package-extend", { state: { packageData: pkg } })}
+                style={{ cursor: "pointer" }}
+              >
                 {/* Image Section */}
                 <div
                   style={{
                     height: "200px",
-                    backgroundImage: pkg.image 
-                      ? `url(${SERVER_URL}/uploads/${pkg.image})` 
+                    backgroundImage: pkg.image
+                      ? `url(${SERVER_URL}/uploads/${pkg.image})`
                       : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
@@ -322,8 +328,8 @@ const Packages = () => {
                       <span className="h6 text-primary mb-0">₹{pkg.price}</span>
                       <small className="text-muted d-block">per person</small>
                     </div>
-                    <Button 
-                      variant="primary" 
+                    <Button
+                      variant="primary"
                       size="sm"
                       onClick={() => handleBookNow(pkg)}
                       className="px-3"
@@ -498,13 +504,12 @@ const Packages = () => {
                         <td className="fw-bold text-primary">₹{trip.packagePrice}</td>
                         <td>
                           <span
-                            className={`badge ${
-                              trip.status === "confirmed"
+                            className={`badge ${trip.status === "confirmed"
                                 ? "bg-success"
                                 : trip.status === "pending"
-                                ? "bg-warning text-dark"
-                                : "bg-danger"
-                            }`}
+                                  ? "bg-warning text-dark"
+                                  : "bg-danger"
+                              }`}
                           >
                             {trip.status}
                           </span>
@@ -514,7 +519,7 @@ const Packages = () => {
                   </tbody>
                 </Table>
               </div>
-              
+
               {/* Mobile Card View */}
               <div className="d-md-none">
                 <Row className="g-3">
@@ -525,13 +530,12 @@ const Packages = () => {
                           <div className="d-flex justify-content-between align-items-start mb-2">
                             <h6 className="mb-0 text-primary">{trip.packageName}</h6>
                             <span
-                              className={`badge ${
-                                trip.status === "confirmed"
+                              className={`badge ${trip.status === "confirmed"
                                   ? "bg-success"
                                   : trip.status === "pending"
-                                  ? "bg-warning text-dark"
-                                  : "bg-danger"
-                              }`}
+                                    ? "bg-warning text-dark"
+                                    : "bg-danger"
+                                }`}
                             >
                               {trip.status}
                             </span>

@@ -306,7 +306,7 @@ export default function VehicleOnboarding() {
                       {v.images && v.images.map((image, index) => (
                         <img
                           key={index}
-                          src={`http://localhost:5000/uploads/${image}`}
+                          src={`${SERVER_URL}/uploads/${image}`}
                           alt={`Vehicle ${index + 1}`}
                           style={{
                             width: '50px',
