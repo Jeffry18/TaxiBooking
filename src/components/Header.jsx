@@ -101,28 +101,9 @@ export const Header = () => {
                 ) : null
               }
               
-              {/* Custom Contact Us Dropdown */}
-              <div className="custom-dropdown" ref={contactDropdownRef}>
-                <Nav.Link onClick={toggleContactDropdown} className="dropdown-toggle px-lg-3">
-                  Contact Us
-                </Nav.Link>
-                {showContactDropdown && (
-                  <div className="custom-dropdown-menu">
-                    <p className="custom-dropdown-item">Address : Santos Tavel</p>
-                    <p className="custom-dropdown-item">Aluva, Kerala</p>
-                    <p className="custom-dropdown-item">India - 682030</p>
-                    
-                    <a href="mailto:email.gmail.com" target="_blank" className="custom-dropdown-item"
-                       onClick={() => setShowContactDropdown(false)}>
-                      email@gmail.com
-                    </a>
-                    <a href="tel:7889654123" className="custom-dropdown-item"
-                       onClick={() => setShowContactDropdown(false)}>
-                      Call: 7889654123
-                    </a>
-                  </div>
-                )}
-              </div>
+              <Nav.Link as={Link} to="/contactus">Contact us</Nav.Link>
+
+              
 
               {
                 sessionStorage.getItem("token") ?

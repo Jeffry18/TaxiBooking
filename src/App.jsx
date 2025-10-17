@@ -15,6 +15,7 @@ import ViewVehicle from './pages/ViewVehicle.jsx'
 import ViewStates from './pages/ViewStates.jsx'
 import Tariffs from './pages/Tariffs.jsx'
 import PackagesExtend from './pages/PackageExtend.jsx'
+import ContactUs from './pages/ContactUs.jsx'
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
         <Route path='/view-vehicles/:cabTypeName' element={<ViewVehicle/>}/>
         <Route path="/viewstate/:id" element={<ViewStates />} />
         <Route path='/tariffs' element={<Tariffs/>}/>
+        <Route path='/contactus' element={<ContactUs/>}/>
       </Routes>
       <Footer/>
     </>

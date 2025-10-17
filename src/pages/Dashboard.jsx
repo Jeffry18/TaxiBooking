@@ -997,7 +997,7 @@ export default function AdminPage() {
       });
 
       alert("Tariff added!");
-      setNewTariff({ cabType: "", seats: "", rate: "", allowedKm: "",driverBata: "",extraKmRate: "", details: "" });
+      setNewTariff({ cabType: "", seats: "", rate: "", allowedKm: "", driverBata: "", extraKmRate: "", details: "" });
       e.target.reset();
 
       // Auto-refresh the tariff table
@@ -1404,7 +1404,7 @@ export default function AdminPage() {
                         />
                       </div>
                       <div className="edit-row">
-                        
+
                         <div className="form-group">
                           <label className="form-label">Cab Types</label>
                           <div className="cab-types-checkbox-group">
@@ -1433,22 +1433,22 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                        
-                        <div className="edit-row">
-                          
-                          
-                            <input
-                              className="edit-input"
-                              value={editedPackage.month}
-                              onChange={(e) => setEditedPackage({
-                                ...editedPackage,
-                                month: e.target.value
-                              })}
-                              placeholder="Month"
-                            />
-                        
-                        </div>
-                      
+
+                      <div className="edit-row">
+
+
+                        <input
+                          className="edit-input"
+                          value={editedPackage.month}
+                          onChange={(e) => setEditedPackage({
+                            ...editedPackage,
+                            month: e.target.value
+                          })}
+                          placeholder="Month"
+                        />
+
+                      </div>
+
                       <div className="form-group full-width">
                         <label className="form-label">Package Image</label>
                         <input
@@ -1659,51 +1659,106 @@ export default function AdminPage() {
           {selectedImage ? (
             <div className="image-gallery">
               {Array.isArray(selectedImage) ? (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                  gap: '10px',
-                  padding: '10px'
-                }}>
-                  {selectedImage.map((img, index) => (
-                    <div key={index} style={{
-                      position: 'relative',
-                      paddingBottom: '100%',
-                      height: 0,
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => handleImageClick(img, index)}
-                    >
-                      <img
-                        src={`${SERVER_URL}/uploads/${img}`}
-                        alt={`Vehicle ${index + 1}`}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                    gap: "10px",
+                    padding: "10px",
+                  }}
+                >
+                  {selectedImage.map((file, index) => {
+                    const isPDF = file.toLowerCase().endsWith(".pdf");
+                    const fileURL = `${SERVER_URL}/uploads/${file}`;
+
+                    return (
+                      <div
+                        key={index}
                         style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          borderRadius: '8px',
-                          border: '1px solid #ddd'
+                          position: "relative",
+                          paddingBottom: "100%",
+                          height: 0,
+                          cursor: "pointer",
                         }}
-                      />
-                    </div>
-                  ))}
+                        onClick={() => {
+                          if (isPDF) window.open(fileURL, "_blank");
+                          else handleImageClick(file, index);
+                        }}
+                      >
+                        {isPDF ? (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              background: "#f5f5f5",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              border: "1px solid #ddd",
+                              borderRadius: "8px",
+                              color: "#333",
+                              fontSize: "14px",
+                              flexDirection: "column",
+                            }}
+                          >
+                            <i className="fas fa-file-pdf fa-2x text-danger mb-2"></i>
+                            <span>View PDF</span>
+                          </div>
+                        ) : (
+                          <img
+                            src={fileURL}
+                            alt={`Vehicle ${index + 1}`}
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: "8px",
+                              border: "1px solid #ddd",
+                            }}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+
                 </div>
               ) : (
-                <img
-                  src={`${SERVER_URL}/uploads/${selectedImage}`}
-                  alt="Vehicle"
-                  style={{ maxWidth: "100%", height: "auto", cursor: 'pointer' }}
-                  onClick={() => setZoomImage(`${SERVER_URL}/uploads/${selectedImage}`)}
-                />
+                <>
+                  {selectedImage.toLowerCase().endsWith(".pdf") ? (
+                    <iframe
+                      src={`${SERVER_URL}/uploads/${selectedImage}`}
+                      title="PDF Viewer"
+                      style={{
+                        width: "100%",
+                        height: "80vh",
+                        border: "none",
+                        borderRadius: "8px",
+                      }}
+                    ></iframe>
+                  ) : (
+                    <img
+                      src={`${SERVER_URL}/uploads/${selectedImage}`}
+                      alt="Vehicle"
+                      style={{ maxWidth: "100%", height: "auto", cursor: "pointer" }}
+                      onClick={() =>
+                        setZoomImage(`${SERVER_URL}/uploads/${selectedImage}`)
+                      }
+                    />
+                  )}
+                </>
               )}
             </div>
           ) : (
             <p>No images available</p>
           )}
         </Modal.Body>
+
       </Modal>
 
       {/* Zoom Modal */}
@@ -1895,7 +1950,7 @@ export default function AdminPage() {
               <Modal.Body>
                 {selectedDriverImage ? (
                   <div className="image-gallery">
-                    <div 
+                    <div
                       style={{
                         position: 'relative',
                         textAlign: 'center'
@@ -1904,9 +1959,9 @@ export default function AdminPage() {
                       <img
                         src={`${SERVER_URL}/uploads/${selectedDriverImage}`}
                         alt="Driver"
-                        style={{ 
-                          maxWidth: "100%", 
-                          height: "auto", 
+                        style={{
+                          maxWidth: "100%",
+                          height: "auto",
                           cursor: 'pointer',
                           borderRadius: '8px',
                           border: '1px solid #ddd'
@@ -1928,9 +1983,9 @@ export default function AdminPage() {
                   <img
                     src={driverZoomImage}
                     alt="Zoomed Driver"
-                    style={{ 
-                      maxWidth: '100%', 
-                      maxHeight: '80vh', 
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '80vh',
                       objectFit: 'contain'
                     }}
                   />
@@ -3258,7 +3313,7 @@ export default function AdminPage() {
                   t.allowedKm
                 )}
               </td>
-              <td> 
+              <td>
                 {editingTariffId === t._id ? (
                   <Form.Control type="number" value={editedTariff.driverBata} onChange={(e) => setEditedTariff({ ...editedTariff, driverBata: e.target.value })} />
                 ) : (
@@ -3459,7 +3514,7 @@ export default function AdminPage() {
     setSelectedImage(null);
   };
 
-    const handleVehicleViewImage = (images) => {
+  const handleVehicleViewImage = (images) => {
     setSelectedImage(images);
     setShowImageModal(true);
   };

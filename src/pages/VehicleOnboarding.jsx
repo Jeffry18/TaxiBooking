@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import SERVER_URL from "../services/serverURL";
 import {
   Container,
   Form,
@@ -59,7 +60,7 @@ export default function VehicleOnboarding() {
       return "❌ Maximum 10 images allowed.";
 
     const invalidImage = form.images.find(
-      image => !["image/jpeg", "image/png"].includes(image.type)
+      image => !["image/jpeg", "image/png", "application/pdf"].includes(image.type)
     );
     if (invalidImage)
       return "❌ Only JPG , PNG or PDF images are allowed.";
@@ -103,7 +104,7 @@ export default function VehicleOnboarding() {
         formData.append('images', image);
       });
 
-      await axios.post("http://localhost:5000/vehicles", formData, {
+      await axios.post(`${SERVER_URL}/vehicles`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -140,7 +141,7 @@ export default function VehicleOnboarding() {
       const token = sessionStorage.getItem("token");
       if (!token) return;
 
-      const response = await axios.get("http://localhost:5000/vehicles", {
+      const response = await axios.get(`${SERVER_URL}/vehicles`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

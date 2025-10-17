@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Form, Button, Container, Row, Col, Card, Alert, Nav, Table, Spinner, Carousel, CardTitle } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
@@ -42,6 +42,7 @@ export const Home = () => {
   });
 
   const navigate = useNavigate();
+  const bookingFormRef = useRef(null);
   const [message, setMessage] = useState("");
   const [places, setPlaces] = useState([]);
   const [tripType, setTripType] = useState("round");
@@ -57,6 +58,10 @@ export const Home = () => {
     { value: "CCJ", label: "Calicut International Airport (CCJ)" },
     { value: "CNN", label: "Kannur International Airport (CNN)" },
   ];
+
+  const scrollToBookingForm = () => {
+    bookingFormRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
 
@@ -299,7 +304,7 @@ export const Home = () => {
 
       <Container fluid className="" style={{ width: "100%", minHeight: "100vh", paddingTop: "70px", paddingRight: "0px", paddingLeft: "0px" }}>
 
-        <div style={{ position: "relative", width: "100%" }}>
+        <div ref={bookingFormRef} style={{ position: "relative", width: "100%" }}>
           {/* Banner Carousel */}
           <HomeCarousel />
 
@@ -835,7 +840,7 @@ export const Home = () => {
                 <p className="text-muted">Taxi Services - Discover the beauty of Kerala with our expertly curated tour packages. From tranquil backwaters to vibrant cities and exciting wildlife encounters, our itineraries offer a diverse range of experiences. Whether you're seeking a pre-planned adventure or a personalized journey, our dedicated team will ensure a hassle-free trip filled with unforgettable memories. Book your Kerala taxi service today and embark on a magical exploration of God's Own Country.</p>
               </div>
 
-              <button className="rounded bg-primary text-white fw-bold" style={{ width: '150px', height: '40px' }}>Enquire Now</button>
+              <button className="rounded bg-primary text-white fw-bold" style={{ width: '150px', height: '40px' }} onClick={scrollToBookingForm}>Enquire Now</button>
 
 
             </Col>

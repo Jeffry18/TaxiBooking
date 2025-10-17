@@ -326,7 +326,7 @@ const Packages = () => {
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
                       <span className="h6 text-primary mb-0">₹{pkg.price}</span>
-                      <small className="text-muted d-block">per person</small>
+                      <small className="text-muted d-block">Per Day Onwards</small>
                     </div>
                     <Button
                       variant="primary"
