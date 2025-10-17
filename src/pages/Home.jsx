@@ -252,7 +252,7 @@ export const Home = () => {
       const response = await axios.post(`${SERVER_URL}/bookings`, bookingData)
       if (response.data) {
         setAlertVariant('success');
-        setMessage("✅ Booking successful!");
+        setMessage("✅ Enquiry successful!");
         setShowAlert(true);
         setTimeout(() => setShowAlert(false), 3000);
 
@@ -309,7 +309,7 @@ export const Home = () => {
           <HomeCarousel />
 
           {/* Enhanced Booking Form for large screens (overlay) */}
-          <Row className="d-none d-md-block">
+          <Row className="d-none d-md-block" id="booking-form">
             <Col md={12} className="mb-4">
               <Card className="booking-form-card shadow-lg"
                 style={{
@@ -494,7 +494,7 @@ export const Home = () => {
           </Row>
 
           {/* Enhanced Booking Form for small screens (stacked, no overlay) */}
-          <Row className="d-block d-md-none">
+          <Row className="d-block d-md-none" id="booking-form">
             <Col xs={12} className="mb-3 px-3">
               <Card className="booking-form-card shadow-lg">
                 <div>

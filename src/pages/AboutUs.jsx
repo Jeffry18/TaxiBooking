@@ -1,9 +1,22 @@
 import React from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 import aboutus1 from "../assets/AboutUs(1).jpg";
 import aboutus2 from "../assets/aboutUs(2).jpg";
 
 export const AboutUs = () => {
+
+  const navigate = useNavigate();
+
+  const goHome = () => {
+    navigate("/");               // Navigate to home page
+    window.scrollTo({            // Scroll to top
+      top: 0,
+      behavior: "smooth"         // Optional smooth scroll
+    });
+  };
+
+
   return (
     <div className="about-us-page">
       {/* Hero Section */}
@@ -28,10 +41,10 @@ export const AboutUs = () => {
                   Welcome to <span className="text-gradient">FlyMallu</span>
                 </h1>
                 <p className="about-hero-subtitle">
-                  Your trusted partner in creating unforgettable travel experiences across incredible India. 
+                  Your trusted partner in creating unforgettable travel experiences across incredible India.
                   We specialize in premium taxi services, adventure tours, and personalized holiday packages.
                 </p>
-                
+
                 <div className="hero-features">
                   <div className="feature-item">
                     <div className="feature-icon">
@@ -73,9 +86,9 @@ export const AboutUs = () => {
                     <span>Explore Our Services</span>
                     <i className="fas fa-arrow-right"></i>
                   </button>
-                  <button className="hero-cta-btn secondary">
+                  <Link to="/contactus" className="hero-cta-btn secondary">
                     <span>Contact Us</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             </Col>
@@ -245,7 +258,7 @@ export const AboutUs = () => {
       </section>
 
       {/* Recognition Section */}
-      <section className="about-recognition">
+      {/* <section className="about-recognition">
         <Container>
           <Row className="justify-content-center mb-5">
             <Col lg={8} className="text-center">
@@ -282,7 +295,7 @@ export const AboutUs = () => {
             </Col>
           </Row>
         </Container>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="about-cta">
@@ -294,10 +307,20 @@ export const AboutUs = () => {
                 Let us create an unforgettable journey tailored just for you
               </p>
               <div className="cta-buttons">
-                <Button className="cta-btn primary" size="lg">
+                <Button
+                  className="cta-btn primary"
+                  size="lg"
+                  onClick={goHome}
+                >
                   Plan Your Trip
                 </Button>
-                <Button className="cta-btn secondary" size="lg" variant="outline-light">
+
+                <Button
+                  className="cta-btn secondary"
+                  size="lg"
+                  variant="outline-light"
+                  onClick={() => navigate("/contactus")}
+                >
                   Contact Us
                 </Button>
               </div>

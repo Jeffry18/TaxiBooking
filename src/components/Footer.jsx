@@ -26,36 +26,41 @@ export const Footer = () => {
           {/* links */}
           <div className="col-6 col-md-3 col-lg-2">
             <h5 className="mb-4 mt-3">Quick Links</h5>
-            <Link to="/" className="text-decoration-none text-dark d-block mb-2">
+            <Link to="/" className="text-decoration-none text-dark d-block mb-2" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
               Home Page
             </Link>
             <Link
               to="/login"
               className="text-decoration-none text-dark d-block mb-2"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
               Login Page
             </Link>
             <Link
               to="/register"
               className="text-decoration-none text-dark d-block mb-2"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
               Register Page
             </Link>
             <Link
               to="/aboutus"
               className="text-decoration-none text-dark d-block mb-2"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
               About Us
             </Link>
             <Link
               to="/tariffs"
               className="text-decoration-none text-dark d-block mb-2"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
               Tariff
             </Link>
             <Link
               to="/packages"
               className="text-decoration-none text-dark d-block mb-2"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
               Trip Packages
             </Link>

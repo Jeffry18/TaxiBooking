@@ -26,11 +26,9 @@ const Packages = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
 
-
-
-  const [message, setMessage] = useState(null); // ✅ For validation alerts
+  const [searchTerm, setSearchTerm] = useState(""); // ✅ Search state
+  const [message, setMessage] = useState(null);
   const navigate = useNavigate();
-
 
   // ✅ Fetch packages
   useEffect(() => {
@@ -53,7 +51,6 @@ const Packages = () => {
         setLoading(false);
       }
     };
-
     fetchPackages();
   }, []);
 
@@ -99,21 +96,35 @@ const Packages = () => {
     setShowModal(true);
   };
 
-
-
-
-
-
-
-
-  
+  // ✅ Filtered packages based on search
+  const filteredPackages = packages.filter((pkg) =>
+    pkg.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="container py-4" style={{ marginTop: "100px" }}>
       <div className="text-center mb-5">
         <h2 className="display-6 fw-bold text-primary mb-2">Travel Packages</h2>
-        <p className="lead text-muted">Discover amazing destinations with our curated travel packages</p>
+        <div className="d-flex gap-5 align-items-center mb-4">
+          {/* Search bar on the left */}
+          <div style={{ maxWidth: "300px", flex: "1" }}>
+            <Form.Control
+              type="text"
+              placeholder="Search packages by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {/* Paragraph text on the right */}
+          <p className="lead mb-0 ms-3 text-muted ms-4">
+            Discover amazing destinations with our curated travel packages
+          </p>
+        </div>
+        
       </div>
+
+      
 
       {/* ✅ Show Packages */}
       {loading ? (
@@ -140,13 +151,22 @@ const Packages = () => {
           ))}
         </Row>
       ) : error ? (
-        <Alert variant="danger" className="text-center">{error}</Alert>
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
+      ) : filteredPackages.length === 0 ? (
+        <Alert variant="info" className="text-center">
+          No packages found for "{searchTerm}"
+        </Alert>
       ) : (
         <Row className="g-4">
-          {packages.map((pkg) => (
+          {filteredPackages.map((pkg) => (
             <Col lg={4} md={6} sm={12} key={pkg._id}>
-              <Card className="h-100 package-card rounded-3 overflow-hidden"
-                onClick={() => navigate("/package-extend", { state: { packageData: pkg } })}
+              <Card
+                className="h-100 package-card rounded-3 overflow-hidden"
+                onClick={() =>
+                  navigate("/package-extend", { state: { packageData: pkg } })
+                }
                 style={{ cursor: "pointer" }}
               >
                 {/* Image Section */}
@@ -161,11 +181,14 @@ const Packages = () => {
                     position: "relative",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
                   }}
                 >
                   {!pkg.image && (
-                    <i className="bi bi-geo-alt text-white" style={{ fontSize: "3rem", opacity: 0.7 }}></i>
+                    <i
+                      className="bi bi-geo-alt text-white"
+                      style={{ fontSize: "3rem", opacity: 0.7 }}
+                    ></i>
                   )}
                   <div className="package-image-overlay"></div>
                   <div
@@ -177,7 +200,7 @@ const Packages = () => {
                       borderRadius: "20px",
                       fontSize: "13px",
                       fontWeight: "600",
-                      zIndex: 2
+                      zIndex: 2,
                     }}
                   >
                     ₹{pkg.price}
@@ -186,9 +209,7 @@ const Packages = () => {
 
                 {/* Content Section */}
                 <Card.Body className="p-3">
-                  <Card.Title className="h5 mb-2 text-truncate">
-                    {pkg.name}
-                  </Card.Title>
+                  <Card.Title className="h5 mb-2 text-truncate">{pkg.name}</Card.Title>
                   <Card.Subtitle className="mb-2 text-muted small">
                     {pkg.city} → {pkg.destination}
                   </Card.Subtitle>
@@ -196,7 +217,7 @@ const Packages = () => {
                     {pkg.description}
                   </Card.Text>
 
-                  {/* Package Details in Compact Format */}
+                  {/* Package Details */}
                   <div className="row g-2 mb-3">
                     <div className="col-6">
                       <div className="d-flex align-items-center">
@@ -240,13 +261,11 @@ const Packages = () => {
         </Row>
       )}
 
-  
-
       {/* ✅ User Trips */}
       <div className="mt-5">
         <div className="d-flex align-items-center mb-4">
           <i className="bi bi-calendar-check me-2 text-primary"></i>
-          <h4 className="mb-0">Your Bookings</h4>
+          <h4 className="mb-0">Your Enquires</h4>
         </div>
         {sessionStorage.getItem("token") ? (
           bookingsLoading ? (
@@ -259,15 +278,33 @@ const Packages = () => {
             <>
               {/* Desktop Table View */}
               <div className="d-none d-md-block">
-                <Table striped bordered hover responsive className="bg-white rounded shadow-sm">
+                <Table
+                  striped
+                  bordered
+                  hover
+                  responsive
+                  className="bg-white rounded shadow-sm"
+                >
                   <thead className="bg-light">
                     <tr>
-                      <th className="border-0"><i className="bi bi-box me-1"></i>Package</th>
-                      <th className="border-0"><i className="bi bi-calendar me-1"></i>Date</th>
-                      <th className="border-0"><i className="bi bi-clock me-1"></i>Time</th>
-                      <th className="border-0"><i className="bi bi-people me-1"></i>Passengers</th>
-                      <th className="border-0"><i className="bi bi-currency-rupee me-1"></i>Price</th>
-                      <th className="border-0"><i className="bi bi-check-circle me-1"></i>Status</th>
+                      <th className="border-0">
+                        <i className="bi bi-box me-1"></i>Package
+                      </th>
+                      <th className="border-0">
+                        <i className="bi bi-calendar me-1"></i>Date
+                      </th>
+                      <th className="border-0">
+                        <i className="bi bi-clock me-1"></i>Time
+                      </th>
+                      <th className="border-0">
+                        <i className="bi bi-people me-1"></i>Passengers
+                      </th>
+                      <th className="border-0">
+                        <i className="bi bi-currency-rupee me-1"></i>Price
+                      </th>
+                      <th className="border-0">
+                        <i className="bi bi-check-circle me-1"></i>Status
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -331,7 +368,9 @@ const Packages = () => {
                             </div>
                             <div className="col-6">
                               <i className="bi bi-currency-rupee me-1 text-muted"></i>
-                              <span className="fw-bold text-primary">₹{trip.packagePrice}</span>
+                              <span className="fw-bold text-primary">
+                                ₹{trip.packagePrice}
+                              </span>
                             </div>
                           </div>
                         </Card.Body>
