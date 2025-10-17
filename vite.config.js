@@ -7,8 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        // target: 'https://flymallu.com/api',
-        target: 'https://taxibooking-server-2.onrender.com',
+         target: 'https://flymallu.com/api',
+        //target: 'https://taxibooking-server-2.onrender.com',
         // target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false, // <-- ignore TLS cert issues locally
