@@ -215,7 +215,7 @@ html, body {
 
 /* Add/Remove Stop Buttons */
 .add-stop-btn {
-  width: 44px !important;
+  width: auto !important;
   height: 44px !important;
   border-radius: 12px !important;
   background: linear-gradient(135deg, #28a745, #20c997) !important;

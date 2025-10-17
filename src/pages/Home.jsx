@@ -388,13 +388,13 @@ export const Home = () => {
                     </Col>
 
 
-                    <Col lg={3} md={6} className="d-flex align-items-end justify-content-center">
+                    <Col lg={2} md={6} className="d-flex align-items-end justify-content-center mb-3">
                       <Button
                         className="add-stop-btn"
                         onClick={addStop}
                         title="Add extra stop"
                       >
-                        +
+                        + ADD STOP
                       </Button>
                     </Col>
                   </Row>
