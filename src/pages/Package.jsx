@@ -86,6 +86,14 @@ const Packages = () => {
     }
   };
 
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 992); // lg breakpoint = 992px
+
+  useEffect(() => {
+    const handleResize = () => setIsLargeScreen(window.innerWidth >= 992);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     fetchTrips();
   }, []);
@@ -105,9 +113,14 @@ const Packages = () => {
     <div className="container py-4" style={{ marginTop: "100px" }}>
       <div className="text-center mb-5">
         <h2 className="display-6 fw-bold text-primary mb-2">Travel Packages</h2>
-        <div className="d-flex gap-5 align-items-center mb-4">
-          {/* Search bar on the left */}
-          <div style={{ maxWidth: "300px", flex: "1" }}>
+        <div className="d-flex flex-column flex-lg-row align-items-center justify-content-center justify-content-lg-between mb-4 w-100">
+          {/* Paragraph text */}
+          <p className="lead text-muted text-center text-lg-center mb-2  mb-lg-0 flex-grow-1" style={{marginLeft: isLargeScreen ? "19rem" : "0"}}>
+            Discover amazing destinations with our curated travel packages
+          </p>
+
+          {/* Search bar */}
+          <div className="mt-2 mt-lg-0" style={{ maxWidth: "300px", width: "100%" }}>
             <Form.Control
               type="text"
               placeholder="Search packages by name..."
@@ -115,16 +128,12 @@ const Packages = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
-          {/* Paragraph text on the right */}
-          <p className="lead mb-0 ms-3 text-muted ms-4">
-            Discover amazing destinations with our curated travel packages
-          </p>
         </div>
-        
+
+
       </div>
 
-      
+
 
       {/* ✅ Show Packages */}
       {loading ? (
@@ -318,10 +327,10 @@ const Packages = () => {
                         <td>
                           <span
                             className={`badge ${trip.status === "confirmed"
-                                ? "bg-success"
-                                : trip.status === "pending"
-                                  ? "bg-warning text-dark"
-                                  : "bg-danger"
+                              ? "bg-success"
+                              : trip.status === "pending"
+                                ? "bg-warning text-dark"
+                                : "bg-danger"
                               }`}
                           >
                             {trip.status}
@@ -344,10 +353,10 @@ const Packages = () => {
                             <h6 className="mb-0 text-primary">{trip.packageName}</h6>
                             <span
                               className={`badge ${trip.status === "confirmed"
-                                  ? "bg-success"
-                                  : trip.status === "pending"
-                                    ? "bg-warning text-dark"
-                                    : "bg-danger"
+                                ? "bg-success"
+                                : trip.status === "pending"
+                                  ? "bg-warning text-dark"
+                                  : "bg-danger"
                                 }`}
                             >
                               {trip.status}
