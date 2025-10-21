@@ -1,11 +1,22 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Table, Button, Form, Row, Col, Card, Nav, Alert, Badge, Modal, Dropdown } from "react-bootstrap";
+import {
+  Container,
+  Table,
+  Button,
+  Form,
+  Row,
+  Col,
+  Card,
+  Nav,
+  Alert,
+  Badge,
+  Modal,
+  Dropdown,
+} from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo 2.png";
-
-
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -48,6 +59,10 @@ export default function AdminPage() {
   const [editingCabType, setEditingCabType] = useState(null);
   const [editedCabType, setEditedCabType] = useState(null);
 
+  // edit trip bookings
+  const [editingTripId, setEditingTripId] = useState(null);
+  const [editedTrip, setEditedTrip] = useState({});
+
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("token"); // Clear auth token
@@ -73,35 +88,33 @@ export default function AdminPage() {
     name: "",
     description: "",
     seats: "",
-    image: null
+    image: null,
   });
   const [cabVehicles, setCabVehicles] = useState([]);
   const [newCabVehicle, setNewCabVehicle] = useState({
     cabTypeName: "",
     modelName: "",
     capacity: "",
-    pricePerKm: ""
+    pricePerKm: "",
   });
   // Editing state for cab vehicles
   const [editingCabVehicleId, setEditingCabVehicleId] = useState(null);
   const [editedCabVehicle, setEditedCabVehicle] = useState(null);
 
-
-
-  const [states, setStates] = useState([])
+  const [states, setStates] = useState([]);
   const [newStates, setNewStates] = useState({
     name: "",
     description: "",
     image: null,
   });
-  const [city, setCity] = useState([])
+  const [city, setCity] = useState([]);
   const [newCity, setNewCity] = useState({
     name: "",
     state: "",
     description: "",
     image: null,
   });
-  const [place, setPlace] = useState([])
+  const [place, setPlace] = useState([]);
   const [newPlace, setNewPlace] = useState({
     name: "",
     city: "",
@@ -109,7 +122,7 @@ export default function AdminPage() {
     rate: "",
     image: null,
   });
-  const [tariff, setTariff] = useState([])
+  const [tariff, setTariff] = useState([]);
   const [newTariff, setNewTariff] = useState({
     cabType: "",
     seats: "",
@@ -119,7 +132,7 @@ export default function AdminPage() {
     extraKmRate: "",
     details: "",
   });
-  const [cityTariff, setCityTariff] = useState([])
+  const [cityTariff, setCityTariff] = useState([]);
   const [newCityTariff, setNewCityTariff] = useState({
     city: "",
     cabType: "",
@@ -137,11 +150,6 @@ export default function AdminPage() {
   // Editing state for city tariffs
   const [editingCityTariffId, setEditingCityTariffId] = useState(null);
   const [editedCityTariff, setEditedCityTariff] = useState(null);
-
-
-
-
-
 
   useEffect(() => {
     fetchVehicles();
@@ -216,7 +224,7 @@ export default function AdminPage() {
     try {
       setLoading((prev) => ({ ...prev, bookings: true }));
 
-      const token = sessionStorage.getItem("token")
+      const token = sessionStorage.getItem("token");
 
       const res = await axios.get(`${SERVER_URL}/bookings`, {
         headers: {
@@ -227,7 +235,6 @@ export default function AdminPage() {
       setBookings(Array.isArray(res.data) ? res.data : []);
 
       setError((prev) => ({ ...prev, bookings: null }));
-
     } catch (err) {
       console.error("Error fetching bookings:", err);
       setBookings([]);
@@ -284,12 +291,11 @@ export default function AdminPage() {
     try {
       const res = await axios.get(`${SERVER_URL}/cabvehicles`);
       setCabVehicles(Array.isArray(res.data) ? res.data : []);
-
     } catch (err) {
       console.error("Failed to fetch cab vehicles:", err);
       setCabVehicles([]);
     }
-  }
+  };
 
   const fetchStates = async () => {
     try {
@@ -299,7 +305,7 @@ export default function AdminPage() {
       console.error("Failed to fetch states:", err);
       setStates([]);
     }
-  }
+  };
 
   const fetchCity = async () => {
     try {
@@ -309,8 +315,7 @@ export default function AdminPage() {
       console.error("Failed to fetch city:", err);
       setCity([]);
     }
-  }
-
+  };
 
   const fetchPlace = async () => {
     try {
@@ -320,7 +325,19 @@ export default function AdminPage() {
       console.error("Failed to fetch place:", err);
       setPlace([]);
     }
-  }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      await axios.delete(`${SERVER_URL}/vehicles/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchVehicles();
+    } catch (err) {
+      console.error("Failed to delete vehicle:", err);
+    }
+  };
 
   const fetchTariff = async () => {
     try {
@@ -330,7 +347,7 @@ export default function AdminPage() {
       console.error("Failed to fetch tariff:", err);
       setTariff([]);
     }
-  }
+  };
 
   const fetchCityTariff = async () => {
     try {
@@ -340,13 +357,16 @@ export default function AdminPage() {
       console.error("Failed to fetch city tariff:", err);
       setCityTariff([]);
     }
-  }
-
+  };
 
   const approveVehicle = async (id) => {
     try {
       const token = sessionStorage.getItem("token");
-      await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "approved" }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.patch(
+        `${SERVER_URL}/vehicles/${id}`,
+        { status: "approved" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       fetchVehicles();
     } catch (err) {
       console.error("Failed to approve vehicle:", err);
@@ -356,7 +376,11 @@ export default function AdminPage() {
   const unapproveVehicle = async (id) => {
     try {
       const token = sessionStorage.getItem("token");
-      await axios.patch(`${SERVER_URL}/vehicles/${id}`, { status: "pending" }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.patch(
+        `${SERVER_URL}/vehicles/${id}`,
+        { status: "pending" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       fetchVehicles();
     } catch (err) {
       console.error("Failed to unapprove vehicle:", err);
@@ -402,9 +426,13 @@ export default function AdminPage() {
   const updateBookingStatus = async (id, status) => {
     try {
       const token = sessionStorage.getItem("token");
-      await axios.patch(`${SERVER_URL}/bookings/${id}`, { status }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.patch(
+        `${SERVER_URL}/bookings/${id}`,
+        { status },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       fetchBookings();
     } catch (err) {
       console.error("Error updating booking:", err);
@@ -427,8 +455,8 @@ export default function AdminPage() {
     } else if (name === "cabtype") {
       // Handle multiple select
       const selectedOptions = [...options]
-        .filter(option => option.selected)
-        .map(option => option.value);
+        .filter((option) => option.selected)
+        .map((option) => option.value);
       setNewPackage({ ...newPackage, cabtype: selectedOptions });
     } else {
       setNewPackage({ ...newPackage, [name]: value });
@@ -460,7 +488,7 @@ export default function AdminPage() {
     } else {
       setNewStates({ ...newStates, [name]: value });
     }
-  }
+  };
 
   const handleCityChange = (e) => {
     const { name, value, files } = e.target;
@@ -469,8 +497,7 @@ export default function AdminPage() {
     } else {
       setNewCity({ ...newCity, [name]: value });
     }
-  }
-
+  };
 
   const handlePlaceChange = (e) => {
     const { name, value, files } = e.target;
@@ -479,17 +506,16 @@ export default function AdminPage() {
     } else {
       setNewPlace({ ...newPlace, [name]: value });
     }
-  }
+  };
 
   const handleTariffChange = (e) => {
-
     const { name, value, files } = e.target;
     if (name === "image") {
       setNewTariff({ ...newTariff, image: files[0] });
     } else {
       setNewTariff({ ...newTariff, [name]: value });
     }
-  }
+  };
 
   const handleCityTariffChange = (e) => {
     const { name, value, files } = e.target;
@@ -498,8 +524,19 @@ export default function AdminPage() {
     } else {
       setNewCityTariff({ ...newCityTariff, [name]: value });
     }
-  }
+  };
 
+  // Enable edit mode for a row
+  const handleTripEdit = (trip) => {
+    setEditingTripId(trip._id);
+    setEditedTrip({ ...trip }); // copy trip data for editing
+  };
+
+  // Handle form field change
+  const handleTripChange = (e) => {
+    const { name, value } = e.target;
+    setEditedTrip((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleTariffDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this tariff?")) {
@@ -542,8 +579,8 @@ export default function AdminPage() {
       setEditingTariffId(null);
       setEditedTariff(null);
     } catch (err) {
-      console.error('Failed to update tariff:', err);
-      alert('Error updating tariff');
+      console.error("Failed to update tariff:", err);
+      alert("Error updating tariff");
     }
   };
 
@@ -565,8 +602,8 @@ export default function AdminPage() {
       setEditingCityTariffId(null);
       setEditedCityTariff(null);
     } catch (err) {
-      console.error('Failed to update city tariff:', err);
-      alert('Error updating city tariff');
+      console.error("Failed to update city tariff:", err);
+      alert("Error updating city tariff");
     }
   };
 
@@ -575,17 +612,21 @@ export default function AdminPage() {
       const formData = new FormData();
 
       // Add all fields to formData
-      Object.keys(editedPackage).forEach(key => {
-        if (key !== '_id' && key !== '__v' && editedPackage[key] !== undefined) {
+      Object.keys(editedPackage).forEach((key) => {
+        if (
+          key !== "_id" &&
+          key !== "__v" &&
+          editedPackage[key] !== undefined
+        ) {
           // skip the temporary newImage field here, it's handled below
-          if (key === 'newImage') return;
+          if (key === "newImage") return;
           formData.append(key, editedPackage[key]);
         }
       });
 
       // If there's a new image file, append it
       if (editedPackage.newImage instanceof File) {
-        formData.append('image', editedPackage.newImage);
+        formData.append("image", editedPackage.newImage);
       }
 
       // IMPORTANT: do NOT set Content-Type here. Let the browser/axios set the multipart boundary.
@@ -598,115 +639,131 @@ export default function AdminPage() {
         setEditingId(null);
         setEditedPackage(null);
         fetchPackages();
-        alert('Package updated successfully!');
+        alert("Package updated successfully!");
       }
     } catch (error) {
-      console.error('Error updating package:', error);
-      alert('Failed to update package. Please try again.');
+      console.error("Error updating package:", error);
+      alert("Failed to update package. Please try again.");
     }
   };
 
   const handleUpdateState = async (stateId) => {
     try {
       const formData = new FormData();
-      formData.append('name', editedState.name);
-      formData.append('description', editedState.description);
+      formData.append("name", editedState.name);
+      formData.append("description", editedState.description);
       if (editedState.newImage instanceof File) {
-        formData.append('image', editedState.newImage);
+        formData.append("image", editedState.newImage);
       }
 
-      const response = await axios.put(`${SERVER_URL}/states/${stateId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await axios.put(
+        `${SERVER_URL}/states/${stateId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       if (response.data) {
         setEditingState(null);
         setEditedState(null);
         fetchStates();
-        alert('State updated successfully!');
+        alert("State updated successfully!");
       }
     } catch (error) {
-      console.error('Error updating state:', error);
-      alert('Failed to update state. Please try again.');
+      console.error("Error updating state:", error);
+      alert("Failed to update state. Please try again.");
     }
   };
 
   const handleUpdateCity = async (cityId) => {
     try {
       const formData = new FormData();
-      formData.append('name', editedCity.name);
-      formData.append('state', editedCity.state);
-      formData.append('description', editedCity.description);
+      formData.append("name", editedCity.name);
+      formData.append("state", editedCity.state);
+      formData.append("description", editedCity.description);
       if (editedCity.newImage instanceof File) {
-        formData.append('image', editedCity.newImage);
+        formData.append("image", editedCity.newImage);
       }
 
-      const response = await axios.put(`${SERVER_URL}/city/${cityId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await axios.put(
+        `${SERVER_URL}/city/${cityId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       if (response.data) {
         setEditingCity(null);
         setEditedCity(null);
         fetchCity(); // Refresh the city list
-        alert('City updated successfully!');
+        alert("City updated successfully!");
       }
     } catch (error) {
-      console.error('Error updating city:', error);
-      alert('Failed to update city. Please try again.');
+      console.error("Error updating city:", error);
+      alert("Failed to update city. Please try again.");
     }
   };
 
   const handleUpdatePlace = async (placeId) => {
     try {
       const formData = new FormData();
-      formData.append('name', editedPlace.name);
-      formData.append('city', editedPlace.city);
-      formData.append('description', editedPlace.description);
-      formData.append('rate', editedPlace.rate);
+      formData.append("name", editedPlace.name);
+      formData.append("city", editedPlace.city);
+      formData.append("description", editedPlace.description);
+      formData.append("rate", editedPlace.rate);
       if (editedPlace.newImage instanceof File) {
-        formData.append('image', editedPlace.newImage);
+        formData.append("image", editedPlace.newImage);
       }
 
-      const response = await axios.put(`${SERVER_URL}/place/${placeId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await axios.put(
+        `${SERVER_URL}/place/${placeId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       if (response.data) {
         setEditingPlace(null);
         setEditedPlace(null);
         fetchPlace(); // Refresh the places list
-        alert('Place updated successfully!');
+        alert("Place updated successfully!");
       }
     } catch (error) {
-      console.error('Error updating place:', error);
-      alert('Failed to update place. Please try again.');
+      console.error("Error updating place:", error);
+      alert("Failed to update place. Please try again.");
     }
   };
 
   const handleUpdateCabType = async (cabTypeId) => {
     try {
       const formData = new FormData();
-      formData.append('name', editedCabType.name);
-      formData.append('description', editedCabType.description);
-      formData.append('seats', editedCabType.seats);
+      formData.append("name", editedCabType.name);
+      formData.append("description", editedCabType.description);
+      formData.append("seats", editedCabType.seats);
       if (editedCabType.newImage instanceof File) {
-        formData.append('image', editedCabType.newImage);
+        formData.append("image", editedCabType.newImage);
       }
 
-      const response = await axios.patch(`${SERVER_URL}/cabtypes/${cabTypeId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await axios.patch(
+        `${SERVER_URL}/cabtypes/${cabTypeId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       if (response.data) {
         setEditingCabType(null);
         setEditedCabType(null);
         fetchCabs(); // Refresh the cab types list
-        alert('Cab type updated successfully!');
+        alert("Cab type updated successfully!");
       }
     } catch (error) {
-      console.error('Error updating cab type:', error);
-      alert('Failed to update cab type. Please try again.');
+      console.error("Error updating cab type:", error);
+      alert("Failed to update cab type. Please try again.");
     }
   };
 
@@ -714,41 +771,44 @@ export default function AdminPage() {
     try {
       if (!editedCabVehicle) return;
       const formData = new FormData();
-      formData.append('cabTypeName', editedCabVehicle.cabTypeName || '');
-      formData.append('modelName', editedCabVehicle.modelName || '');
-      formData.append('capacity', editedCabVehicle.capacity || '');
-      formData.append('pricePerKm', editedCabVehicle.pricePerKm || '');
+      formData.append("cabTypeName", editedCabVehicle.cabTypeName || "");
+      formData.append("modelName", editedCabVehicle.modelName || "");
+      formData.append("capacity", editedCabVehicle.capacity || "");
+      formData.append("pricePerKm", editedCabVehicle.pricePerKm || "");
       if (editedCabVehicle.newImage) {
-        formData.append('image', editedCabVehicle.newImage);
+        formData.append("image", editedCabVehicle.newImage);
       }
 
       const res = await fetch(`${SERVER_URL}/cabVehicles/${vehicleId}`, {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       });
 
       if (!res.ok) {
         const err = await res.text();
-        throw new Error(err || 'Failed to update cab vehicle');
+        throw new Error(err || "Failed to update cab vehicle");
       }
 
       const updated = await res.json();
 
       // Update local state
-      setCabVehicles((prev) => prev.map((v) => (v._id === vehicleId ? updated : v)));
+      setCabVehicles((prev) =>
+        prev.map((v) => (v._id === vehicleId ? updated : v))
+      );
 
       // Clear editing state
       setEditingCabVehicleId(null);
       setEditedCabVehicle(null);
     } catch (error) {
-      console.error('update cab vehicle error', error);
+      console.error("update cab vehicle error", error);
       // Optionally set an error state or show toast
     }
   };
 
   const handleCabTypeDelete = async (id) => {
     try {
-      if (!window.confirm("Are you sure you want to delete this cab type?")) return;
+      if (!window.confirm("Are you sure you want to delete this cab type?"))
+        return;
       const response = await axios.delete(`${SERVER_URL}/cabtypes/${id}`);
       if (response.status === 200) {
         alert(response.data.message); // "Cab type deleted successfully"
@@ -759,14 +819,17 @@ export default function AdminPage() {
     } catch (err) {
       console.error("Failed to delete cab type:", err);
       // If backend sends a specific error message
-      const errorMessage = err.response?.data?.message || "Failed to delete cab type. Please try again.";
+      const errorMessage =
+        err.response?.data?.message ||
+        "Failed to delete cab type. Please try again.";
       alert(errorMessage);
     }
   };
 
   const handleCabVehicleDelete = async (id) => {
     try {
-      if (!window.confirm("Are you sure you want to delete this cab vehicle?")) return;
+      if (!window.confirm("Are you sure you want to delete this cab vehicle?"))
+        return;
       const response = await axios.delete(`${SERVER_URL}/cabvehicles/${id}`);
       if (response.status === 200) {
         alert(response.data.message);
@@ -776,10 +839,56 @@ export default function AdminPage() {
       }
     } catch (err) {
       console.error("Failed to delete cab vehicle:", err);
-      const errorMessage = err.response?.data?.message || "Failed to delete cab vehicle. Please try again.";
+      const errorMessage =
+        err.response?.data?.message ||
+        "Failed to delete cab vehicle. Please try again.";
       alert(errorMessage);
     }
   };
+
+  const handleUpdateTrip = async (id) => {
+    try {
+      if (!editedTrip) return;
+
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        alert("Unauthorized! Please log in again.");
+        return;
+      }
+
+      const response = await axios.put(
+        `${SERVER_URL}/trips/${id}`,
+        editedTrip,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ Add token here
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setEditingTripId(null);
+        setEditedTrip(null);
+        fetchTrips(); // Refresh table data
+        alert("Trip updated successfully!");
+      } else {
+        alert(response.data.message || "Failed to update trip.");
+      }
+    } catch (err) {
+      console.error("Failed to update trip:", err);
+      alert("Error updating trip. Please try again.");
+    }
+  };
+
+
+  const handleTripEditCancel = () => {
+    setEditingTripId(null);
+    setEditedTrip(null);
+  };
+
+
+
 
   const addPackage = async (e) => {
     e.preventDefault();
@@ -796,12 +905,11 @@ export default function AdminPage() {
       formData.append("description", newPackage.description);
       formData.append("duration", newPackage.duration);
       formData.append("price", newPackage.price);
-      formData.append("cabtype", newPackage.cabtype.join(','));
+      formData.append("cabtype", newPackage.cabtype.join(","));
       formData.append("city", newPackage.city);
       formData.append("destination", newPackage.destination);
       formData.append("month", newPackage.month);
       formData.append("image", newPackage.image);
-
 
       await axios.post(`${SERVER_URL}/packages`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -831,7 +939,8 @@ export default function AdminPage() {
 
   const deletePackageById = async (id) => {
     try {
-      if (!window.confirm("Are you sure you want to delete this package?")) return;
+      if (!window.confirm("Are you sure you want to delete this package?"))
+        return;
 
       const response = await axios.delete(`${SERVER_URL}/packages/${id}`);
 
@@ -844,7 +953,9 @@ export default function AdminPage() {
     } catch (err) {
       console.error("Failed to delete package:", err);
       // If backend sends a specific error message
-      const errorMessage = err.response?.data?.message || "Failed to delete package. Please try again.";
+      const errorMessage =
+        err.response?.data?.message ||
+        "Failed to delete package. Please try again.";
       alert(errorMessage);
     }
   };
@@ -894,11 +1005,20 @@ export default function AdminPage() {
       });
 
       alert("Cab vehicle added successfully!");
-      setNewCabVehicle({ cabTypeName: "", modelName: "", capacity: "", pricePerKm: "", image: null });
+      setNewCabVehicle({
+        cabTypeName: "",
+        modelName: "",
+        capacity: "",
+        pricePerKm: "",
+        image: null,
+      });
       e.target.reset();
       if (fetchCabVehicles) fetchCabVehicles(); // refresh list
     } catch (err) {
-      console.error("Failed to add cab vehicle:", err.response?.data || err.message);
+      console.error(
+        "Failed to add cab vehicle:",
+        err.response?.data || err.message
+      );
       alert("Error adding cab vehicle. Please try again.");
     }
   };
@@ -908,7 +1028,7 @@ export default function AdminPage() {
     try {
       const formData = new FormData();
       formData.append("name", newStates.name);
-      formData.append("description", newStates.description)
+      formData.append("description", newStates.description);
       if (newStates.image) {
         formData.append("image", newStates.image);
       }
@@ -921,20 +1041,19 @@ export default function AdminPage() {
       setNewStates({ name: "", description: "", image: null });
       e.target.reset();
       fetchStates();
-
     } catch (err) {
       console.error("Failed to add state:", err.response?.data || err.message);
       alert("Error adding state. Please try again.");
     }
-  }
+  };
 
   const AddCities = async (e) => {
     e.preventDefault();
     try {
       const formData = new FormData();
-      formData.append("name", newCity.name)
-      formData.append("state", newCity.state)
-      formData.append("description", newCity.description)
+      formData.append("name", newCity.name);
+      formData.append("state", newCity.state);
+      formData.append("description", newCity.description);
       if (newCity.image) {
         formData.append("image", newCity.image);
       }
@@ -951,16 +1070,16 @@ export default function AdminPage() {
       console.error("Failed to add city:", err.response?.data || err.message);
       alert("Error adding city. Please try again.");
     }
-  }
+  };
 
   const AddPlace = async (e) => {
     e.preventDefault();
     try {
       const formData = new FormData();
-      formData.append("name", newPlace.name)
-      formData.append("city", newPlace.city)
-      formData.append("description", newPlace.description)
-      formData.append("rate", newPlace.rate)
+      formData.append("name", newPlace.name);
+      formData.append("city", newPlace.city);
+      formData.append("description", newPlace.description);
+      formData.append("rate", newPlace.rate);
       if (newPlace.image) {
         formData.append("image", newPlace.image);
       }
@@ -970,15 +1089,20 @@ export default function AdminPage() {
       });
 
       alert("place added!");
-      setNewPlace({ name: "", city: "", description: "", rate: "", image: null });
+      setNewPlace({
+        name: "",
+        city: "",
+        description: "",
+        rate: "",
+        image: null,
+      });
       e.target.reset();
       fetchPlace();
-
     } catch (err) {
       console.error("Failed to add place:", err.response?.data || err.message);
       alert("Error adding place. Please try again.");
     }
-  }
+  };
 
   const AddTariff = async (e) => {
     e.preventDefault();
@@ -997,17 +1121,24 @@ export default function AdminPage() {
       });
 
       alert("Tariff added!");
-      setNewTariff({ cabType: "", seats: "", rate: "", allowedKm: "", driverBata: "", extraKmRate: "", details: "" });
+      setNewTariff({
+        cabType: "",
+        seats: "",
+        rate: "",
+        allowedKm: "",
+        driverBata: "",
+        extraKmRate: "",
+        details: "",
+      });
       e.target.reset();
 
       // Auto-refresh the tariff table
       fetchTariff();
-    }
-    catch (err) {
+    } catch (err) {
       console.error("Failed to add tariff:", err.response?.data || err.message);
       alert("Error adding tariff. Please try again.");
     }
-  }
+  };
 
   const AddCityTariff = async (e) => {
     e.preventDefault();
@@ -1027,17 +1158,25 @@ export default function AdminPage() {
       });
 
       alert("Tariff added!");
-      setNewCityTariff({ city: "", cabType: "", seats: "", ratePerDay: "", allowedKm: "", extraKmRate: "", outstation: "", details: "" });
+      setNewCityTariff({
+        city: "",
+        cabType: "",
+        seats: "",
+        ratePerDay: "",
+        allowedKm: "",
+        extraKmRate: "",
+        outstation: "",
+        details: "",
+      });
       e.target.reset();
 
       // Auto-refresh the tariff table
       fetchCityTariff();
-    }
-    catch (err) {
+    } catch (err) {
       console.error("Failed to add tariff:", err.response?.data || err.message);
       alert("Error adding tariff. Please try again.");
     }
-  }
+  };
 
   const [zoomImage, setZoomImage] = useState(null);
   const [zoomIndex, setZoomIndex] = useState(0);
@@ -1045,22 +1184,29 @@ export default function AdminPage() {
   const handleNextZoom = () => {
     if (!Array.isArray(selectedImage)) return;
     setZoomIndex((prev) => (prev + 1) % selectedImage.length);
-    setZoomImage(`${SERVER_URL}/uploads/${selectedImage[(zoomIndex + 1) % selectedImage.length]}`);
+    setZoomImage(
+      `${SERVER_URL}/uploads/${selectedImage[(zoomIndex + 1) % selectedImage.length]
+      }`
+    );
   };
 
   const handlePrevZoom = () => {
     if (!Array.isArray(selectedImage)) return;
-    setZoomIndex((prev) => (prev - 1 + selectedImage.length) % selectedImage.length);
-    setZoomImage(`${SERVER_URL}/uploads/${selectedImage[(zoomIndex - 1 + selectedImage.length) % selectedImage.length]}`);
+    setZoomIndex(
+      (prev) => (prev - 1 + selectedImage.length) % selectedImage.length
+    );
+    setZoomImage(
+      `${SERVER_URL}/uploads/${selectedImage[
+      (zoomIndex - 1 + selectedImage.length) % selectedImage.length
+      ]
+      }`
+    );
   };
 
   const handleImageClick = (img, index) => {
     setZoomIndex(index);
     setZoomImage(`${SERVER_URL}/uploads/${img}`);
   };
-
-
-
 
   // Move these declarations outside of renderVehiclesTable
   const grouped = bookings.reduce((acc, b) => {
@@ -1087,7 +1233,9 @@ export default function AdminPage() {
     <div className="dashboard-overview">
       <div className="overview-header">
         <h1 className="page-title">Dashboard Overview</h1>
-        <p className="page-subtitle">Welcome back! Here's what's happening with your taxi booking service.</p>
+        <p className="page-subtitle">
+          Welcome back! Here's what's happening with your taxi booking service.
+        </p>
       </div>
 
       <div className="overview-stats">
@@ -1096,7 +1244,9 @@ export default function AdminPage() {
             <i className="fas fa-car"></i>
           </div>
           <div className="stat-content">
-            <div className="stat-number">{vehicles.filter(v => v.status === "approved").length}</div>
+            <div className="stat-number">
+              {vehicles.filter((v) => v.status === "approved").length}
+            </div>
             <div className="stat-label">Active Vehicles</div>
             <div className="stat-change positive">
               <i className="fas fa-arrow-up"></i>
@@ -1110,7 +1260,9 @@ export default function AdminPage() {
             <i className="fas fa-id-card"></i>
           </div>
           <div className="stat-content">
-            <div className="stat-number">{drivers.filter(d => d.status === "approved").length}</div>
+            <div className="stat-number">
+              {drivers.filter((d) => d.status === "approved").length}
+            </div>
             <div className="stat-label">Active Drivers</div>
             <div className="stat-change positive">
               <i className="fas fa-arrow-up"></i>
@@ -1124,7 +1276,9 @@ export default function AdminPage() {
             <i className="fas fa-rupee-sign"></i>
           </div>
           <div className="stat-content">
-            <div className="stat-number">₹{(bookings.length * 1250).toLocaleString()}</div>
+            <div className="stat-number">
+              ₹{(bookings.length * 1250).toLocaleString()}
+            </div>
             <div className="stat-label">Total Revenue</div>
             <div className="stat-change positive">
               <i className="fas fa-arrow-up"></i>
@@ -1141,30 +1295,38 @@ export default function AdminPage() {
             <p>Items requiring your attention</p>
           </div>
           <div className="pending-list">
-            {vehicles.filter(v => v.status === "pending").slice(0, 3).map(vehicle => (
-              <div key={vehicle._id} className="pending-item">
-                <i className="fas fa-car"></i>
-                <span>Vehicle {vehicle.model} - {vehicle.number}</span>
-                <button
-                  className="approve-btn"
-                  onClick={() => approveVehicle(vehicle._id)}
-                >
-                  Approve
-                </button>
-              </div>
-            ))}
-            {drivers.filter(d => d.status === "pending").slice(0, 3).map(driver => (
-              <div key={driver._id} className="pending-item">
-                <i className="fas fa-id-card"></i>
-                <span>Driver {driver.name}</span>
-                <button
-                  className="approve-btn"
-                  onClick={() => approveDriver(driver._id)}
-                >
-                  Approve
-                </button>
-              </div>
-            ))}
+            {vehicles
+              .filter((v) => v.status === "pending")
+              .slice(0, 3)
+              .map((vehicle) => (
+                <div key={vehicle._id} className="pending-item">
+                  <i className="fas fa-car"></i>
+                  <span>
+                    Vehicle {vehicle.model} - {vehicle.number}
+                  </span>
+                  <button
+                    className="approve-btn"
+                    onClick={() => approveVehicle(vehicle._id)}
+                  >
+                    Approve
+                  </button>
+                </div>
+              ))}
+            {drivers
+              .filter((d) => d.status === "pending")
+              .slice(0, 3)
+              .map((driver) => (
+                <div key={driver._id} className="pending-item">
+                  <i className="fas fa-id-card"></i>
+                  <span>Driver {driver.name}</span>
+                  <button
+                    className="approve-btn"
+                    onClick={() => approveDriver(driver._id)}
+                  >
+                    Approve
+                  </button>
+                </div>
+              ))}
           </div>
         </div>
       </div>
@@ -1175,7 +1337,9 @@ export default function AdminPage() {
     <div className="dashboard-section">
       <div className="section-header">
         <h1 className="page-title">Package Management</h1>
-        <p className="page-subtitle">Manage your travel packages and offerings</p>
+        <p className="page-subtitle">
+          Manage your travel packages and offerings
+        </p>
       </div>
 
       <div className="content-card">
@@ -1235,8 +1399,6 @@ export default function AdminPage() {
               </div>
             </div>
 
-
-
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Duration</label>
@@ -1249,7 +1411,6 @@ export default function AdminPage() {
                 />
               </div>
 
-
               <div className="form-group">
                 <label className="form-label">Month</label>
                 <input
@@ -1260,7 +1421,6 @@ export default function AdminPage() {
                   placeholder="e.g., November-January"
                 />
               </div>
-
 
               <div className="form-group">
                 <label className="form-label">Cab Types</label>
@@ -1275,11 +1435,11 @@ export default function AdminPage() {
                         checked={newPackage.cabtype.includes(cab.name)}
                         onChange={(e) => {
                           const value = e.target.value;
-                          setNewPackage(prev => ({
+                          setNewPackage((prev) => ({
                             ...prev,
                             cabtype: e.target.checked
                               ? [...prev.cabtype, value]
-                              : prev.cabtype.filter(type => type !== value)
+                              : prev.cabtype.filter((type) => type !== value),
                           }));
                         }}
                       />
@@ -1288,8 +1448,6 @@ export default function AdminPage() {
                   ))}
                 </div>
               </div>
-
-
 
               <div className="form-group">
                 <label className="form-label">Package Image</label>
@@ -1343,68 +1501,78 @@ export default function AdminPage() {
                 )}
                 <div className="package-content">
                   {editingId === pkg._id ? (
-
                     // Editing mode
                     <div className="package-edit-form">
                       <input
                         className="edit-input"
                         value={editedPackage.name}
-                        onChange={(e) => setEditedPackage({
-                          ...editedPackage,
-                          name: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedPackage({
+                            ...editedPackage,
+                            name: e.target.value,
+                          })
+                        }
                         placeholder="Package Name"
                       />
                       <input
                         className="edit-input"
                         value={editedPackage.city}
-                        onChange={(e) => setEditedPackage({
-                          ...editedPackage,
-                          city: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedPackage({
+                            ...editedPackage,
+                            city: e.target.value,
+                          })
+                        }
                         placeholder="City"
                       />
                       <input
                         className="edit-input"
                         value={editedPackage.destination}
-                        onChange={(e) => setEditedPackage({
-                          ...editedPackage,
-                          destination: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedPackage({
+                            ...editedPackage,
+                            destination: e.target.value,
+                          })
+                        }
                         placeholder="Destination"
                       />
                       <textarea
                         className="edit-input"
                         value={editedPackage.description}
-                        onChange={(e) => setEditedPackage({
-                          ...editedPackage,
-                          description: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedPackage({
+                            ...editedPackage,
+                            description: e.target.value,
+                          })
+                        }
                         placeholder="Description"
                       />
                       <div className="edit-row">
                         <input
                           className="edit-input"
                           value={editedPackage.duration}
-                          onChange={(e) => setEditedPackage({
-                            ...editedPackage,
-                            duration: e.target.value
-                          })}
+                          onChange={(e) =>
+                            setEditedPackage({
+                              ...editedPackage,
+                              duration: e.target.value,
+                            })
+                          }
                           placeholder="Duration"
                         />
                         <input
                           className="edit-input"
                           type="number"
                           value={editedPackage.price}
-                          onChange={(e) => setEditedPackage({
-                            ...editedPackage,
-                            price: e.target.value
-                          })}
+                          onChange={(e) =>
+                            setEditedPackage({
+                              ...editedPackage,
+                              price: e.target.value,
+                            })
+                          }
                           placeholder="Price"
                         />
                       </div>
                       <div className="edit-row">
-
                         <div className="form-group">
                           <label className="form-label">Cab Types</label>
                           <div className="cab-types-checkbox-group">
@@ -1413,40 +1581,49 @@ export default function AdminPage() {
                                 <input
                                   type="checkbox"
                                   id={`edit-cab-${cab._id}`}
-                                  checked={editedPackage.cabtype.includes(cab.name)}
+                                  checked={editedPackage.cabtype.includes(
+                                    cab.name
+                                  )}
                                   onChange={(e) => {
                                     const value = cab.name;
-                                    setEditedPackage(prev => ({
+                                    setEditedPackage((prev) => ({
                                       ...prev,
                                       cabtype: e.target.checked
-                                        ? [...(Array.isArray(prev.cabtype) ? prev.cabtype : []), value]
+                                        ? [
+                                          ...(Array.isArray(prev.cabtype)
+                                            ? prev.cabtype
+                                            : []),
+                                          value,
+                                        ]
                                         : Array.isArray(prev.cabtype)
-                                          ? prev.cabtype.filter(type => type !== value)
-                                          : []
+                                          ? prev.cabtype.filter(
+                                            (type) => type !== value
+                                          )
+                                          : [],
                                     }));
                                   }}
                                 />
-                                <label htmlFor={`edit-cab-${cab._id}`}>{cab.name}</label>
+                                <label htmlFor={`edit-cab-${cab._id}`}>
+                                  {cab.name}
+                                </label>
                               </div>
                             ))}
                           </div>
                         </div>
                       </div>
 
-
                       <div className="edit-row">
-
-
                         <input
                           className="edit-input"
                           value={editedPackage.month}
-                          onChange={(e) => setEditedPackage({
-                            ...editedPackage,
-                            month: e.target.value
-                          })}
+                          onChange={(e) =>
+                            setEditedPackage({
+                              ...editedPackage,
+                              month: e.target.value,
+                            })
+                          }
                           placeholder="Month"
                         />
-
                       </div>
 
                       <div className="form-group full-width">
@@ -1454,10 +1631,12 @@ export default function AdminPage() {
                         <input
                           type="file"
                           className="edit-input file-input"
-                          onChange={(e) => setEditedPackage({
-                            ...editedPackage,
-                            newImage: e.target.files[0]
-                          })}
+                          onChange={(e) =>
+                            setEditedPackage({
+                              ...editedPackage,
+                              newImage: e.target.files[0],
+                            })
+                          }
                         />
                       </div>
 
@@ -1483,7 +1662,9 @@ export default function AdminPage() {
                     // Display mode
                     <>
                       <h4 className="package-title">{pkg.name}</h4>
-                      <p className="package-title">{pkg.city} - {pkg.destination}</p>
+                      <p className="package-title">
+                        {pkg.city} - {pkg.destination}
+                      </p>
                       <p className="package-description">{pkg.description}</p>
                       <div className="package-details">
                         <div className="detail-item">
@@ -1502,8 +1683,6 @@ export default function AdminPage() {
                           <i className="fas fa-rupee-sign"></i>
                           <span>₹{pkg.price} Per Day Onwards</span>
                         </div>
-
-
                       </div>
                       <div className="package-actions">
                         <button
@@ -1543,7 +1722,9 @@ export default function AdminPage() {
       <div className="dashboard-section">
         <div className="section-header">
           <h1 className="page-title">Vehicle Management</h1>
-          <p className="page-subtitle">Manage onboarded vehicles and approvals</p>
+          <p className="page-subtitle">
+            Manage onboarded vehicles and approvals
+          </p>
         </div>
 
         <div className="content-card">
@@ -1562,12 +1743,16 @@ export default function AdminPage() {
               <div className="table-header">
                 <h3>Vehicle List</h3>
                 <div className="table-stats">
-                  <span className="stat-badge stat-total">{vehicles.length} Total</span>
+                  <span className="stat-badge stat-total">
+                    {vehicles.length} Total
+                  </span>
                   <span className="stat-badge stat-pending">
-                    {vehicles.filter(v => v.status === "pending").length} Pending
+                    {vehicles.filter((v) => v.status === "pending").length}{" "}
+                    Pending
                   </span>
                   <span className="stat-badge stat-approved">
-                    {vehicles.filter(v => v.status === "approved").length} Approved
+                    {vehicles.filter((v) => v.status === "approved").length}{" "}
+                    Approved
                   </span>
                 </div>
               </div>
@@ -1599,7 +1784,13 @@ export default function AdminPage() {
                             {(v.images && v.images.length > 0) || v.imageUrl ? (
                               <button
                                 className="image-btn btn btn-primary btn-sm"
-                                onClick={() => handleVehicleViewImage(v.images?.length > 0 ? v.images : [v.imageUrl])}
+                                onClick={() =>
+                                  handleVehicleViewImage(
+                                    v.images?.length > 0
+                                      ? v.images
+                                      : [v.imageUrl]
+                                  )
+                                }
                               >
                                 <i className="fas fa-image me-1"></i>
                                 View ({v.images?.length || 1})
@@ -1662,7 +1853,8 @@ export default function AdminPage() {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(200px, 1fr))",
                     gap: "10px",
                     padding: "10px",
                   }}
@@ -1726,7 +1918,6 @@ export default function AdminPage() {
                       </div>
                     );
                   })}
-
                 </div>
               ) : (
                 <>
@@ -1745,7 +1936,11 @@ export default function AdminPage() {
                     <img
                       src={`${SERVER_URL}/uploads/${selectedImage}`}
                       alt="Vehicle"
-                      style={{ maxWidth: "100%", height: "auto", cursor: "pointer" }}
+                      style={{
+                        maxWidth: "100%",
+                        height: "auto",
+                        cursor: "pointer",
+                      }}
                       onClick={() =>
                         setZoomImage(`${SERVER_URL}/uploads/${selectedImage}`)
                       }
@@ -1758,35 +1953,43 @@ export default function AdminPage() {
             <p>No images available</p>
           )}
         </Modal.Body>
-
       </Modal>
 
       {/* Zoom Modal */}
-      <Modal show={!!zoomImage} onHide={() => setZoomImage(null)} centered size="xl">
-        <Modal.Body style={{ textAlign: 'center', position: 'relative' }}>
+      <Modal
+        show={!!zoomImage}
+        onHide={() => setZoomImage(null)}
+        centered
+        size="xl"
+      >
+        <Modal.Body style={{ textAlign: "center", position: "relative" }}>
           {zoomImage && (
             <>
               <img
                 src={zoomImage}
                 alt="Zoomed Vehicle"
-                style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "80vh",
+                  objectFit: "contain",
+                }}
               />
               {Array.isArray(selectedImage) && selectedImage.length > 1 && (
                 <>
                   <button
                     onClick={handlePrevZoom}
                     style={{
-                      position: 'absolute',
-                      top: '50%',
+                      position: "absolute",
+                      top: "50%",
                       left: 10,
-                      transform: 'translateY(-50%)',
-                      background: 'rgba(0,0,0,0.5)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '50%',
+                      transform: "translateY(-50%)",
+                      background: "rgba(0,0,0,0.5)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "50%",
                       width: 40,
                       height: 40,
-                      cursor: 'pointer'
+                      cursor: "pointer",
                     }}
                   >
                     &#8592;
@@ -1794,17 +1997,17 @@ export default function AdminPage() {
                   <button
                     onClick={handleNextZoom}
                     style={{
-                      position: 'absolute',
-                      top: '50%',
+                      position: "absolute",
+                      top: "50%",
                       right: 10,
-                      transform: 'translateY(-50%)',
-                      background: 'rgba(0,0,0,0.5)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '50%',
+                      transform: "translateY(-50%)",
+                      background: "rgba(0,0,0,0.5)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "50%",
                       width: 40,
                       height: 40,
-                      cursor: 'pointer'
+                      cursor: "pointer",
                     }}
                   >
                     &#8594;
@@ -1860,12 +2063,15 @@ export default function AdminPage() {
             <div className="table-header">
               <h3>Driver List</h3>
               <div className="table-stats">
-                <span className="stat-badge stat-total">{drivers.length} Total</span>
+                <span className="stat-badge stat-total">
+                  {drivers.length} Total
+                </span>
                 <span className="stat-badge stat-pending">
-                  {drivers.filter(d => d.status === "pending").length} Pending
+                  {drivers.filter((d) => d.status === "pending").length} Pending
                 </span>
                 <span className="stat-badge stat-approved">
-                  {drivers.filter(d => d.status === "approved").length} Approved
+                  {drivers.filter((d) => d.status === "approved").length}{" "}
+                  Approved
                 </span>
               </div>
             </div>
@@ -1943,7 +2149,12 @@ export default function AdminPage() {
             </div>
 
             {/* Driver Image Modal */}
-            <Modal show={showDriverImageModal} onHide={handleCloseDriverModal} centered size="lg">
+            <Modal
+              show={showDriverImageModal}
+              onHide={handleCloseDriverModal}
+              centered
+              size="lg"
+            >
               <Modal.Header closeButton>
                 <Modal.Title>Driver Image</Modal.Title>
               </Modal.Header>
@@ -1952,8 +2163,8 @@ export default function AdminPage() {
                   <div className="image-gallery">
                     <div
                       style={{
-                        position: 'relative',
-                        textAlign: 'center'
+                        position: "relative",
+                        textAlign: "center",
                       }}
                     >
                       <img
@@ -1962,11 +2173,13 @@ export default function AdminPage() {
                         style={{
                           maxWidth: "100%",
                           height: "auto",
-                          cursor: 'pointer',
-                          borderRadius: '8px',
-                          border: '1px solid #ddd'
+                          cursor: "pointer",
+                          borderRadius: "8px",
+                          border: "1px solid #ddd",
                         }}
-                        onClick={() => handleDriverImageClick(selectedDriverImage)}
+                        onClick={() =>
+                          handleDriverImageClick(selectedDriverImage)
+                        }
                       />
                     </div>
                   </div>
@@ -1977,16 +2190,21 @@ export default function AdminPage() {
             </Modal>
 
             {/* Driver Image Zoom Modal */}
-            <Modal show={!!driverZoomImage} onHide={() => setDriverZoomImage(null)} centered size="xl">
-              <Modal.Body style={{ textAlign: 'center', position: 'relative' }}>
+            <Modal
+              show={!!driverZoomImage}
+              onHide={() => setDriverZoomImage(null)}
+              centered
+              size="xl"
+            >
+              <Modal.Body style={{ textAlign: "center", position: "relative" }}>
                 {driverZoomImage && (
                   <img
                     src={driverZoomImage}
                     alt="Zoomed Driver"
                     style={{
-                      maxWidth: '100%',
-                      maxHeight: '80vh',
-                      objectFit: 'contain'
+                      maxWidth: "100%",
+                      maxHeight: "80vh",
+                      objectFit: "contain",
                     }}
                   />
                 )}
@@ -2037,8 +2255,14 @@ export default function AdminPage() {
                       <td>{b.pickup}</td>
                       <td style={dropdownStyle}>
                         <Dropdown>
-                          <Dropdown.Toggle variant="link" className="p-0 text-dark text-decoration-none">
-                            {b.drop} {b.extraStops?.length > 0 && <i className="fas fa-caret-down ms-1" />}
+                          <Dropdown.Toggle
+                            variant="link"
+                            className="p-0 text-dark text-decoration-none"
+                          >
+                            {b.drop}{" "}
+                            {b.extraStops?.length > 0 && (
+                              <i className="fas fa-caret-down ms-1" />
+                            )}
                           </Dropdown.Toggle>
                           <Dropdown.Menu style={dropdownMenuStyle}>
                             <Dropdown.Header>Extra Stops</Dropdown.Header>
@@ -2079,9 +2303,10 @@ export default function AdminPage() {
                             <Button
                               variant="success"
                               size="sm"
-                              onClick={() => updateBookingStatus(b._id, "confirmed")}
+                              onClick={() =>
+                                updateBookingStatus(b._id, "confirmed")
+                              }
                             >
-
                               Assigned
                             </Button>
                           )}
@@ -2089,9 +2314,10 @@ export default function AdminPage() {
                             <Button
                               variant="danger"
                               size="sm"
-                              onClick={() => updateBookingStatus(b._id, "cancelled")}
+                              onClick={() =>
+                                updateBookingStatus(b._id, "cancelled")
+                              }
                             >
-
                               Cancel
                             </Button>
                           )}
@@ -2133,90 +2359,209 @@ export default function AdminPage() {
             </tr>
           </thead>
           <tbody>
-            {trips.map((trip, idx) => (
-              <tr key={trip._id}>
-                <td>{idx + 1}</td>
-                <td>
-                  <div>
-                    <strong>{trip.name}</strong><br />
-                    <small className="text-muted">{trip.email}</small><br />
-                    <small className="text-muted">{trip.phone}</small>
-                  </div>
-                </td>
-                <td>
-                  <div>
-                    <strong>{trip.packageName}</strong><br />
-                    <small className="text-muted">₹{trip.packagePrice}</small>
-                  </div>
-                </td>
-                <td>{new Date(trip.date).toLocaleDateString()}</td>
-                <td>{trip.time}</td>
-                <td>{trip.passengers}</td>
+            {trips.map((trip, idx) => {
+              const isEditing = editingTripId === trip._id;
+              return (
+                <tr key={trip._id}>
+                  <td>{idx + 1}</td>
+                  <td>
+                    {isEditing ? (
+                      <>
+                        <Form.Control
+                          size="sm"
+                          type="text"
+                          name="name"
+                          value={editedTrip.name}
+                          onChange={handleTripChange}
+                          className="mb-1"
+                        />
+                        <Form.Control
+                          size="sm"
+                          type="email"
+                          name="email"
+                          value={editedTrip.email}
+                          onChange={handleTripChange}
+                          className="mb-1"
+                        />
+                        <Form.Control
+                          size="sm"
+                          type="text"
+                          name="phone"
+                          value={editedTrip.phone}
+                          onChange={handleTripChange}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <strong>{trip.name}</strong><br />
+                        <small className="text-muted">{trip.email}</small><br />
+                        <small className="text-muted">{trip.phone}</small>
+                      </>
+                    )}
+                  </td>
 
-                <td>
-                  <Badge
-                    bg={
-                      trip.status === "cancelled"
-                        ? "danger"
-                        : trip.status === "completed"
-                          ? "primary"
-                          : trip.status === "confirmed"
-                            ? "success"
-                            : "warning"
-                    }
-                  >
-                    {trip.status}
-                  </Badge>
-                </td>
-                <td>
-                  <div className="d-flex gap-1">
-                    {trip.status === "pending" && (
+                  <td>
+                    {isEditing ? (
                       <>
-                        <Button
-                          variant="success"
+                        <Form.Control
                           size="sm"
-                          onClick={() => updateTripStatus(trip._id, "confirmed")}
-                        >
-                          Confirm
-                        </Button>
-                        <Button
-                          variant="danger"
+                          type="text"
+                          name="packageName"
+                          value={editedTrip.packageName}
+                          onChange={handleTripChange}
+                        />
+                        <Form.Control
                           size="sm"
-                          onClick={() => updateTripStatus(trip._id, "cancelled")}
-                        >
-                          Cancel
-                        </Button>
+                          type="number"
+                          name="packagePrice"
+                          value={editedTrip.packagePrice}
+                          onChange={handleTripChange}
+                          className="mt-1"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <strong>{trip.packageName}</strong><br />
+                        <small className="text-muted">₹{trip.packagePrice}</small>
                       </>
                     )}
-                    {trip.status === "confirmed" && (
-                      <>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => updateTripStatus(trip._id, "completed")}
-                        >
-                          Complete
-                        </Button>
-                        <Button
-                          className="ms-1"
-                          variant="danger"
-                          size="sm"
-                          onClick={() => updateTripStatus(trip._id, "cancelled")}
-                        >
-                          Cancel
-                        </Button>
-                      </>
+                  </td>
+
+                  <td>
+                    {isEditing ? (
+                      <Form.Control
+                        size="sm"
+                        type="date"
+                        name="date"
+                        value={new Date(editedTrip.date).toISOString().split("T")[0]}
+                        onChange={handleTripChange}
+                      />
+                    ) : (
+                      new Date(trip.date).toLocaleDateString()
                     )}
-                    {trip.status === "cancelled" && (
-                      <span className="text-muted">No actions</span>
+                  </td>
+
+                  <td>
+                    {isEditing ? (
+                      <Form.Control
+                        size="sm"
+                        type="text"
+                        name="time"
+                        value={editedTrip.time}
+                        onChange={handleTripChange}
+                      />
+                    ) : (
+                      trip.time
                     )}
-                    {trip.status === "completed" && (
-                      <span className="text-muted">No actions</span>
+                  </td>
+
+                  <td>
+                    {isEditing ? (
+                      <Form.Control
+                        size="sm"
+                        type="number"
+                        name="passengers"
+                        value={editedTrip.passengers}
+                        onChange={handleTripChange}
+                      />
+                    ) : (
+                      trip.passengers
                     )}
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+
+                  <td>
+                    <Badge
+                      bg={
+                        trip.status === "cancelled"
+                          ? "danger"
+                          : trip.status === "completed"
+                            ? "primary"
+                            : trip.status === "confirmed"
+                              ? "success"
+                              : "warning"
+                      }
+                    >
+                      {trip.status}
+                    </Badge>
+                  </td>
+
+                  <td>
+                    <div className="d-flex flex-wrap gap-1">
+                      {isEditing ? (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="success"
+                            onClick={() => handleUpdateTrip(trip._id)}
+                          >
+                            Save
+                          </Button>
+                          <Button size="sm" variant="secondary" onClick={handleTripEditCancel}>
+                            Cancel
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => handleTripEdit(trip)}
+                          >
+                            Edit
+                          </Button>
+
+                          {/* Keep your existing status buttons */}
+                          {trip.status === "pending" && (
+                            <>
+                              <Button
+                                variant="success"
+                                size="sm"
+                                onClick={() =>
+                                  updateTripStatus(trip._id, "confirmed")
+                                }
+                              >
+                                Confirm
+                              </Button>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() =>
+                                  updateTripStatus(trip._id, "cancelled")
+                                }
+                              >
+                                Cancel
+                              </Button>
+                            </>
+                          )}
+                          {trip.status === "confirmed" && (
+                            <>
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() =>
+                                  updateTripStatus(trip._id, "completed")
+                                }
+                              >
+                                Complete
+                              </Button>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() =>
+                                  updateTripStatus(trip._id, "cancelled")
+                                }
+                              >
+                                Cancel
+                              </Button>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       )}
@@ -2241,8 +2586,6 @@ export default function AdminPage() {
             />
           </Form.Group>
 
-
-
           <Form.Group className="mb-3">
             <Form.Label>Description</Form.Label>
             <Form.Control
@@ -2254,8 +2597,6 @@ export default function AdminPage() {
               placeholder="Enter cab description"
             />
           </Form.Group>
-
-
 
           <Form.Group className="mb-3">
             <Form.Label>Seats</Form.Label>
@@ -2307,8 +2648,6 @@ export default function AdminPage() {
             />
           </Form.Group>
 
-
-
           <Form.Group className="mb-3">
             <Form.Label>Cab Type</Form.Label>
             <Form.Select
@@ -2325,8 +2664,6 @@ export default function AdminPage() {
               ))}
             </Form.Select>
           </Form.Group>
-
-
 
           <Form.Group className="mb-3">
             <Form.Label>Capacity</Form.Label>
@@ -2356,11 +2693,11 @@ export default function AdminPage() {
             <Form.Label>Image</Form.Label>
             <Form.Control
               type="file"
-              onChange={(e) => setNewCabVehicle({ ...newCabVehicle, image: e.target.files[0] })}
+              onChange={(e) =>
+                setNewCabVehicle({ ...newCabVehicle, image: e.target.files[0] })
+              }
             />
           </Form.Group>
-
-
 
           <Button type="submit" variant="success">
             Add Cab Vehicle
@@ -2390,10 +2727,12 @@ export default function AdminPage() {
                       <input
                         className="edit-input"
                         value={editedCabType.name}
-                        onChange={(e) => setEditedCabType({
-                          ...editedCabType,
-                          name: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedCabType({
+                            ...editedCabType,
+                            name: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       cabType.name
@@ -2404,10 +2743,12 @@ export default function AdminPage() {
                       <input
                         className="edit-input"
                         value={editedCabType.description}
-                        onChange={(e) => setEditedCabType({
-                          ...editedCabType,
-                          description: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedCabType({
+                            ...editedCabType,
+                            description: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       cabType.description
@@ -2419,10 +2760,12 @@ export default function AdminPage() {
                         className="edit-input"
                         type="text"
                         value={editedCabType.seats}
-                        onChange={(e) => setEditedCabType({
-                          ...editedCabType,
-                          seats: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedCabType({
+                            ...editedCabType,
+                            seats: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       cabType.seats
@@ -2433,10 +2776,12 @@ export default function AdminPage() {
                       <input
                         type="file"
                         className="edit-input"
-                        onChange={(e) => setEditedCabType({
-                          ...editedCabType,
-                          newImage: e.target.files[0]
-                        })}
+                        onChange={(e) =>
+                          setEditedCabType({
+                            ...editedCabType,
+                            newImage: e.target.files[0],
+                          })
+                        }
                         accept="image/*"
                       />
                     ) : (
@@ -2444,7 +2789,11 @@ export default function AdminPage() {
                         <img
                           src={`${SERVER_URL}/uploads/${cabType.image}`}
                           alt={cabType.name}
-                          style={{ height: '50px', width: '50px', objectFit: 'cover' }}
+                          style={{
+                            height: "50px",
+                            width: "50px",
+                            objectFit: "cover",
+                          }}
                         />
                       )
                     )}
@@ -2522,7 +2871,12 @@ export default function AdminPage() {
                       <Form.Control
                         type="text"
                         value={editedCabVehicle.cabTypeName}
-                        onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, cabTypeName: e.target.value })}
+                        onChange={(e) =>
+                          setEditedCabVehicle({
+                            ...editedCabVehicle,
+                            cabTypeName: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       vehicle.cabTypeName
@@ -2533,7 +2887,12 @@ export default function AdminPage() {
                       <Form.Control
                         type="text"
                         value={editedCabVehicle.modelName}
-                        onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, modelName: e.target.value })}
+                        onChange={(e) =>
+                          setEditedCabVehicle({
+                            ...editedCabVehicle,
+                            modelName: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       vehicle.modelName
@@ -2544,7 +2903,12 @@ export default function AdminPage() {
                       <Form.Control
                         type="number"
                         value={editedCabVehicle.capacity}
-                        onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, capacity: e.target.value })}
+                        onChange={(e) =>
+                          setEditedCabVehicle({
+                            ...editedCabVehicle,
+                            capacity: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       vehicle.capacity
@@ -2555,7 +2919,12 @@ export default function AdminPage() {
                       <Form.Control
                         type="number"
                         value={editedCabVehicle.pricePerKm}
-                        onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, pricePerKm: e.target.value })}
+                        onChange={(e) =>
+                          setEditedCabVehicle({
+                            ...editedCabVehicle,
+                            pricePerKm: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       `₹${vehicle.pricePerKm}`
@@ -2564,23 +2933,32 @@ export default function AdminPage() {
                   <td>
                     {editingCabVehicleId === vehicle._id ? (
                       <div>
-                        <small className="text-muted">Leave empty to keep existing</small>
+                        <small className="text-muted">
+                          Leave empty to keep existing
+                        </small>
                         <Form.Control
                           type="file"
-                          onChange={(e) => setEditedCabVehicle({ ...editedCabVehicle, newImage: e.target.files[0] })}
+                          onChange={(e) =>
+                            setEditedCabVehicle({
+                              ...editedCabVehicle,
+                              newImage: e.target.files[0],
+                            })
+                          }
                           accept="image/*"
                         />
                       </div>
+                    ) : vehicle.image ? (
+                      <img
+                        src={`${SERVER_URL}/uploads/${vehicle.image}`}
+                        alt={vehicle.modelName}
+                        style={{
+                          width: "80px",
+                          height: "50px",
+                          objectFit: "cover",
+                        }}
+                      />
                     ) : (
-                      vehicle.image ? (
-                        <img
-                          src={`${SERVER_URL}/uploads/${vehicle.image}`}
-                          alt={vehicle.modelName}
-                          style={{ width: "80px", height: "50px", objectFit: "cover" }}
-                        />
-                      ) : (
-                        "No Image"
-                      )
+                      "No Image"
                     )}
                   </td>
                   <td>
@@ -2596,7 +2974,10 @@ export default function AdminPage() {
                         <Button
                           variant="secondary"
                           size="sm"
-                          onClick={() => { setEditingCabVehicleId(null); setEditedCabVehicle(null); }}
+                          onClick={() => {
+                            setEditingCabVehicleId(null);
+                            setEditedCabVehicle(null);
+                          }}
                         >
                           <i className="fas fa-times"></i> Cancel
                         </Button>
@@ -2606,7 +2987,15 @@ export default function AdminPage() {
                         <Button
                           variant="primary"
                           size="sm"
-                          onClick={() => { setEditingCabVehicleId(vehicle._id); setEditedCabVehicle({ cabTypeName: vehicle.cabTypeName, modelName: vehicle.modelName, capacity: vehicle.capacity, pricePerKm: vehicle.pricePerKm }); }}
+                          onClick={() => {
+                            setEditingCabVehicleId(vehicle._id);
+                            setEditedCabVehicle({
+                              cabTypeName: vehicle.cabTypeName,
+                              modelName: vehicle.modelName,
+                              capacity: vehicle.capacity,
+                              pricePerKm: vehicle.pricePerKm,
+                            });
+                          }}
                         >
                           <i className="fas fa-edit"></i> Edit
                         </Button>
@@ -2628,7 +3017,6 @@ export default function AdminPage() {
           <Alert variant="warning">No cab vehicles available.</Alert>
         )}
       </Card>
-
     </>
   );
 
@@ -2687,10 +3075,7 @@ export default function AdminPage() {
         </Form>
       </Card>
 
-
-
       {/* States List */}
-
 
       <Card className="p-4 shadow mt-4">
         <h4 className="mb-3 fw-bold">Available States</h4>
@@ -2712,10 +3097,12 @@ export default function AdminPage() {
                       <input
                         className="edit-inputState"
                         value={editedState.name}
-                        onChange={(e) => setEditedState({
-                          ...editedState,
-                          name: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedState({
+                            ...editedState,
+                            name: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       state.name
@@ -2726,10 +3113,12 @@ export default function AdminPage() {
                       <input
                         className="edit-inputState"
                         value={editedState.description}
-                        onChange={(e) => setEditedState({
-                          ...editedState,
-                          description: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedState({
+                            ...editedState,
+                            description: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       state.description
@@ -2740,7 +3129,11 @@ export default function AdminPage() {
                       <img
                         src={`${SERVER_URL}/uploads/${state.image}`}
                         alt={state.name}
-                        style={{ width: "80px", height: "50px", objectFit: "cover" }}
+                        style={{
+                          width: "80px",
+                          height: "50px",
+                          objectFit: "cover",
+                        }}
                       />
                     ) : (
                       "No Image"
@@ -2794,7 +3187,6 @@ export default function AdminPage() {
         )}
       </Card>
 
-
       {/* Add City Form */}
       <Card className="p-4 shadow mt-3">
         <h4 className="mb-3 fw-bold">Add New City</h4>
@@ -2816,7 +3208,9 @@ export default function AdminPage() {
             <Form.Select
               name="state"
               value={newCity.state}
-              onChange={(e) => setNewCity({ ...newCity, state: e.target.value })}
+              onChange={(e) =>
+                setNewCity({ ...newCity, state: e.target.value })
+              }
               required
             >
               <option value="">-- Select State --</option>
@@ -2834,7 +3228,9 @@ export default function AdminPage() {
               name="description"
               as="textarea"
               value={newCity.description}
-              onChange={(e) => setNewCity({ ...newCity, description: e.target.value })}
+              onChange={(e) =>
+                setNewCity({ ...newCity, description: e.target.value })
+              }
             />
           </Form.Group>
 
@@ -2844,7 +3240,9 @@ export default function AdminPage() {
               type="file"
               name="image"
               accept="image/*"
-              onChange={(e) => setNewCity({ ...newCity, image: e.target.files[0] })}
+              onChange={(e) =>
+                setNewCity({ ...newCity, image: e.target.files[0] })
+              }
             />
             {newCity.image && (
               <div className="mt-2">
@@ -2883,10 +3281,12 @@ export default function AdminPage() {
                       <input
                         className="edit-input"
                         value={editedCity.name}
-                        onChange={(e) => setEditedCity({
-                          ...editedCity,
-                          name: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedCity({
+                            ...editedCity,
+                            name: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       cityItem.name
@@ -2897,10 +3297,12 @@ export default function AdminPage() {
                       <select
                         className="edit-input"
                         value={editedCity.state}
-                        onChange={(e) => setEditedCity({
-                          ...editedCity,
-                          state: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedCity({
+                            ...editedCity,
+                            state: e.target.value,
+                          })
+                        }
                       >
                         <option value="">Select State</option>
                         {states.map((state) => (
@@ -2918,10 +3320,12 @@ export default function AdminPage() {
                       <input
                         className="edit-input"
                         value={editedCity.description}
-                        onChange={(e) => setEditedCity({
-                          ...editedCity,
-                          description: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedCity({
+                            ...editedCity,
+                            description: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       cityItem.description
@@ -2932,10 +3336,12 @@ export default function AdminPage() {
                       <input
                         type="file"
                         className="edit-input"
-                        onChange={(e) => setEditedCity({
-                          ...editedCity,
-                          newImage: e.target.files[0]
-                        })}
+                        onChange={(e) =>
+                          setEditedCity({
+                            ...editedCity,
+                            newImage: e.target.files[0],
+                          })
+                        }
                         accept="image/*"
                       />
                     ) : (
@@ -2943,7 +3349,11 @@ export default function AdminPage() {
                         <img
                           src={`${SERVER_URL}/uploads/${cityItem.image}`}
                           alt={cityItem.name}
-                          style={{ height: '50px', width: '50px', objectFit: 'cover' }}
+                          style={{
+                            height: "50px",
+                            width: "50px",
+                            objectFit: "cover",
+                          }}
                         />
                       )
                     )}
@@ -3006,7 +3416,9 @@ export default function AdminPage() {
               type="text"
               name="name"
               value={newPlace.name}
-              onChange={(e) => setNewPlace({ ...newPlace, name: e.target.value })}
+              onChange={(e) =>
+                setNewPlace({ ...newPlace, name: e.target.value })
+              }
               placeholder="Enter place name"
               required
             />
@@ -3017,7 +3429,9 @@ export default function AdminPage() {
             <Form.Select
               name="city"
               value={newPlace.city}
-              onChange={(e) => setNewPlace({ ...newPlace, city: e.target.value })}
+              onChange={(e) =>
+                setNewPlace({ ...newPlace, city: e.target.value })
+              }
               required
             >
               <option value="">-- Select City --</option>
@@ -3047,7 +3461,9 @@ export default function AdminPage() {
               type="number"
               name="rate"
               value={newPlace.rate}
-              onChange={(e) => setNewPlace({ ...newPlace, rate: e.target.value })}
+              onChange={(e) =>
+                setNewPlace({ ...newPlace, rate: e.target.value })
+              }
               placeholder="Enter rate"
               required
             />
@@ -3101,10 +3517,12 @@ export default function AdminPage() {
                       <input
                         className="edit-input"
                         value={editedPlace.name}
-                        onChange={(e) => setEditedPlace({
-                          ...editedPlace,
-                          name: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedPlace({
+                            ...editedPlace,
+                            name: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       placeItem.name
@@ -3115,10 +3533,12 @@ export default function AdminPage() {
                       <select
                         className="edit-inputplace"
                         value={editedPlace.city}
-                        onChange={(e) => setEditedPlace({
-                          ...editedPlace,
-                          city: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedPlace({
+                            ...editedPlace,
+                            city: e.target.value,
+                          })
+                        }
                       >
                         <option value="">Select City</option>
                         {city.map((c) => (
@@ -3136,10 +3556,12 @@ export default function AdminPage() {
                       <input
                         className="edit-inputplace"
                         value={editedPlace.description}
-                        onChange={(e) => setEditedPlace({
-                          ...editedPlace,
-                          description: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedPlace({
+                            ...editedPlace,
+                            description: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       placeItem.description
@@ -3151,10 +3573,12 @@ export default function AdminPage() {
                         className="edit-inputplace"
                         type="number"
                         value={editedPlace.rate}
-                        onChange={(e) => setEditedPlace({
-                          ...editedPlace,
-                          rate: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditedPlace({
+                            ...editedPlace,
+                            rate: e.target.value,
+                          })
+                        }
                       />
                     ) : (
                       placeItem.rate
@@ -3165,10 +3589,12 @@ export default function AdminPage() {
                       <input
                         type="file"
                         className="edit-inputplace"
-                        onChange={(e) => setEditedPlace({
-                          ...editedPlace,
-                          newImage: e.target.files[0]
-                        })}
+                        onChange={(e) =>
+                          setEditedPlace({
+                            ...editedPlace,
+                            newImage: e.target.files[0],
+                          })
+                        }
                         accept="image/*"
                       />
                     ) : (
@@ -3176,7 +3602,11 @@ export default function AdminPage() {
                         <img
                           src={`${SERVER_URL}/uploads/${placeItem.image}`}
                           alt={placeItem.name}
-                          style={{ height: '50px', width: '50px', objectFit: 'cover' }}
+                          style={{
+                            height: "50px",
+                            width: "50px",
+                            objectFit: "cover",
+                          }}
                         />
                       )
                     )}
@@ -3228,10 +3658,8 @@ export default function AdminPage() {
           <Alert variant="warning">No places available.</Alert>
         )}
       </Card>
-
-
     </>
-  )
+  );
 
   const renderTariffTable = () => (
     <>
@@ -3254,18 +3682,56 @@ export default function AdminPage() {
           </Form.Select>
 
           <Form.Label>Seats</Form.Label>
-          <Form.Control type="number" name="seats" value={newTariff.seats} onChange={handleTariffChange} required />
+          <Form.Control
+            type="number"
+            name="seats"
+            value={newTariff.seats}
+            onChange={handleTariffChange}
+            required
+          />
           <Form.Label>Rate</Form.Label>
-          <Form.Control type="number" name="rate" value={newTariff.rate} onChange={handleTariffChange} required />
+          <Form.Control
+            type="number"
+            name="rate"
+            value={newTariff.rate}
+            onChange={handleTariffChange}
+            required
+          />
           <Form.Label>Allowed Km</Form.Label>
-          <Form.Control type="number" name="allowedKm" value={newTariff.allowedKm} onChange={handleTariffChange} required />
+          <Form.Control
+            type="number"
+            name="allowedKm"
+            value={newTariff.allowedKm}
+            onChange={handleTariffChange}
+            required
+          />
           <Form.Label>Driver Bata</Form.Label>
-          <Form.Control type="number" name="driverBata" value={newTariff.driverBata} onChange={handleTariffChange} required />
+          <Form.Control
+            type="number"
+            name="driverBata"
+            value={newTariff.driverBata}
+            onChange={handleTariffChange}
+            required
+          />
           <Form.Label>Extra Km Rate</Form.Label>
-          <Form.Control type="number" name="extraKmRate" value={newTariff.extraKmRate} onChange={handleTariffChange} required />
+          <Form.Control
+            type="number"
+            name="extraKmRate"
+            value={newTariff.extraKmRate}
+            onChange={handleTariffChange}
+            required
+          />
           <Form.Label>Detials</Form.Label>
-          <Form.Control type="text" name="details" value={newTariff.details} onChange={handleTariffChange} required />
-          <Button type="submit" variant="primary">Add Tariff</Button>
+          <Form.Control
+            type="text"
+            name="details"
+            value={newTariff.details}
+            onChange={handleTariffChange}
+            required
+          />
+          <Button type="submit" variant="primary">
+            Add Tariff
+          </Button>
         </Form.Group>
       </Form>
       <h4>Tariffs</h4>
@@ -3287,49 +3753,109 @@ export default function AdminPage() {
             <tr key={t._id}>
               <td>
                 {editingTariffId === t._id ? (
-                  <Form.Control type="text" value={editedTariff.cabType} onChange={(e) => setEditedTariff({ ...editedTariff, cabType: e.target.value })} />
+                  <Form.Control
+                    type="text"
+                    value={editedTariff.cabType}
+                    onChange={(e) =>
+                      setEditedTariff({
+                        ...editedTariff,
+                        cabType: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.cabType
                 )}
               </td>
               <td>
                 {editingTariffId === t._id ? (
-                  <Form.Control type="number" value={editedTariff.seats} onChange={(e) => setEditedTariff({ ...editedTariff, seats: e.target.value })} />
+                  <Form.Control
+                    type="number"
+                    value={editedTariff.seats}
+                    onChange={(e) =>
+                      setEditedTariff({
+                        ...editedTariff,
+                        seats: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.seats
                 )}
               </td>
               <td>
                 {editingTariffId === t._id ? (
-                  <Form.Control type="number" value={editedTariff.rate} onChange={(e) => setEditedTariff({ ...editedTariff, rate: e.target.value })} />
+                  <Form.Control
+                    type="number"
+                    value={editedTariff.rate}
+                    onChange={(e) =>
+                      setEditedTariff({ ...editedTariff, rate: e.target.value })
+                    }
+                  />
                 ) : (
                   t.rate
                 )}
               </td>
               <td>
                 {editingTariffId === t._id ? (
-                  <Form.Control type="number" value={editedTariff.allowedKm} onChange={(e) => setEditedTariff({ ...editedTariff, allowedKm: e.target.value })} />
+                  <Form.Control
+                    type="number"
+                    value={editedTariff.allowedKm}
+                    onChange={(e) =>
+                      setEditedTariff({
+                        ...editedTariff,
+                        allowedKm: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.allowedKm
                 )}
               </td>
               <td>
                 {editingTariffId === t._id ? (
-                  <Form.Control type="number" value={editedTariff.driverBata} onChange={(e) => setEditedTariff({ ...editedTariff, driverBata: e.target.value })} />
+                  <Form.Control
+                    type="number"
+                    value={editedTariff.driverBata}
+                    onChange={(e) =>
+                      setEditedTariff({
+                        ...editedTariff,
+                        driverBata: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.driverBata
                 )}
               </td>
               <td>
                 {editingTariffId === t._id ? (
-                  <Form.Control type="number" value={editedTariff.extraKmRate} onChange={(e) => setEditedTariff({ ...editedTariff, extraKmRate: e.target.value })} />
+                  <Form.Control
+                    type="number"
+                    value={editedTariff.extraKmRate}
+                    onChange={(e) =>
+                      setEditedTariff({
+                        ...editedTariff,
+                        extraKmRate: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.extraKmRate
                 )}
               </td>
               <td>
                 {editingTariffId === t._id ? (
-                  <Form.Control type="text" value={editedTariff.details} onChange={(e) => setEditedTariff({ ...editedTariff, details: e.target.value })} />
+                  <Form.Control
+                    type="text"
+                    value={editedTariff.details}
+                    onChange={(e) =>
+                      setEditedTariff({
+                        ...editedTariff,
+                        details: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.details
                 )}
@@ -3337,13 +3863,43 @@ export default function AdminPage() {
               <td>
                 {editingTariffId === t._id ? (
                   <div className="d-flex gap-2">
-                    <Button size="sm" variant="success" onClick={() => handleUpdateTariff(t._id)}>Save</Button>
-                    <Button size="sm" variant="secondary" onClick={() => { setEditingTariffId(null); setEditedTariff(null); }}>Cancel</Button>
+                    <Button
+                      size="sm"
+                      variant="success"
+                      onClick={() => handleUpdateTariff(t._id)}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        setEditingTariffId(null);
+                        setEditedTariff(null);
+                      }}
+                    >
+                      Cancel
+                    </Button>
                   </div>
                 ) : (
                   <div className="d-flex gap-2">
-                    <Button size="sm" variant="primary" onClick={() => { setEditingTariffId(t._id); setEditedTariff({ ...t }); }}>Edit</Button>
-                    <Button size="sm" variant="danger" onClick={() => handleTariffDelete(t._id)}>Delete</Button>
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={() => {
+                        setEditingTariffId(t._id);
+                        setEditedTariff({ ...t });
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleTariffDelete(t._id)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 )}
               </td>
@@ -3353,7 +3909,7 @@ export default function AdminPage() {
       </Table>
 
       <h4 className="mt-5">Add New City Tariff</h4>
-      <Form onSubmit={AddCityTariff} >
+      <Form onSubmit={AddCityTariff}>
         <Form.Group className="mb-3">
           <Form.Label>City</Form.Label>
           <Form.Select
@@ -3384,18 +3940,56 @@ export default function AdminPage() {
             ))}
           </Form.Select>
           <Form.Label>Seats</Form.Label>
-          <Form.Control type="number" name="seats" value={newCityTariff.seats} onChange={handleCityTariffChange} required />
+          <Form.Control
+            type="number"
+            name="seats"
+            value={newCityTariff.seats}
+            onChange={handleCityTariffChange}
+            required
+          />
           <Form.Label>Rate</Form.Label>
-          <Form.Control type="number" name="ratePerDay" value={newCityTariff.ratePerDay} onChange={handleCityTariffChange} required />
+          <Form.Control
+            type="number"
+            name="ratePerDay"
+            value={newCityTariff.ratePerDay}
+            onChange={handleCityTariffChange}
+            required
+          />
           <Form.Label>Details</Form.Label>
-          <Form.Control type="text" name="details" value={newCityTariff.details} onChange={handleCityTariffChange} required />
+          <Form.Control
+            type="text"
+            name="details"
+            value={newCityTariff.details}
+            onChange={handleCityTariffChange}
+            required
+          />
           <Form.Label>Allowed Km</Form.Label>
-          <Form.Control type="number" name="allowedKm" value={newCityTariff.allowedKm} onChange={handleCityTariffChange} required />
+          <Form.Control
+            type="number"
+            name="allowedKm"
+            value={newCityTariff.allowedKm}
+            onChange={handleCityTariffChange}
+            required
+          />
           <Form.Label>Extra Km Rate</Form.Label>
-          <Form.Control type="number" name="extraKmRate" value={newCityTariff.extraKmRate} onChange={handleCityTariffChange} required />
+          <Form.Control
+            type="number"
+            name="extraKmRate"
+            value={newCityTariff.extraKmRate}
+            onChange={handleCityTariffChange}
+            required
+          />
           <Form.Label>Outstation Rate</Form.Label>
-          <Form.Control type="text" name="outstation" value={newCityTariff.outstation} onChange={handleCityTariffChange} required />
-          <Button type="submit" variant="primary">Add City Tariff</Button>
+          <Form.Control
+            type="text"
+            name="outstation"
+            value={newCityTariff.outstation}
+            onChange={handleCityTariffChange}
+            required
+          />
+          <Button type="submit" variant="primary">
+            Add City Tariff
+          </Button>
         </Form.Group>
       </Form>
       <h4>City Tariffs</h4>
@@ -3418,56 +4012,128 @@ export default function AdminPage() {
             <tr key={t._id}>
               <td>
                 {editingCityTariffId === t._id ? (
-                  <Form.Control type="text" value={editedCityTariff.city} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, city: e.target.value })} />
+                  <Form.Control
+                    type="text"
+                    value={editedCityTariff.city}
+                    onChange={(e) =>
+                      setEditedCityTariff({
+                        ...editedCityTariff,
+                        city: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.city
                 )}
               </td>
               <td>
                 {editingCityTariffId === t._id ? (
-                  <Form.Control type="text" value={editedCityTariff.cabType} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, cabType: e.target.value })} />
+                  <Form.Control
+                    type="text"
+                    value={editedCityTariff.cabType}
+                    onChange={(e) =>
+                      setEditedCityTariff({
+                        ...editedCityTariff,
+                        cabType: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.cabType
                 )}
               </td>
               <td>
                 {editingCityTariffId === t._id ? (
-                  <Form.Control type="number" value={editedCityTariff.seats} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, seats: e.target.value })} />
+                  <Form.Control
+                    type="number"
+                    value={editedCityTariff.seats}
+                    onChange={(e) =>
+                      setEditedCityTariff({
+                        ...editedCityTariff,
+                        seats: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.seats
                 )}
               </td>
               <td>
                 {editingCityTariffId === t._id ? (
-                  <Form.Control type="number" value={editedCityTariff.ratePerDay} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, ratePerDay: e.target.value })} />
+                  <Form.Control
+                    type="number"
+                    value={editedCityTariff.ratePerDay}
+                    onChange={(e) =>
+                      setEditedCityTariff({
+                        ...editedCityTariff,
+                        ratePerDay: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.ratePerDay
                 )}
               </td>
               <td>
                 {editingCityTariffId === t._id ? (
-                  <Form.Control type="text" value={editedCityTariff.details} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, details: e.target.value })} />
+                  <Form.Control
+                    type="text"
+                    value={editedCityTariff.details}
+                    onChange={(e) =>
+                      setEditedCityTariff({
+                        ...editedCityTariff,
+                        details: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.details
                 )}
               </td>
               <td>
                 {editingCityTariffId === t._id ? (
-                  <Form.Control type="number" value={editedCityTariff.allowedKm} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, allowedKm: e.target.value })} />
+                  <Form.Control
+                    type="number"
+                    value={editedCityTariff.allowedKm}
+                    onChange={(e) =>
+                      setEditedCityTariff({
+                        ...editedCityTariff,
+                        allowedKm: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.allowedKm
                 )}
               </td>
               <td>
                 {editingCityTariffId === t._id ? (
-                  <Form.Control type="number" value={editedCityTariff.extraKmRate} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, extraKmRate: e.target.value })} />
+                  <Form.Control
+                    type="number"
+                    value={editedCityTariff.extraKmRate}
+                    onChange={(e) =>
+                      setEditedCityTariff({
+                        ...editedCityTariff,
+                        extraKmRate: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.extraKmRate
                 )}
               </td>
               <td>
                 {editingCityTariffId === t._id ? (
-                  <Form.Control type="text" value={editedCityTariff.outstation} onChange={(e) => setEditedCityTariff({ ...editedCityTariff, outstation: e.target.value })} />
+                  <Form.Control
+                    type="text"
+                    value={editedCityTariff.outstation}
+                    onChange={(e) =>
+                      setEditedCityTariff({
+                        ...editedCityTariff,
+                        outstation: e.target.value,
+                      })
+                    }
+                  />
                 ) : (
                   t.outstation
                 )}
@@ -3475,13 +4141,43 @@ export default function AdminPage() {
               <td>
                 {editingCityTariffId === t._id ? (
                   <div className="d-flex gap-2">
-                    <Button size="sm" variant="success" onClick={() => handleUpdateCityTariff(t._id)}>Save</Button>
-                    <Button size="sm" variant="secondary" onClick={() => { setEditingCityTariffId(null); setEditedCityTariff(null); }}>Cancel</Button>
+                    <Button
+                      size="sm"
+                      variant="success"
+                      onClick={() => handleUpdateCityTariff(t._id)}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        setEditingCityTariffId(null);
+                        setEditedCityTariff(null);
+                      }}
+                    >
+                      Cancel
+                    </Button>
                   </div>
                 ) : (
                   <div className="d-flex gap-2">
-                    <Button size="sm" variant="primary" onClick={() => { setEditingCityTariffId(t._id); setEditedCityTariff({ ...t }); }}>Edit</Button>
-                    <Button size="sm" variant="danger" onClick={() => handleCityTariffDelete(t._id)}>Delete</Button>
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={() => {
+                        setEditingCityTariffId(t._id);
+                        setEditedCityTariff({ ...t });
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleCityTariffDelete(t._id)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 )}
               </td>
@@ -3490,18 +4186,18 @@ export default function AdminPage() {
         </tbody>
       </Table>
     </>
-  )
+  );
 
   const dropdownStyle = {
-    position: 'relative'
+    position: "relative",
   };
 
   const dropdownMenuStyle = {
-    position: 'absolute',
-    transform: 'none',
-    top: '100%',
+    position: "absolute",
+    transform: "none",
+    top: "100%",
     left: 0,
-    willChange: 'transform'
+    willChange: "transform",
   };
 
   const handleViewImage = (imageUrl) => {
@@ -3523,9 +4219,6 @@ export default function AdminPage() {
     setShowImageModal(false);
     setSelectedImage(null);
   };
-
-
-
 
   return (
     <div className="admin-dashboard">
@@ -3590,7 +4283,8 @@ export default function AdminPage() {
               <nav className="sidebar-nav">
                 <button
                   onClick={() => setActiveTab("overview")}
-                  className={`nav-item ${activeTab === "overview" ? "active" : ""}`}
+                  className={`nav-item ${activeTab === "overview" ? "active" : ""
+                    }`}
                 >
                   <i className="fas fa-tachometer-alt"></i>
                   <span>Dashboard</span>
@@ -3606,18 +4300,23 @@ export default function AdminPage() {
               <nav className="sidebar-nav">
                 <button
                   onClick={() => setActiveTab("vehicles")}
-                  className={`nav-item ${activeTab === "vehicles" ? "active" : ""}`}
+                  className={`nav-item ${activeTab === "vehicles" ? "active" : ""
+                    }`}
                 >
                   <i className="fas fa-car"></i>
                   <span>Onboarded Vehicles</span>
-                  {vehicles.filter(v => v.status === "pending").length > 0 && (
-                    <span className="nav-badge">{vehicles.filter(v => v.status === "pending").length}</span>
-                  )}
+                  {vehicles.filter((v) => v.status === "pending").length >
+                    0 && (
+                      <span className="nav-badge">
+                        {vehicles.filter((v) => v.status === "pending").length}
+                      </span>
+                    )}
                 </button>
 
                 <button
                   onClick={() => setActiveTab("cabtypes")}
-                  className={`nav-item ${activeTab === "cabtypes" ? "active" : ""}`}
+                  className={`nav-item ${activeTab === "cabtypes" ? "active" : ""
+                    }`}
                 >
                   <i className="fas fa-list"></i>
                   <span>Cab Type Management</span>
@@ -3633,23 +4332,30 @@ export default function AdminPage() {
               <nav className="sidebar-nav">
                 <button
                   onClick={() => setActiveTab("drivers")}
-                  className={`nav-item ${activeTab === "drivers" ? "active" : ""}`}
+                  className={`nav-item ${activeTab === "drivers" ? "active" : ""
+                    }`}
                 >
                   <i className="fas fa-id-card"></i>
                   <span>Onboarded Drivers</span>
-                  {drivers.filter(d => d.status === "pending").length > 0 && (
-                    <span className="nav-badge">{drivers.filter(d => d.status === "pending").length}</span>
+                  {drivers.filter((d) => d.status === "pending").length > 0 && (
+                    <span className="nav-badge">
+                      {drivers.filter((d) => d.status === "pending").length}
+                    </span>
                   )}
                 </button>
                 <button
                   onClick={() => setActiveTab("enquiries")}
-                  className={`nav-item ${activeTab === "enquiries" ? "active" : ""}`}
+                  className={`nav-item ${activeTab === "enquiries" ? "active" : ""
+                    }`}
                 >
                   <i className="fas fa-user"></i>
                   <span>Enquiries</span>
-                  {bookings.filter(c => c.status === "pending").length > 0 && (
-                    <span className="nav-badge">{bookings.filter(c => c.status === "pending").length}</span>
-                  )}
+                  {bookings.filter((c) => c.status === "pending").length >
+                    0 && (
+                      <span className="nav-badge">
+                        {bookings.filter((c) => c.status === "pending").length}
+                      </span>
+                    )}
                 </button>
               </nav>
             </div>
@@ -3662,12 +4368,15 @@ export default function AdminPage() {
               <nav className="sidebar-nav">
                 <button
                   onClick={() => setActiveTab("trips")}
-                  className={`nav-item ${activeTab === "trips" ? "active" : ""}`}
+                  className={`nav-item ${activeTab === "trips" ? "active" : ""
+                    }`}
                 >
                   <i className="fas fa-suitcase"></i>
                   <span>Package Bookings</span>
-                  {trips.filter(t => t.status === "pending").length > 0 && (
-                    <span className="nav-badge">{trips.filter(t => t.status === "pending").length}</span>
+                  {trips.filter((t) => t.status === "pending").length > 0 && (
+                    <span className="nav-badge">
+                      {trips.filter((t) => t.status === "pending").length}
+                    </span>
                   )}
                 </button>
               </nav>
@@ -3681,7 +4390,8 @@ export default function AdminPage() {
               <nav className="sidebar-nav">
                 <button
                   onClick={() => setActiveTab("packages")}
-                  className={`nav-item ${activeTab === "packages" ? "active" : ""}`}
+                  className={`nav-item ${activeTab === "packages" ? "active" : ""
+                    }`}
                 >
                   <i className="fas fa-gift"></i>
                   <span>Package Entry</span>
@@ -3689,7 +4399,8 @@ export default function AdminPage() {
 
                 <button
                   onClick={() => setActiveTab("state")}
-                  className={`nav-item ${activeTab === "state" ? "active" : ""}`}
+                  className={`nav-item ${activeTab === "state" ? "active" : ""
+                    }`}
                 >
                   <i className="fas fa-map-marked-alt"></i>
                   <span>States & Places</span>
@@ -3697,7 +4408,8 @@ export default function AdminPage() {
 
                 <button
                   onClick={() => setActiveTab("tariff")}
-                  className={`nav-item ${activeTab === "tariff" ? "active" : ""}`}
+                  className={`nav-item ${activeTab === "tariff" ? "active" : ""
+                    }`}
                 >
                   <i className="fas fa-calculator"></i>
                   <span>Tariff Management</span>
@@ -3725,4 +4437,3 @@ export default function AdminPage() {
     </div>
   );
 }
-

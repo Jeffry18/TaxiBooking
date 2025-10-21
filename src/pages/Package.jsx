@@ -11,8 +11,10 @@ import {
   Col,
   Card,
   Alert,
+  Collapse,
 } from "react-bootstrap";
 import SERVER_URL from "../services/serverURL";
+
 
 const Packages = () => {
   const [packages, setPackages] = useState([]);
@@ -25,7 +27,7 @@ const Packages = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
-
+  const [openTripId, setOpenTripId] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // ✅ Search state
   const [message, setMessage] = useState(null);
   const navigate = useNavigate();
@@ -109,13 +111,17 @@ const Packages = () => {
     pkg.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const toggleOpen = (tripId) => {
+    setOpenTripId(openTripId === tripId ? null : tripId);
+  };
+
   return (
     <div className="container py-4" style={{ marginTop: "100px" }}>
       <div className="text-center mb-5">
         <h2 className="display-6 fw-bold text-primary mb-2">Travel Packages</h2>
         <div className="d-flex flex-column flex-lg-row align-items-center justify-content-center justify-content-lg-between mb-4 w-100">
           {/* Paragraph text */}
-          <p className="lead text-muted text-center text-lg-center mb-2  mb-lg-0 flex-grow-1" style={{marginLeft: isLargeScreen ? "19rem" : "0"}}>
+          <p className="lead text-muted text-center text-lg-center mb-2  mb-lg-0 flex-grow-1" style={{ marginLeft: isLargeScreen ? "19rem" : "0" }}>
             Discover amazing destinations with our curated travel packages
           </p>
 
@@ -276,123 +282,137 @@ const Packages = () => {
           <i className="bi bi-calendar-check me-2 text-primary"></i>
           <h4 className="mb-0">Your Enquires</h4>
         </div>
-        {sessionStorage.getItem("token") ? (
-          bookingsLoading ? (
-            <Spinner animation="border" />
-          ) : bookingsError ? (
-            <p className="text-danger">{bookingsError}</p>
-          ) : trips.length === 0 ? (
-            <p>No bookings found.</p>
-          ) : (
-            <>
-              {/* Desktop Table View */}
-              <div className="d-none d-md-block">
-                <Table
-                  striped
-                  bordered
-                  hover
-                  responsive
-                  className="bg-white rounded shadow-sm"
-                >
-                  <thead className="bg-light">
-                    <tr>
-                      <th className="border-0">
-                        <i className="bi bi-box me-1"></i>Package
-                      </th>
-                      <th className="border-0">
-                        <i className="bi bi-calendar me-1"></i>Date
-                      </th>
-                      <th className="border-0">
-                        <i className="bi bi-clock me-1"></i>Time
-                      </th>
-                      <th className="border-0">
-                        <i className="bi bi-people me-1"></i>Passengers
-                      </th>
-                      <th className="border-0">
-                        <i className="bi bi-currency-rupee me-1"></i>Price
-                      </th>
-                      <th className="border-0">
-                        <i className="bi bi-check-circle me-1"></i>Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {trips.map((trip) => (
-                      <tr key={trip._id}>
-                        <td className="fw-medium">{trip.packageName}</td>
-                        <td>{new Date(trip.date).toLocaleDateString()}</td>
-                        <td>{trip.time}</td>
-                        <td>{trip.passengers}</td>
-                        <td className="fw-bold text-primary">₹{trip.packagePrice}</td>
-                        <td>
-                          <span
-                            className={`badge ${trip.status === "confirmed"
-                              ? "bg-success"
-                              : trip.status === "pending"
-                                ? "bg-warning text-dark"
-                                : "bg-danger"
-                              }`}
-                          >
-                            {trip.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </div>
 
-              {/* Mobile Card View */}
-              <div className="d-md-none">
-                <Row className="g-3">
-                  {trips.map((trip) => (
-                    <Col xs={12} key={trip._id}>
-                      <Card className="shadow-sm border-0">
-                        <Card.Body className="p-3">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <h6 className="mb-0 text-primary">{trip.packageName}</h6>
-                            <span
-                              className={`badge ${trip.status === "confirmed"
-                                ? "bg-success"
-                                : trip.status === "pending"
-                                  ? "bg-warning text-dark"
-                                  : "bg-danger"
-                                }`}
-                            >
-                              {trip.status}
-                            </span>
-                          </div>
-                          <div className="row g-2 text-sm">
-                            <div className="col-6">
-                              <i className="bi bi-calendar me-1 text-muted"></i>
-                              <small>{new Date(trip.date).toLocaleDateString()}</small>
-                            </div>
-                            <div className="col-6">
-                              <i className="bi bi-clock me-1 text-muted"></i>
-                              <small>{trip.time}</small>
-                            </div>
-                            <div className="col-6">
-                              <i className="bi bi-people me-1 text-muted"></i>
-                              <small>{trip.passengers} passengers</small>
-                            </div>
-                            <div className="col-6">
-                              <i className="bi bi-currency-rupee me-1 text-muted"></i>
-                              <span className="fw-bold text-primary">
-                                ₹{trip.packagePrice}
-                              </span>
-                            </div>
-                          </div>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                  ))}
-                </Row>
-              </div>
-            </>
-          )
-        ) : (
-          <p className="text-muted">Please login to view your bookings.</p>
-        )}
+        {/* Desktop Table View */}
+        <div className="d-none d-md-block">
+          <Table striped bordered hover responsive className="bg-white rounded shadow-sm">
+            <thead className="bg-light">
+              <tr>
+                <th>Package</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Passengers</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Total Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {trips.map((trip) => (
+                <React.Fragment key={trip._id}>
+                  <tr>
+                    <td>{trip.packageName}</td>
+                    <td>{new Date(trip.date).toLocaleDateString()}</td>
+                    <td>{trip.time}</td>
+                    <td>{trip.passengers}</td>
+                    <td>₹{trip.packagePrice}</td>
+                    <td>
+                      <span
+                        className={`badge ${trip.status === "confirmed"
+                          ? "bg-success"
+                          : trip.status === "pending"
+                            ? "bg-warning text-dark"
+                            : "bg-danger"
+                          }`}
+                      >
+                        {trip.status}
+                      </span>
+                    </td>
+                    <td>
+                      <Button
+                        size="sm"
+                        variant="outline-primary"
+                        onClick={() => toggleOpen(trip._id)}
+                        aria-controls={`collapse-${trip._id}`}
+                        aria-expanded={openTripId === trip._id}
+                      >
+                        View Total
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan={7} className="p-0 border-0">
+                      <Collapse in={openTripId === trip._id}>
+                        <div id={`collapse-${trip._id}`} className="p-3 bg-light">
+                          <strong>Total Cost:</strong>{" "}
+                          {trip.passengers} × ₹{trip.packagePrice} ={" "}
+                          <span className="fw-bold text-primary">
+                            ₹{trip.passengers * trip.packagePrice}
+                          </span>
+                        </div>
+                      </Collapse>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="d-md-none">
+          <Row className="g-3">
+            {trips.map((trip) => (
+              <Col xs={12} key={trip._id}>
+                <Card className="shadow-sm border-0">
+                  <Card.Body className="p-3">
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <h6 className="mb-0 text-primary">{trip.packageName}</h6>
+                      <span
+                        className={`badge ${trip.status === "confirmed"
+                          ? "bg-success"
+                          : trip.status === "pending"
+                            ? "bg-warning text-dark"
+                            : "bg-danger"
+                          }`}
+                      >
+                        {trip.status}
+                      </span>
+                    </div>
+                    <div className="row g-2 text-sm mb-2">
+                      <div className="col-6">
+                        <i className="bi bi-calendar me-1 text-muted"></i>
+                        <small>{new Date(trip.date).toLocaleDateString()}</small>
+                      </div>
+                      <div className="col-6">
+                        <i className="bi bi-clock me-1 text-muted"></i>
+                        <small>{trip.time}</small>
+                      </div>
+                      <div className="col-6">
+                        <i className="bi bi-people me-1 text-muted"></i>
+                        <small>{trip.passengers} passengers</small>
+                      </div>
+                      <div className="col-6">
+                        <i className="bi bi-currency-rupee me-1 text-muted"></i>
+                        <span className="fw-bold text-primary">{trip.packagePrice}</span>
+                      </div>
+                    </div>
+
+                    {/* Toggle Total Cost */}
+                    <Button
+                      size="sm"
+                      variant="outline-primary"
+                      onClick={() => toggleOpen(trip._id)}
+                      aria-controls={`collapse-mobile-${trip._id}`}
+                      aria-expanded={openTripId === trip._id}
+                    >
+                      View Total
+                    </Button>
+                    <Collapse in={openTripId === trip._id}>
+                      <div id={`collapse-${trip._id}`} className="p-3 bg-light">
+                          <strong>Total Cost:</strong>{" "}
+                          {trip.passengers} × ₹{trip.packagePrice} ={" "}
+                          <span className="fw-bold text-primary">
+                            ₹{trip.passengers * trip.packagePrice}
+                          </span>
+                        </div>
+                    </Collapse>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
       </div>
     </div>
   );
