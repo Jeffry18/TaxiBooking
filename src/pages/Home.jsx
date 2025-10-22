@@ -46,18 +46,11 @@ export const Home = () => {
   const [message, setMessage] = useState("");
   const [places, setPlaces] = useState([]);
   const [tripType, setTripType] = useState("round");
-  const [selectedAirport, setSelectedAirport] = useState(null);
-  const [airportTripType, setAirportTripType] = useState("pickup");
   const [recent, setRecent] = useState([]);
   const [extraStops, setExtraStops] = useState([]); // for extra locations
   const [states, setStates] = useState([])
 
-  const keralaAirports = [
-    { value: "COK", label: "Cochin International Airport (COK)" },
-    { value: "TRV", label: "Trivandrum International Airport (TRV)" },
-    { value: "CCJ", label: "Calicut International Airport (CCJ)" },
-    { value: "CNN", label: "Kannur International Airport (CNN)" },
-  ];
+
 
   const scrollToBookingForm = () => {
     bookingFormRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -211,33 +204,32 @@ export const Home = () => {
         pickup: form.pickup,
         drop: form.drop,
         email: form.email || "",
-        extraStops: extraStops.filter(s => s.trim() !== "") || [], // ✅ include extra stops
         date: form.date,
         returnDate: form.returnDate,
         time: form.time,
         passengerCount: parseInt(form.passengerCount) || 1,
         phoneNumber: form.phoneNumber,
-        // tripType,
-        // airportTripType: tripType === "airport" ? airportTripType : null,
-        status: "pending",
-        // Google Places data for better location accuracy
+        extraStops: (extraStops || []).filter(s => s.trim() !== ""),
         pickupCoordinates: {
-          lat: form.pickupPlace.lat,
-          lng: form.pickupPlace.lng,
-          place_id: form.pickupPlace.place_id
+          lat: form.pickupPlace?.lat || "",
+          lng: form.pickupPlace?.lng || "",
+          place_id: form.pickupPlace?.place_id || ""
         },
         dropCoordinates: {
-          lat: form.dropPlace.lat,
-          lng: form.dropPlace.lng,
-          place_id: form.dropPlace.place_id
+          lat: form.dropPlace?.lat || "",
+          lng: form.dropPlace?.lng || "",
+          place_id: form.dropPlace?.place_id || ""
         },
-        extraStopCoordinates: form.extraStopPlaces.map(place => ({
-          lat: place.lat,
-          lng: place.lng,
-          place_id: place.place_id,
-          address: place.address
-        }))
+        extraStopCoordinates: Array.isArray(form.extraStopPlaces)
+          ? form.extraStopPlaces.map(place => ({
+            lat: place?.lat || "",
+            lng: place?.lng || "",
+            place_id: place?.place_id || "",
+            address: place?.address || ""
+          }))
+          : []
       };
+
 
 
       // cab types are already loaded on mount
@@ -269,6 +261,8 @@ export const Home = () => {
           vehicleType: "",
           passengerCount: "",
           phoneNumber: "",
+          extraStopPlaces: [],
+          
         });
 
         // refresh bookings after new booking
@@ -289,8 +283,7 @@ export const Home = () => {
     }
   };
 
-  // const isAirport = tripType === "airport";
-  // const isRound = tripType === "round";
+
   const row1Cols = 4;
   const row1Lg = 12 / row1Cols;
   const row2Cols = 4;
@@ -406,12 +399,12 @@ export const Home = () => {
                         <Col key={index} lg={3} md={6} className="booking-field">
                           <div className="d-flex align-items-end">
                             <div style={{ flexGrow: 1 }}>
-                            <SimpleGooglePlaces
-                              label={`Stop ${index + 1}`}
-                              onPlaceSelect={(place) => handleExtraStopPlaceSelect(index, place)}
-                              placeholder="Enter extra stop location"
-                              className="booking-input"
-                            />
+                              <SimpleGooglePlaces
+                                label={`Stop ${index + 1}`}
+                                onPlaceSelect={(place) => handleExtraStopPlaceSelect(index, place)}
+                                placeholder="Enter extra stop location"
+                                className="booking-input"
+                              />
                             </div>
                             <Button
                               className="remove-stop-btn"
@@ -437,7 +430,7 @@ export const Home = () => {
                         value={form.date}
                         onChange={handleChange}
                         min={new Date().toISOString().split("T")[0]}
-                      required
+                        required
                       />
                     </Col>
 
@@ -660,7 +653,7 @@ export const Home = () => {
         </div>
 
 
-        
+
 
         {showAlert && (
           <div style={{
@@ -745,7 +738,7 @@ export const Home = () => {
 
         {/* Cab Type Preview List */}
         <h5 className=" fw-bold text-center cab-heading" >Available Cab Types</h5>
-        
+
         {/* Error and Loading States */}
         {loading && (
           <Row className="" style={{ marginTop: "320px" }}>

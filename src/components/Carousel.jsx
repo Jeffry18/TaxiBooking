@@ -92,14 +92,7 @@ function HomeCarousel() {
         ))}
       </Carousel>
       
-      <div className="hero-scroll-indicator">
-        <div className="scroll-arrow">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <p>Scroll Down</p>
-      </div>
+      
     </div>
   )
 }

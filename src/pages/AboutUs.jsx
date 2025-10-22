@@ -94,12 +94,7 @@ export const AboutUs = () => {
             </Col>
           </Row>
         </Container>
-        <div className="">
-          <div className="scroll-mouse">
-            <div className="scroll-wheel"></div>
-          </div>
-          <span>Scroll to explore</span>
-        </div>
+        
       </section>
 
       {/* Our Story Section */}

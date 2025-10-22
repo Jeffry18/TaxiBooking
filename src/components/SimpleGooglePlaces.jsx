@@ -80,8 +80,8 @@ const SimpleGooglePlaces = ({
   }, []);
 
   return (
-    <Form.Group className="mb-3">
-      {label && <Form.Label>{label} {required && <span className="text-danger">*</span>}</Form.Label>}
+    <Form.Group className="">
+      {label && <Form.Label className="booking-label">{label} {required && <span className="text-danger"></span>}</Form.Label>}
       <Form.Control
         ref={inputRef}
         type="text"
@@ -90,9 +90,7 @@ const SimpleGooglePlaces = ({
         autoComplete="off"
         required={required}
       />
-      <Form.Text className="text-muted">
-        <small>Start typing for location suggestions</small>
-      </Form.Text>
+      
     </Form.Group>
   );
 };
