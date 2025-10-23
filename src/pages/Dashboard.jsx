@@ -3125,18 +3125,30 @@ export default function AdminPage() {
                     )}
                   </td>
                   <td>
-                    {state.image ? (
-                      <img
-                        src={`${SERVER_URL}/uploads/${state.image}`}
-                        alt={state.name}
-                        style={{
-                          width: "80px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
+                    {editingState === state._id ? (
+                      <input
+                        type="file"
+                        className="edit-inputState"
+                        onChange={(e) =>
+                          setEditedState({
+                            ...editedState,
+                            newImage: e.target.files[0],
+                          })
+                        }
+                        accept="image/*"
                       />
                     ) : (
-                      "No Image"
+                      state.image && (
+                        <img
+                          src={`${SERVER_URL}/uploads/${state.image}`}
+                          alt={state.name}
+                          style={{
+                            height: "50px",
+                            width: "50px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      )
                     )}
                   </td>
                   <td>

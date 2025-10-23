@@ -15,7 +15,7 @@ const Auth = ({ insideRegister }) => {
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   const validateUsername = (username) => /^[a-zA-Z0-9]{5,}$/.test(username)
   const validatePassword = (password) =>
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(password)
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/.test(password);
 
   // Register
   const handleRegister = async (e) => {
@@ -107,7 +107,7 @@ const Auth = ({ insideRegister }) => {
             <div className="col-lg-10 col-xl-8">
               <div className="auth-card">
                 <div className="row g-0">
-                  
+
                   {/* Left Side */}
                   <div className="col-lg-6 auth-brand-side">
                     <div className="auth-brand-content">
@@ -152,7 +152,7 @@ const Auth = ({ insideRegister }) => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Right Side - Form */}
                   <div className="col-lg-6 auth-form-side">
                     <div className="auth-form-content">
@@ -204,10 +204,10 @@ const Auth = ({ insideRegister }) => {
                           />
                         </FloatingLabel>
 
-                        
-                      
-                    
-                    {insideRegister ? (
+
+
+
+                        {insideRegister ? (
                           <div className="form-actions">
                             <button
                               onClick={handleRegister}
@@ -220,7 +220,7 @@ const Auth = ({ insideRegister }) => {
                               </div>
                             </button>
 
-                            
+
                           </div>
                         ) : (
                           <div className="form-actions">
@@ -263,7 +263,7 @@ const Auth = ({ insideRegister }) => {
             </div>
           </div>
         </div>
-      </div>  
+      </div>
     </div>
   )
 }

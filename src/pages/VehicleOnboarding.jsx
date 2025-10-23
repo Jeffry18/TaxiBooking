@@ -11,7 +11,140 @@ import {
   Table,
   Alert,
   Spinner,
+  Modal,
 } from "react-bootstrap";
+
+
+function VehicleFilesCell({ files }) {
+  const [showModal, setShowModal] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+
+  const handleFileClick = (file) => {
+    const fileUrl = `${SERVER_URL}/uploads/${file}`;
+    if (file.toLowerCase().endsWith(".pdf")) {
+      window.open(fileUrl, "_blank");
+    } else {
+      setPreviewImage(fileUrl);
+    }
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
+    setPreviewImage(null);
+  };
+
+  return (
+    <>
+      <Button
+        variant="outline-primary"
+        size="sm"
+        onClick={() => setShowModal(true)}
+      >
+        View Files
+      </Button>
+
+      <Modal show={showModal} onHide={handleClose} centered size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Vehicle Files</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {previewImage ? (
+            <div className="text-center">
+              <img
+                src={previewImage}
+                alt="Preview"
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "80vh",
+                  borderRadius: "8px",
+                }}
+              />
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              {files && files.length > 0 ? (
+                files.map((file, index) => {
+                  const isPdf = file.toLowerCase().endsWith(".pdf");
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => handleFileClick(file)}
+                      style={{
+                        cursor: "pointer",
+                        textAlign: "center",
+                        width: "80px",
+                      }}
+                    >
+                      {isPdf ? (
+                        <div
+                          style={{
+                            width: "60px",
+                            height: "60px",
+                            border: "1px solid #ccc",
+                            borderRadius: "6px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            background: "#f9f9f9",
+                          }}
+                        >
+                          <i
+                            className="fas fa-file-pdf"
+                            style={{ fontSize: "28px", color: "#d9534f" }}
+                          ></i>
+                        </div>
+                      ) : (
+                        <img
+                          src={`${SERVER_URL}/uploads/${file}`}
+                          alt={`File ${index + 1}`}
+                          style={{
+                            width: "60px",
+                            height: "60px",
+                            objectFit: "cover",
+                            borderRadius: "6px",
+                            border: "1px solid #ddd",
+                          }}
+                        />
+                      )}
+                      <small
+                        style={{
+                          display: "block",
+                          marginTop: "4px",
+                          fontSize: "12px",
+                          color: "#555",
+                          wordBreak: "break-all",
+                        }}
+                      >
+                        {file.slice(0, 10)}...
+                      </small>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-muted">No files available</p>
+              )}
+            </div>
+          )}
+        </Modal.Body>
+        {previewImage && (
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setPreviewImage(null)}>
+              Back to Files
+            </Button>
+          </Modal.Footer>
+        )}
+      </Modal>
+    </>
+  );
+}
+
 
 export default function VehicleOnboarding() {
   const [form, setForm] = useState({
@@ -303,22 +436,9 @@ export default function VehicleOnboarding() {
                     <span className="badge bg-success">Approved</span>
                   </td>
                   <td>
-                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                      {v.images && v.images.map((image, index) => (
-                        <img
-                          key={index}
-                          src={`${SERVER_URL}/uploads/${image}`}
-                          alt={`Vehicle ${index + 1}`}
-                          style={{
-                            width: '50px',
-                            height: '50px',
-                            objectFit: 'cover',
-                            borderRadius: '4px'
-                          }}
-                        />
-                      ))}
-                    </div>
+                    <VehicleFilesCell files={v.images} />
                   </td>
+
                 </tr>
               ))}
             </tbody>
