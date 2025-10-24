@@ -122,9 +122,9 @@ export const Footer = () => {
           {/* contact */}
           <div className="col-12 col-md-6 col-lg-5">
             <h5 className="mt-3 mb-4">Contacts</h5>
-            <p>Address : </p>
-            <p>Email : <a href=""></a></p>
-            <p>Phone : </p>
+            <div className="d-flex"><p className="">Address : </p> <p className="ms-2">NH, Aluva, <br />Kochi, Kerala, <br />India</p></div>
+            <p>Email : <a href="mailto:info@flymallu.com">info@flymallu.com</a></p>
+            <p>Phone : +91 8089084080</p>
             
 
             {/* Social Media Icons */}

@@ -39,7 +39,7 @@ const ContactUs = () => {
               <i className="fas fa-map-marker-alt fa-2x mb-3"></i>
               <Card.Title>Address</Card.Title>
               <Card.Text>
-                123 Main Street<br />
+                NH, Aluva<br />
                 Kochi, Kerala<br />
                 India
               </Card.Text>
@@ -53,7 +53,7 @@ const ContactUs = () => {
               <i className="fas fa-envelope fa-2x mb-3"></i>
               <Card.Title>Email</Card.Title>
               <Card.Text>
-                support@flymallu.com
+                info@flymallu.com
               </Card.Text>
             </Card.Body>
           </Card>
@@ -65,7 +65,7 @@ const ContactUs = () => {
               <i className="fas fa-phone fa-2x mb-3"></i>
               <Card.Title>Phone</Card.Title>
               <Card.Text>
-                +91 9876543210
+                +91 8089084080
               </Card.Text>
             </Card.Body>
           </Card>
