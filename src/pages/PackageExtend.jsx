@@ -85,45 +85,42 @@ const PackageExtend = () => {
   };
 
   const handleSubmitBooking = async (e) => {
-    e.preventDefault();
-    const token = sessionStorage.getItem("token");
-    if (!token) {
-      setMessage({ type: "danger", text: "❌ Please login to book a package." });
-      return;
+  e.preventDefault();
+
+  const validationError = validateBookingForm();
+  if (validationError) {
+    setMessage({ type: "danger", text: validationError });
+    return;
+  }
+
+  setSubmitting(true);
+  try {
+    const bookingData = {
+      ...bookingForm,
+      packageId: packageData._id,
+      packageName: packageData.name,
+      packagePrice: packageData.price,
+      packageDestination: packageData.destination,
+    };
+
+    const response = await axios.post(`${SERVER_URL}/trips`, bookingData, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.data.success) {
+      setMessage({ type: "success", text: "✅ Booking submitted successfully!" });
+      setTimeout(() => handleCloseModal(), 2000);
+    } else {
+      setMessage({ type: "danger", text: response.data.message || "❌ Booking failed. Please try again." });
     }
+  } catch (err) {
+    console.error(err);
+    setMessage({ type: "danger", text: "❌ Error submitting booking. Please try again." });
+  } finally {
+    setSubmitting(false);
+  }
+};
 
-    const validationError = validateBookingForm();
-    if (validationError) {
-      setMessage({ type: "danger", text: validationError });
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const bookingData = {
-        ...bookingForm,
-        packageId: packageData._id,
-        packageName: packageData.name,
-        packagePrice: packageData.price,
-      };
-
-      const response = await axios.post(`${SERVER_URL}/trips`, bookingData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.data.success) {
-        setMessage({ type: "success", text: "✅ Booking submitted successfully!" });
-        setTimeout(() => handleCloseModal(), 2000);
-      } else {
-        setMessage({ type: "danger", text: response.data.message || "❌ Booking failed. Please try again." });
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "danger", text: "❌ Error submitting booking. Please try again after logging in." });
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   // ---------------------- JSX ----------------------
   return (

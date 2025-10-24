@@ -278,13 +278,13 @@ const Packages = () => {
 
       {/* ✅ User Trips */}
       <div className="mt-5">
-        <div className="d-flex align-items-center mb-4">
+        {/* <div className="d-flex align-items-center mb-4">
           <i className="bi bi-calendar-check me-2 text-primary"></i>
           <h4 className="mb-0">Your Enquires</h4>
-        </div>
+        </div> */}
 
         {/* Desktop Table View */}
-        <div className="d-none d-md-block">
+        {/* <div className="d-none d-md-block">
           <Table striped bordered hover responsive className="bg-white rounded shadow-sm">
             <thead className="bg-light">
               <tr>
@@ -347,10 +347,10 @@ const Packages = () => {
               ))}
             </tbody>
           </Table>
-        </div>
+        </div> */}
 
         {/* Mobile Card View */}
-        <div className="d-md-none">
+        {/* <div className="d-md-none">
           <Row className="g-3">
             {trips.map((trip) => (
               <Col xs={12} key={trip._id}>
@@ -388,7 +388,7 @@ const Packages = () => {
                       </div>
                     </div>
 
-                    {/* Toggle Total Cost */}
+                    
                     <Button
                       size="sm"
                       variant="outline-primary"
@@ -412,7 +412,7 @@ const Packages = () => {
               </Col>
             ))}
           </Row>
-        </div>
+        </div> */}
       </div>
     </div>
   );

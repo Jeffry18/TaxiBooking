@@ -68,16 +68,16 @@ export const AboutUs = () => {
 
                 <div className="about-hero-stats">
                   <div className="stat-item">
-                    <span className="stat-number">14+</span>
-                    <span className="stat-label">Years Experience</span>
+                    <span className="stat-number" >14+</span>
+                    <span className="stat-label" style={{color:"black"}}>Years Experience</span>
                   </div>
                   <div className="stat-item">
                     <span className="stat-number">10K+</span>
-                    <span className="stat-label">Happy Customers</span>
+                    <span className="stat-label" style={{color:"black"}}>Happy Customers</span>
                   </div>
                   <div className="stat-item">
                     <span className="stat-number">100%</span>
-                    <span className="stat-label">Satisfaction Rate</span>
+                    <span className="stat-label" style={{color:"black"}}>Satisfaction Rate</span>
                   </div>
                 </div>
 

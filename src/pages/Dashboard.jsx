@@ -2423,6 +2423,7 @@ export default function AdminPage() {
                       <>
                         <strong>{trip.packageName}</strong><br />
                         <small className="text-muted">₹{trip.packagePrice}</small>
+                        <small className="text-muted d-block">📍 {trip.packageDestination}</small>
                       </>
                     )}
                   </td>
